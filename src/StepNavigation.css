@@ -1,0 +1,116 @@
+.step-navigation {
+  background: #fff;
+  padding: 2rem 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.steps-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.step-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.step-circle.active {
+  background: #374151;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.step-circle.active .step-dot {
+  background: #fff;
+}
+
+.step-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #9ca3af;
+  text-align: center;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.step-label.active {
+  color: #374151;
+  font-weight: 600;
+}
+
+.step-line {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: #d1d5db;
+  z-index: 1;
+}
+
+.step-item:last-child .step-line {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .step-navigation {
+    padding: 1.5rem 0;
+  }
+
+  .steps-container {
+    padding: 0 1rem;
+  }
+
+  .step-label {
+    font-size: 0.75rem;
+  }
+
+  .step-circle {
+    width: 16px;
+    height: 16px;
+  }
+
+  .step-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .step-line {
+    top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-label {
+    font-size: 0.7rem;
+    max-width: 80px;
+    line-height: 1.2;
+  }
+}

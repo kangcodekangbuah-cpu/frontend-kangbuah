@@ -21,6 +21,9 @@ export default function Navbar() {
           <a href="#values" className="nav-link">
             Nilai
           </a>
+          <Link to="/catalog" className="nav-link">
+            Katalog
+          </Link>
           <a href="#contact" className="nav-link">
             Kontak
           </a>
