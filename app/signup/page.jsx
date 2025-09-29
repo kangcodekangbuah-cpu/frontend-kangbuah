@@ -167,7 +167,7 @@ export default function SignupPage() {
 
             <div className="auth-footer">
               <span>Sudah punya akun? </span>
-              <Link href="/login" className="auth-link">
+              <Link to="/login" className="auth-link">
                 Masuk
               </Link>
             </div>

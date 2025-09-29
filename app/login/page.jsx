@@ -79,7 +79,7 @@ export default function LoginPage() {
                 <span className="checkmark"></span>
                 Ingat saya
               </label>
-              <Link href="/forgot-password" className="forgot-password">
+              <Link to="/forgot-password" className="forgot-password">
                 Forgot password?
               </Link>
             </div>
@@ -116,7 +116,7 @@ export default function LoginPage() {
 
             <div className="auth-footer">
               <span>Belum punya akun? </span>
-              <Link href="/signup" className="auth-link">
+              <Link to="/signup" className="auth-link">
                 Buat akun
               </Link>
             </div>
