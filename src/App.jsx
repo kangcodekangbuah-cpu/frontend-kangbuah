@@ -1,9 +1,9 @@
 // App.jsx
 import { Routes, Route } from "react-router-dom"
 import HomePage from "/src/HomePage"
-import LoginPage from "/App/login/page"
-import SignupPage from "/App/signup/page"
-import CatalogPage from "/App/catalog/page"
+import LoginPage from "/app/login/page"
+import RegisterPage from "/app/register/page"
+import CatalogPage from "/app/catalog/page"
 
 export default function App() {
   return (
@@ -13,7 +13,7 @@ export default function App() {
 
       {/* Auth Pages */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/catalog" element={<CatalogPage />} />
     </Routes>
   )

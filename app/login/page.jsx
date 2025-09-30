@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import axios from "axios"
 import "./login.css"
 
 export default function LoginPage() {
@@ -21,34 +22,31 @@ export default function LoginPage() {
   }
 
   const handleSubmit = async (e) => {
-  e.preventDefault()
-  try {
-    const res = await fetch("http://localhost:3000/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    e.preventDefault()
+    try {
+      const res = await axios.post("http://localhost:3000/auth/login", {
         email: formData.email,
         password: formData.password,
-      }),
-    })
+      })
 
-    if (!res.ok) {
-      throw new Error("Login gagal")
-    }
+      console.log("Login success:", res.data)
 
-    const data = await res.json()
-    console.log("Login success:", data)
+      // Simpan token dari response backend
+      localStorage.setItem("token", res.data.accessToken)
 
-    // Simpan token dari backend
-    localStorage.setItem("token", data.accessToken)
-
-    // Redirect setelah login
-    window.location.to = "/catalog"
-  } catch (err) {
-    console.error(err)
-    alert("Email atau password salah")
+      // Redirect setelah login
+      window.location.href = "/catalog"
+    } catch (err) {
+      if (err.response) {
+        console.error("Error response:", err.response.data)
+        alert(err.response.data.message || "Email atau password salah")
+      } else {
+        console.error("Error:", err.message)
+        alert("Terjadi kesalahan jaringan")
+      }
     }
   }
+
 
   return (
     <div className="auth-container">

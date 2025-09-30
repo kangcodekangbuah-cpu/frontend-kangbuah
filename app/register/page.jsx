@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import "./signup.css"
+import "./register.css"
 
-export default function SignupPage() {
+export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
