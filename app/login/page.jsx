@@ -20,9 +20,34 @@ export default function LoginPage() {
     }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log("Login form submitted:", formData)
+  const handleSubmit = async (e) => {
+  e.preventDefault()
+  try {
+    const res = await fetch("http://localhost:3000/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+      }),
+    })
+
+    if (!res.ok) {
+      throw new Error("Login gagal")
+    }
+
+    const data = await res.json()
+    console.log("Login success:", data)
+
+    // Simpan token dari backend
+    localStorage.setItem("token", data.accessToken)
+
+    // Redirect setelah login
+    window.location.to = "/catalog"
+  } catch (err) {
+    console.error(err)
+    alert("Email atau password salah")
+    }
   }
 
   return (

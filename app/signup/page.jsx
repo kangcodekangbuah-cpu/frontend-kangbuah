@@ -24,10 +24,45 @@ export default function SignupPage() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log("Signup form submitted:", formData)
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Password dan konfirmasi password tidak sama!")
+      return
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          username: formData.name,          // mapping ke "username"
+          phone_number: formData.phone,     // mapping ke "phone_number"
+          company_name: null,               // kalau belum ada
+          npwp: null,                       // kalau belum ada
+        }),
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message || "Signup gagal")
+      }
+
+      const data = await res.json()
+      console.log("Signup success:", data)
+
+      alert("Registrasi berhasil! Silakan cek email untuk verifikasi lalu login.")
+      window.location.to = "/login"
+    } catch (err) {
+      console.error("Signup error:", err)
+      alert(err.message)
+    }
   }
+
 
   return (
     <div className="auth-container">
