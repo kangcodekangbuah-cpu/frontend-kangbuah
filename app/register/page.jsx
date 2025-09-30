@@ -2,6 +2,9 @@
 
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import axios from "axios"
+import { auth, googleProvider } from "../../src/utils/firebase"
+import { signInWithPopup } from "firebase/auth"
 import "./register.css"
 
 export default function RegisterPage() {
@@ -24,6 +27,7 @@ export default function RegisterPage() {
     }))
   }
 
+  // ===== REGISTER MANUAL =====
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -33,33 +37,39 @@ export default function RegisterPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          username: formData.name,          // mapping ke "username"
-          phone_number: formData.phone,     // mapping ke "phone_number"
-          company_name: null,               // kalau belum ada
-          npwp: null,                       // kalau belum ada
-        }),
+      const res = await axios.post("http://localhost:3000/auth/register", {
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        username: formData.name,
+        phone_number: formData.phone,
+        company_name: null,
+        npwp: null,
       })
 
-      if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.message || "Signup gagal")
-      }
-
-      const data = await res.json()
-      console.log("Signup success:", data)
-
+      console.log("Signup success:", res.data)
       alert("Registrasi berhasil! Silakan cek email untuk verifikasi lalu login.")
-      window.location.to = "/login"
+      window.location.href = "/login"
     } catch (err) {
       console.error("Signup error:", err)
-      alert(err.message)
+      alert(err.response?.data?.message || "Signup gagal")
+    }
+  }
+
+  // ===== REGISTER/LOGIN GOOGLE =====
+  const handleGoogleRegister = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider)
+      const token = await result.user.getIdToken()
+
+      const res = await axios.post("http://localhost:3000/auth/google/login", { token })
+
+      console.log("Google signup success:", res.data)
+      alert("Login dengan Google berhasil!")
+      window.location.href = "/HomePage"
+    } catch (err) {
+      console.error("Google signup error:", err)
+      alert("Gagal daftar dengan Google")
     }
   }
 
@@ -175,10 +185,10 @@ export default function RegisterPage() {
             </div>
 
             <button type="submit" className="auth-submit-btn">
-              Masuk
+              Daftar
             </button>
 
-            <button type="button" className="google-auth-btn">
+            <button type="button" className="google-auth-btn" onClick={handleGoogleRegister}>
               <svg width="20" height="20" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -212,3 +222,4 @@ export default function RegisterPage() {
     </div>
   )
 }
+

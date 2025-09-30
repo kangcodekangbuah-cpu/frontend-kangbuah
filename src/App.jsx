@@ -9,7 +9,7 @@ export default function App() {
   return (
     <Routes>
       {/* Landing Page */}
-      <Route path="/" element={<HomePage />} />
+      <Route path="/HomePage" element={<HomePage />} />
 
       {/* Auth Pages */}
       <Route path="/login" element={<LoginPage />} />

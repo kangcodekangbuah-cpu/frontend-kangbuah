@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import axios from "axios"
+import { auth, googleProvider } from "../../src/utils/firebase"
+import { signInWithPopup } from "firebase/auth"
 import "./login.css"
 
 export default function LoginPage() {
@@ -47,6 +49,22 @@ export default function LoginPage() {
     }
   }
 
+    // ===== LOGIN GOOGLE =====
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider)
+      const token = await result.user.getIdToken()
+
+      const res = await axios.post("http://localhost:3000/auth/google/login", { token })
+
+      console.log("Google signup success:", res.data)
+      alert("Login dengan Google berhasil!")
+      window.location.href = "/HomePage"
+    } catch (err) {
+      console.error("Google Login error:", err)
+      alert("Gagal login dengan Google")
+    }
+  }
 
   return (
     <div className="auth-container">
@@ -115,7 +133,7 @@ export default function LoginPage() {
               <span>atau</span>
             </div>
 
-            <button type="button" className="google-auth-btn">
+            <button type="button" className="google-auth-btn" onClick={handleGoogleLogin}>
               <svg width="20" height="20" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -139,7 +157,7 @@ export default function LoginPage() {
 
             <div className="auth-footer">
               <span>Belum punya akun? </span>
-              <Link to="/signup" className="auth-link">
+              <Link to="/register" className="auth-link">
                 Buat akun
               </Link>
             </div>
