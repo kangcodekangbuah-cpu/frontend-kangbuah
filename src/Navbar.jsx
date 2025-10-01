@@ -32,7 +32,7 @@ export default function Navbar() {
           <Link to="/login" className="btn-login">
             Login
           </Link>
-          <Link to="/signup" className="btn-signup">
+          <Link to="/register" className="btn-signup">
             Sign Up
           </Link>
         </div>
