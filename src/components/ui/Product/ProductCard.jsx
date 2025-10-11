@@ -3,10 +3,15 @@ import defaultImage from "../../../assets/kiwi.jpg"
 import "./ProductCard.css";
 
 const ProductCard = ({ product }) => {
+
+  const imageUrl =
+    product.image_url && Array.isArray(product.image_url) && product.image_url.length > 0
+      ? product.image_url[0]
+      : defaultImage;
   return (
     <div className="product-card">
       <div className="product-image-container">
-        <img src={product.image && product.image.startsWith("http") ? product.image : defaultImage} alt={product.name} className="product-image" />
+        <img src={imageUrl} alt={product.name} className="product-image" />
       </div>
       <div className="product-info">
         <h3 className="product-name">{product.name}</h3>
