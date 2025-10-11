@@ -11,12 +11,6 @@ const Header = ({ title }) => {
     navigate(-1);
   };
 
-  // Fungsi untuk logout
-  const handleLogout = () => {
-    // Di sini Anda akan menambahkan logika logout (misal: hapus token, dll)
-    console.log("Pengguna logout");
-    navigate('/login'); // Arahkan ke halaman login setelah logout
-  };
 
   return (
     <header className="page-header">
@@ -25,9 +19,6 @@ const Header = ({ title }) => {
           <span>&#8592;</span> Kembali
         </button>
         <h1 className="header-title">{title}</h1>
-        <button onClick={handleLogout} className="header-btn logout-btn">
-          Logout
-        </button>
       </div>
     </header>
   );

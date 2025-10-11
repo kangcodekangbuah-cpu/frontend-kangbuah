@@ -1,10 +1,27 @@
-import { useState } from "react"; // 1. Impor useState
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react"; // 1. Impor useState
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 import "./Navbar.css";
 
 export default function Navbar() {
   // 2. Buat state untuk mengontrol menu mobile
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false); 
+    handleLinkClick(); 
+    toast.success("Logout berhasil")
+  };
 
   // Fungsi untuk menutup menu saat link diklik
   const handleLinkClick = () => {
@@ -29,9 +46,18 @@ export default function Navbar() {
           <a href="#contact" className="nav-link">Kontak</a>
         </div>
         <div className="nav-buttons-desktop">
-          <Link to="/catalog" className="btn-login">Katalog</Link>
-          <Link to="/login" className="btn-login">Login</Link>
-          <Link to="/register" className="btn-signup">Sign Up</Link>
+          {isLoggedIn ? (
+            <>
+              <Link to="/catalog" className="btn-login">Katalog</Link>
+              <button onClick={handleLogout} className="btn-signup">Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/catalog" className="btn-login">Katalog</Link>
+              <Link to="/login" className="btn-login">Login</Link>
+              <Link to="/register" className="btn-signup">Sign Up</Link>
+            </>
+          )}
         </div>
 
         {/* --- Tombol Hamburger untuk Mobile --- */}
@@ -45,9 +71,18 @@ export default function Navbar() {
       {/* --- Menu Mobile (muncul saat hamburger diklik) --- */}
       <div className={`mobile-menu ${isMenuOpen ? "open" : ""}`}>
         <div className="mobile-buttons">
-          <Link to="/catalog" className="btn-login" onClick={handleLinkClick}>Katalog</Link>
-          <Link to="/login" className="btn-login" onClick={handleLinkClick}>Login</Link>
-          <Link to="/register" className="btn-signup" onClick={handleLinkClick}>Sign Up</Link>
+          {isLoggedIn ? (
+            <>
+              <Link to="/catalog" className="btn-login" onClick={handleLinkClick}>Katalog</Link>
+              <button onClick={handleLogout} className="btn-signup">Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/catalog" className="btn-login" onClick={handleLinkClick}>Katalog</Link>
+              <Link to="/login" className="btn-login" onClick={handleLinkClick}>Login</Link>
+              <Link to="/register" className="btn-signup" onClick={handleLinkClick}>Sign Up</Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
