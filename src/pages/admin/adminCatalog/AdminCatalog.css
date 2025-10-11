@@ -1,0 +1,285 @@
+/* --- Global & Layout Utama --- */
+.admin-cat-page {
+  background-color: #f4f7f6;
+  min-height: 100vh;
+}
+
+.maxw {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* --- Header Admin --- */
+.admin-cat-header {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.hdr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-ans {
+  font-size: 1.75rem;
+  font-weight: bold;
+  background: linear-gradient(45deg, #ff6b35, #f7931e, #7cb342);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.admin-nav .nav-item {
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+  padding-bottom: 5px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.admin-nav .nav-item:hover {
+  color: #2e7d32;
+}
+
+.admin-nav .nav-item.active {
+  color: #2e7d32;
+  border-bottom-color: #2e7d32;
+}
+
+.logout {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout:hover {
+  background: #c62828;
+}
+
+/* --- Main Content & Toolbar --- */
+.admin-cat-main {
+  padding: 2rem 0;
+}
+
+.toolbar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.search,
+.filter {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+}
+
+.search {
+  flex: 1;
+}
+
+.filter {
+  min-width: 200px;
+}
+
+/* --- Layout Grid (Form & Table) --- */
+.grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+/* --- Card (Style dasar untuk form dan tabel) --- */
+.form-card,
+.table-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.form-card h3,
+.table-card h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* --- Form Card --- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.form input,
+.form select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form input:focus,
+.form select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.save,
+.cancel {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.save {
+  background: #4caf50;
+  color: white;
+}
+.save:hover {
+  background: #45a049;
+}
+
+.cancel {
+  background: #e0e0e0;
+  color: #333;
+}
+.cancel:hover {
+  background: #bdbdbd;
+}
+
+
+/* --- Table Card --- */
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.table th {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.noimg {
+  display: inline-block;
+  width: 50px;
+  text-align: center;
+  color: #aaa;
+}
+
+.actions-td {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit,
+.del {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+.edit:hover, .del:hover {
+  transform: scale(1.05);
+}
+
+.edit {
+  background: #2196F3; /* Biru */
+}
+.del {
+  background: #F44336; /* Merah */
+}
+
+.empty td {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+  font-style: italic;
+}
+
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: 1fr; /* Stack form dan tabel */
+  }
+}
+
+@media (max-width: 768px) {
+  .hdr-row {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

@@ -9,6 +9,7 @@ import PasswordInput from "../../components/features/Auth/PasswordInput";
 import GoogleAuthButton from "../../components/features/Auth/GoogleAuthButton";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
+import { jwtDecode } from "jwt-decode";
 import "../register/RegisterPage.css"
 
 export default function LoginPage() {
@@ -35,22 +36,26 @@ export default function LoginPage() {
         password: formData.password,
       })
 
-      console.log("Login success:", res.data)
-
       // Simpan token dari response backend
       localStorage.setItem("token", res.data.data.accessToken)
+      const decodeToken = jwtDecode(res.data.data.accessToken)
+      localStorage.setItem("role", decodeToken.role)
       toast.success('Login berhasil! Mengalihkan...');
 
-      // Redirect setelah login
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
+
+      if (decodeToken.role == "ADMIN") {
+        setTimeout(() => {
+          navigate("/admin/catalog");
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      }
     } catch (err) {
       if (err.response) {
-        console.error("Error response:", err.response.data)
         toast.error(err.response.data.message || "Email atau password salah");
       } else {
-        console.error("Error:", err.message)
         toast.error("Terjadi kesalahan pada server. Coba lagi nanti.");
       }
     }
@@ -64,13 +69,35 @@ export default function LoginPage() {
 
       const res = await axios.post("http://localhost:3000/auth/google/login", { token })
 
-      console.log("Google signup success:", res.data)
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
+      const accessToken = res.data?.data?.accessToken;
+      if (!accessToken) {
+        throw new Error("Token tidak diterima dari server.");
+      }
+
+      localStorage.setItem("token", res.data.data.accessToken)
+      const decodeToken = jwtDecode(res.data.data.accessToken)
+      localStorage.setItem("role", decodeToken.role)
+      toast.success('Login berhasil! Mengalihkan...');
+
+      if (decodeToken.role == "ADMIN") {
+        setTimeout(() => {
+          navigate("/admin/catalog");
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      }
     } catch (err) {
-      console.error("Google Login error:", err)
-      alert("Gagal login dengan Google")
+      console.error("Detail Error Google Login:", err);
+
+      if (err.code === 'auth/popup-closed-by-user') {
+        toast.info("Proses login dengan Google dibatalkan.");
+      } else if (err.response) {
+        toast.error(err.response.data.message || "Gagal login dengan Google.");
+      } else {
+        toast.error("Gagal login dengan Google. Coba lagi nanti.");
+      }
     }
   }
 

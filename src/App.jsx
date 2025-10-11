@@ -6,6 +6,7 @@ import HomePage from "../src/pages/home/HomePage"
 import LoginPage from "../src/pages/login/LoginPage"
 import RegisterPage from "../src/pages/register/RegisterPage"
 import CatalogPage from "../src/pages/catalog/CatalogPage"
+import AdminCatalogPage from "./pages/admin/adminCatalog/AdminCatalogPage";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/catalog" element={<CatalogPage />} />
+        <Route path="/admin/catalog" element={<AdminCatalogPage />} />
       </Routes>
 
       <ToastContainer

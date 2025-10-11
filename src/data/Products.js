@@ -36,7 +36,7 @@ export const products = {
 
 // Buat satu array kategori yang bisa dipakai di mana saja
 export const categories = [
-    { id: "fruits", name: "Buah-buahan", count: products.fruits.length },
-    { id: "vegetables", name: "Sayuran", count: products.vegetables.length },
-    { id: "special", name: "Permintaan Khusus", count: products.special.length },
+    { id: "BUAH", name: "Buah-buahan", count: products.fruits.length },
+    { id: "SAYUR", name: "Sayuran", count: products.vegetables.length },
+    { id: "LAIN_LAIN", name: "Permintaan Khusus", count: products.special.length },
 ];

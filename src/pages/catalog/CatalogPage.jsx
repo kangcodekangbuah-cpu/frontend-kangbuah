@@ -15,7 +15,7 @@ import "./CatalogPage.css";
 
 const CatalogPage = () => {
   // Semua state dan logika tetap di sini
-  const [activeCategory, setActiveCategory] = useState("fruits");
+  const [activeCategory, setActiveCategory] = useState("BUAH");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("name");
   const itemsPerPage = 12;
