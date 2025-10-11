@@ -1,0 +1,133 @@
+/* --- Wadah Utama Section --- */
+.featured-products-section {
+  position: relative;
+  padding: 100px 0;
+  background: linear-gradient(135deg, #f8f6f0 0%, #f0f4e8 100%);
+  overflow: hidden;
+}
+
+/* --- Latar Belakang Dekoratif --- */
+.catalog-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.organic-shapes {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50% 30% 70% 40%;
+  opacity: 0.1;
+  animation: float 20s ease-in-out infinite;
+}
+
+.shape-1 {
+  width: 300px;
+  height: 200px;
+  background: #7cb342;
+  top: 10%;
+  left: -5%;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 250px;
+  height: 180px;
+  background: #ff9800;
+  top: 60%;
+  right: -8%;
+  animation-delay: -5s;
+}
+
+/* ... (shape-3 dan shape-4 bisa Anda hapus jika terlalu ramai) ... */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-20px) rotate(5deg); }
+  50% { transform: translateY(-10px) rotate(-3deg); }
+  75% { transform: translateY(-15px) rotate(2deg); }
+}
+
+/* --- Header Section (Judul & Subjudul) --- */
+.featured-header { /* Ganti nama dari .catalog-header */
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.featured-header h2 { /* Ganti nama dari .catalog-title */
+  font-size: 3rem;
+  font-weight: 800;
+  color: #2e5d31;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.featured-header p { /* Ganti nama dari .catalog-subtitle */
+  font-size: 1.2rem;
+  color: #5d7c61;
+  font-weight: 500;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* --- Grid untuk Produk --- */
+.products-grid {
+  display: grid;
+  /* Menampilkan 4 kolom di layar besar, dan menyesuaikan ke bawah */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+/* --- Footer Section (Tombol "Lihat Semua") --- */
+.featured-footer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.btn-view-all {
+  padding: 15px 35px;
+  background: #2e5d31;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(46, 93, 49, 0.2);
+}
+
+.btn-view-all:hover {
+  background: #7cb342;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(124, 179, 66, 0.3);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+  .featured-header h2 {
+    font-size: 2.5rem;
+  }
+  .featured-header p {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .featured-products-section {
+    padding: 60px 0;
+  }
+  .featured-header h2 {
+    font-size: 2rem;
+  }
+}

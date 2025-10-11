@@ -1,0 +1,91 @@
+/* --- Wadah Utama Kartu --- */
+.product-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Efek Saat Kursor di Atas Kartu --- */
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Bagian Gambar Produk --- */
+.product-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* --- Bagian Informasi di Bawah Gambar --- */
+.product-info {
+  padding: 1.5rem;
+  flex-grow: 1; /* Memastikan bagian info mengisi sisa ruang */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* --- Nama Produk --- */
+.product-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+/* --- Bagian Harga & Satuan --- */
+.product-price-section {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.product-price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #4caf50;
+}
+
+.product-unit {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* --- Tombol Detail --- */
+.product-detail-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: auto; /* Mendorong tombol ke bagian bawah */
+}
+
+.product-detail-btn:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+}

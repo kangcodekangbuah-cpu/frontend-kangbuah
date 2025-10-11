@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import axios from "axios"
 import { auth, googleProvider } from "../../src/utils/firebase"
 import { signInWithPopup } from "firebase/auth"
-import "./login.css"
+import "./LoginPage.css"
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -58,8 +58,7 @@ export default function LoginPage() {
       const res = await axios.post("http://localhost:3000/auth/google/login", { token })
 
       console.log("Google signup success:", res.data)
-      alert("Login dengan Google berhasil!")
-      window.location.href = "/HomePage"
+      window.location.href = "/catalog"
     } catch (err) {
       console.error("Google Login error:", err)
       alert("Gagal login dengan Google")
