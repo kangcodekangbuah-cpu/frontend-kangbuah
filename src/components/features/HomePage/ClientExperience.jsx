@@ -2,12 +2,12 @@ import "./ClientExperience.css"
 
 export default function ClientExperience() {
   const clientImages = [
-    { src: "/fresh-vegetables-delivery.jpg", alt: "Fresh vegetables" },
-    { src: "/produce-warehouse.jpg", alt: "Warehouse operations" },
-    { src: "/delivery-truck-vegetables.jpg", alt: "Delivery truck" },
-    { src: "/pt-puncak-lembah-hijau-client.jpg", alt: "PT Puncak Lembah Hijau" },
-    { src: "/pt-melati-agro-prima-client.jpg", alt: "PT Melati Agro Prima" },
-    { src: "/vegetable-distribution.jpg", alt: "Distribution center" },
+    { src: "src/assets/market.jpg", alt: "Fresh vegetables" },
+    { src: "src/assets/packing.jpeg", alt: "Warehouse operations" },
+    { src: "src/assets/truk.jpeg", alt: "Delivery truck" },
+    { src: "src/assets/sayuran.jpg", alt: "PT Puncak Lembah Hijau" },
+    { src: "src/assets/pasar-sayur.jpg", alt: "PT Melati Agro Prima" },
+    { src: "src/assets/distro.jpeg", alt: "Distribution center" },
   ]
 
   return (

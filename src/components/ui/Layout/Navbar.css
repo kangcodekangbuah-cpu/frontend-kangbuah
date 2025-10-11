@@ -1,3 +1,4 @@
+/* --- Style Dasar (Desktop First) --- */
 .navbar {
   position: fixed;
   top: 0;
@@ -16,6 +17,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 2rem;
+  transition: padding 0.3s ease; /* Transisi untuk padding */
 }
 
 .nav-logo .logo-text {
@@ -27,23 +29,29 @@
   background-clip: text;
 }
 
-.nav-menu {
+.nav-logo a, 
+.nav-logo .logo-text-link {
+  text-decoration: none;
+}
+
+.nav-menu-desktop {
   display: flex;
   gap: 2rem;
+  transition: gap 0.3s ease; /* Transisi untuk jarak */
 }
 
 .nav-link {
   text-decoration: none;
   color: #5a6c57;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .nav-link:hover {
   color: #7cb342;
 }
 
-.nav-buttons {
+.nav-buttons-desktop {
   display: flex;
   gap: 1rem;
 }
@@ -56,6 +64,9 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
 }
 
 .btn-login {
@@ -80,12 +91,85 @@
   box-shadow: 0 5px 15px rgba(124, 179, 66, 0.3);
 }
 
+.hamburger-menu, .mobile-menu {
+  display: none;
+}
+
+/* ... (Kode untuk animasi hamburger dan menu mobile tetap sama di bawah) ... */
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+.hamburger-menu .bar {
+  width: 2rem;
+  height: 0.25rem;
+  background-color: #5a6c57;
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  position: relative;
+  transform-origin: 1px;
+}
+.bar.animate:nth-child(1) { transform: rotate(45deg); }
+.bar.animate:nth-child(2) { opacity: 0; transform: translateX(20px); }
+.bar.animate:nth-child(3) { transform: rotate(-45deg); }
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100vh;
+  background: white;
+  flex-direction: column; justify-content: center; align-items: center;
+  gap: 2rem;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+.mobile-menu.open { transform: translateY(0); display: flex; }
+.mobile-menu .nav-link { font-size: 1.5rem; }
+.mobile-buttons { display: flex; flex-direction: column; gap: 1rem; width: 80%; max-width: 300px; }
+
+
+/* --- (BARU) Media Query untuk Tablet --- */
+@media (max-width: 1024px) {
+  .nav-container {
+    padding: 0 1.5rem; /* Kurangi padding samping */
+  }
+
+  .nav-menu-desktop {
+    gap: 1.2rem; /* Kurangi jarak antar link */
+  }
+
+  .nav-link {
+    font-size: 0.9rem; /* Perkecil sedikit font */
+  }
+
+  .btn-login,
+  .btn-signup {
+    padding: 0.4rem 1.2rem; /* Perkecil tombol */
+    font-size: 0.9rem;
+  }
+}
+
+
+/* --- Media Query untuk Mobile --- */
 @media (max-width: 768px) {
-  .nav-menu {
-    display: none;
+  /* Di sini baru kita sembunyikan menu desktop & tampilkan hamburger */
+  .nav-menu-desktop,
+  .nav-buttons-desktop {
+    display: none; 
+  }
+
+  .hamburger-menu {
+    display: flex; 
   }
 
   .nav-container {
-    padding: 0 1rem;
+    padding: 0 1rem; /* Padding spesifik untuk mobile */
   }
 }

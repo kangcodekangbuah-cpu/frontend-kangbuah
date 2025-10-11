@@ -3,11 +3,11 @@
 // Gunakan data yang paling lengkap (dengan harga dan unit)
 export const products = {
     vegetables: [
-        { id: 1, name: "Wortel 1kg", image: "/fresh-carrots.png", price: 15000, unit: "1kg" },
-        { id: 2, name: "Kentang 5kg", image: "/fresh-potatoes.png", price: 45000, unit: "5kg" },
-        { id: 3, name: "Tomat 1kg", image: "/red-chili-peppers.jpg", price: 12000, unit: "1kg" },
-        { id: 4, name: "Brokoli 1kg", image: "/fresh-broccoli.png", price: 25000, unit: "1kg" },
-        { id: 5, name: "Cabe Merah Keriting", image: "/red-chili-peppers.jpg", price: 35000, unit: "1kg" },
+        { id: 1, name: "Wortel 1kg", image: "src\assets\kiwi.jpg", price: 15000, unit: "1kg" },
+        { id: 2, name: "Kentang 5kg", image: "src\assets\kiwi.jpg", price: 45000, unit: "5kg" },
+        { id: 3, name: "Tomat 1kg", image: "src\assets\kiwi.jpg", price: 12000, unit: "1kg" },
+        { id: 4, name: "Brokoli 1kg", image: "/src\assets\kiwi.jpg", price: 25000, unit: "1kg" },
+        { id: 5, name: "Cabe Merah Keriting", image: "src\assets\kiwi.jpg", price: 35000, unit: "1kg" },
         { id: 6, name: "Cabe Merah Besar", image: "/large-red-chili-peppers.jpg", price: 40000, unit: "1kg" },
         { id: 7, name: "Paprika Merah/Kuning", image: "/red-and-yellow-bell-peppers.jpg", price: 28000, unit: "1kg" },
         { id: 8, name: "Kol Putih", image: "/white-cabbage.jpg", price: 8000, unit: "1kg" },

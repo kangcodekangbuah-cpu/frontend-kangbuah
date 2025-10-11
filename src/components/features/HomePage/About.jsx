@@ -9,10 +9,10 @@ export default function About() {
           <div className="about-grid">
             <div className="about-images">
               <div className="image-card">
-                <img src="/fresh-watermelons-stacked-at-market.jpg" alt="Watermelons" />
+                <img src="src\assets\fresh-watermelons-stacked-at-market.jpg" alt="Watermelons" />
               </div>
               <div className="image-card">
-                <img src="/people-sorting-fresh-vegetables-at-market.jpg" alt="Vegetable sorting" />
+                <img src="src\assets\market.jpg" alt="Vegetable sorting" />
               </div>
             </div>
             <div className="about-text">

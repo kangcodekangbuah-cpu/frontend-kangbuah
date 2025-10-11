@@ -8,7 +8,7 @@ import "./FeaturedProducts.css"; // Gunakan CSS yang sudah ada, tapi sesuaikan i
 // 3. Pilih beberapa produk saja untuk ditampilkan
 const featuredItems = [
   ...products.fruits.slice(0, 4), // Ambil 4 buah pertama
-  ...products.vegetables.slice(0, 8), // Ambil 8 sayuran pertama
+  ...products.vegetables.slice(0, 4), // Ambil 8 sayuran pertama
 ];
 
 const FeaturedProducts = () => {
