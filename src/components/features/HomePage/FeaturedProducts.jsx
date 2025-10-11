@@ -2,7 +2,7 @@
 
 import { Link } from "react-router-dom";
 import { products } from "../../../data/Products"; // 1. Impor data terpusat
-import ProductCard from "../../ui/ProductCard";    // 2. Impor ProductCard universal
+import ProductCard from "../../ui/Product/ProductCard";    // 2. Impor ProductCard universal
 import "./FeaturedProducts.css"; // Gunakan CSS yang sudah ada, tapi sesuaikan isinya
 
 // 3. Pilih beberapa produk saja untuk ditampilkan

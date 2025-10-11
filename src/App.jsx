@@ -1,9 +1,9 @@
 // App.jsx
 import { Routes, Route } from "react-router-dom"
-import HomePage from "/src/HomePage"
-import LoginPage from "/app/login/page"
-import RegisterPage from "/app/register/page"
-import CatalogPage from "/app/catalog/page"
+import HomePage from "../src/pages/home/HomePage"
+import LoginPage from "../src/pages/login/LoginPage"
+import RegisterPage from "../src/pages/register/RegisterPage"
+import CatalogPage from "../src/pages/catalog/CatalogPage"
 
 export default function App() {
   return (

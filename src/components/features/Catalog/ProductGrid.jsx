@@ -1,4 +1,4 @@
-import ProductCard from "../../ui/ProductCard";
+import ProductCard from "../../ui/Product/ProductCard";
 import './ProductGrid.css'
 
 const ProductGrid = ({ products }) => {

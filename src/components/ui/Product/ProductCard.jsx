@@ -1,4 +1,4 @@
-import { formatPrice } from "../../../utils"; // Impor fungsi formatPrice
+import { formatPrice } from "../../../utils/formatPrice"; // Impor fungsi formatPrice
 import "./ProductCard.css";
 
 const ProductCard = ({ product }) => {

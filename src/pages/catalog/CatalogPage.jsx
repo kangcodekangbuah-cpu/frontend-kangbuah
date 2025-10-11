@@ -4,13 +4,13 @@ import { useState } from "react";
 // Impor data terpusat
 import { products, categories } from "../../data/Products";
 // Impor semua komponen yang baru dibuat
-import Header from "../../components/layout/Header";
-import Footer from "../../components/layout/Footer";
+import Header from "../../components/ui/Layout/Header"
+import Footer from "../../components/ui/Layout/Footer";
 import CategorySidebar from "../../components/features/Catalog/CategorySidebar";
 import ProductGrid from "../../components/features/Catalog/ProductGrid";
 import Pagination from "../../components/features/Catalog/Pagination";
 // (Anda juga bisa membuat komponen terpisah untuk ProductControls, StepNavigation, dan FloatingChat)
-import StepNavigation from "../../components/ui/StepNavigation";
+import StepNavigation from "../../components/ui/StepNavigation/StepNavigation";
 import "./CatalogPage.css";
 
 const CatalogPage = () => {

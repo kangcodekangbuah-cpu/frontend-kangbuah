@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import axios from "axios"
-import { auth, googleProvider } from "../../src/utils/firebase"
+import { auth, googleProvider } from "../../services/firebase"
 import { signInWithPopup } from "firebase/auth"
 import "./RegisterPage.css"
 

@@ -1,14 +1,14 @@
 // HomePage.jsx
-import Navbar from "/src/Navbar"
-import Hero from "/src/Hero"
-import About from "/src/About"
-import VisionMission from "/src/VisionMission"
-import CompanyValues from "/src/CompanyValues"
-import Catalog from "/src/Catalog"
-import Services from "/src/Services"
-import ClientExperience from "/src/ClientExperience"
-import Advantages from "/src/Advantages"
-import MarketSegments from "/src/MarketSegments"
+import Navbar from "../../components/ui/Layout/Navbar"
+import Hero from "../../components/features/HomePage/Hero"
+import About from "../../components/features/HomePage/About"
+import VisionMission from "../../components/features/HomePage/VisionMission"
+import CompanyValues from "../../components/features/HomePage/CompanyValues"
+import FeaturedProducts from "../../components/features/HomePage/FeaturedProducts"
+import Services from "../../components/features/HomePage/Services"
+import ClientExperience from "../../components/features/HomePage/ClientExperience"
+import Advantages from "../../components/features/HomePage/Advantages"
+import MarketSegments from "../../components/features/HomePage/MarketSegments"
 
 export default function HomePage() {
   return (
@@ -18,7 +18,7 @@ export default function HomePage() {
       <About />
       <VisionMission />
       <CompanyValues />
-      <Catalog />
+      <FeaturedProducts />
       <Services />
       <ClientExperience />
       <Advantages />
