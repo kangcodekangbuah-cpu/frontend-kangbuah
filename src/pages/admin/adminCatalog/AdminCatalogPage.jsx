@@ -4,37 +4,10 @@ import AdminHeader from "../../../components/features/Admin/AdminHeader";
 import ProductForm from "../../../components/features/Admin/ProductForm";
 import ProductTable from "../../../components/features/Admin/ProductTable";
 import axios from "axios"
+import { toast } from 'react-toastify';
 import "./AdminCatalog.css";
 
-const defaultProducts = [
-  {
-    id: 1,
-    name: "Wortel 1kg",
-    category: "SAYUR",
-    price: 15000,
-    unit: "1kg",
-    image: "/fresh-carrots.png",
-  },
-  {
-    id: 2,
-    name: "Semangka Non Biji",
-    category: "BUAH",
-    price: 25000,
-    unit: "1 buah",
-    image: "/seedless-watermelon.jpg",
-  },
-  {
-    id: 3,
-    name: "Beras Premium 5kg",
-    category: "LAIN_LAIN",
-    price: 85000,
-    unit: "5kg",
-    image: "/white-rice-grains.jpg",
-  },
-];
-
 export default function AdminCatalogPage() {
-  // Semua state dan logika tetap berada di halaman utama ini
   const router = useNavigate();
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [products, setProducts] = useState([]);
@@ -70,7 +43,6 @@ export default function AdminCatalogPage() {
 
     } catch (error) {
       console.error("Gagal mengambil data produk:", error);
-      // Anda bisa menggunakan toast di sini untuk notifikasi error
     } finally {
       setLoading(false);
     }
@@ -107,7 +79,7 @@ export default function AdminCatalogPage() {
   formData.append('description', form.description);
   formData.append('stock', form.stock);
 
-  // Tambahkan file baru jika ada
+
   if (selectedFiles) {
     for (let i = 0; i < selectedFiles.length; i++) {
       formData.append('image', selectedFiles[i]);
@@ -119,29 +91,28 @@ export default function AdminCatalogPage() {
     let res;
 
     if (editingId) {
-      // LOGIKA UNTUK UPDATE (PATCH)
+
       res = await axios.patch(`http://localhost:3000/products/${editingId}`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert("Produk berhasil diperbarui!");
+      toast.success("Produk berhasil diperbarui!");
     } else {
-      // LOGIKA UNTUK CREATE (POST)
+
       if (!selectedFiles || selectedFiles.length === 0) {
-        alert("Silakan pilih minimal satu gambar produk.");
+        toast.error("Minimal satu gambar per produk.");
         return;
       }
       res = await axios.post("http://localhost:3000/products", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert("Produk baru berhasil ditambahkan!");
+      toast.success("Produk baru berhasil ditambahkan!");
     }
 
-    fetchProducts(pagination.page); // Muat ulang data setelah create/update
+    fetchProducts(pagination.page);
     resetForm();
 
   } catch (err) {
-    console.error("Gagal menyimpan produk:", err);
-    alert(err.response?.data?.message || "Terjadi kesalahan saat menyimpan produk.");
+    toast.error(err.response?.data?.message || "Terjadi kesalahan saat menyimpan produk.");
   }
 };
   
@@ -152,17 +123,17 @@ export default function AdminCatalogPage() {
   
   const onDelete = async (id) => {
   if (!confirm("Anda yakin ingin menghapus produk ini?")) return;
-  console.log("ID yang akan dihapus:", id);
+
   try {
     const token = localStorage.getItem('token');
     await axios.delete(`http://localhost:3000/products/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    alert("Produk berhasil dihapus!");
+    toast.success("Produk berhasil dihapus!");
     fetchProducts(pagination.page); // Muat ulang data
   } catch (err) {
-    console.error("Gagal menghapus produk:", err);
-    alert(err.response?.data?.message || "Gagal menghapus produk.");
+    
+    toast.error(err.response?.data?.message || "Gagal menghapus produk.");
   }
 };
   
@@ -170,7 +141,7 @@ export default function AdminCatalogPage() {
   if (!Array.isArray(products)) return [];
   
   return products
-    .filter((p) => (filter === "all" ? true : p.type === filter)) // Ubah p.category jadi p.type
+    .filter((p) => (filter === "all" ? true : p.type === filter))
     .filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
 }, [products, query, filter]);
