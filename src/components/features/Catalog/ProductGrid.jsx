@@ -4,7 +4,7 @@ import './ProductGrid.css'
 const ProductGrid = ({ products }) => {
   return (
     <div className="products-grid">
-      {products.map((product) => (
+      {products.data.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}
     </div>

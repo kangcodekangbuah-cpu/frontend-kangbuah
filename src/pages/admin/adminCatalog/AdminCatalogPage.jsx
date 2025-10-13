@@ -33,7 +33,7 @@ export default function AdminCatalogPage() {
         },
       });
       
-      setProducts(res.data.data.result);
+      setProducts(res.data.data.data);
       setPagination({
         page: res.data.data.page,
         max_page: res.data.data.max_page,

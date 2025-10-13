@@ -19,7 +19,7 @@ const FeaturedProducts = () => {
         const response = await axios.get("http://localhost:3000/products?limit=8");
         
         // Simpan data produk dari API ke dalam state
-        setFeaturedItems(response.data.data.result);
+        setFeaturedItems(response.data.data.data);
       } catch (err) {
         // Jika terjadi error, simpan pesan error di state
         console.error("Gagal mengambil produk unggulan:", err);

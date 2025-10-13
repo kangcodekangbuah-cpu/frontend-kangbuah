@@ -13,7 +13,7 @@ const CategorySidebar = ({ categories, activeCategory, onCategoryChange }) => {
               onClick={() => onCategoryChange(category.id)}
             >
               <span className="category-name">{category.name}</span>
-              <span className="category-count">({category.count})</span>
+              {/* <span className="category-count">({category.count})</span> */}
             </button>
           ))}
         </div>
