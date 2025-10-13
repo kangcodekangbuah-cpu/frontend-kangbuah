@@ -9,6 +9,7 @@ import Services from "../../components/features/HomePage/Services"
 import ClientExperience from "../../components/features/HomePage/ClientExperience"
 import Advantages from "../../components/features/HomePage/Advantages"
 import MarketSegments from "../../components/features/HomePage/MarketSegments"
+import ChatWidget from "../../components/features/chat/ChatWidget"
 
 export default function HomePage() {
   return (
@@ -23,6 +24,7 @@ export default function HomePage() {
       <ClientExperience />
       <Advantages />
       <MarketSegments />
+      <ChatWidget />
     </div>
   )
 }

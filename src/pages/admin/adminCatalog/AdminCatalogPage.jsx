@@ -21,6 +21,7 @@ export default function AdminCatalogPage() {
     total: 0,
   });
   const [form, setForm] = useState({ name: "", category: "BUAH", price: "", description: "", unit: "", stock: ""});
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const fetchProducts = async (page = 1) => {
     setLoading(true);
@@ -31,8 +32,6 @@ export default function AdminCatalogPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log("product:", res.data.data)
       
       setProducts(res.data.data.result);
       setPagination({
@@ -156,7 +155,7 @@ export default function AdminCatalogPage() {
 
   return (
     <div className="admin-cat-page">
-      <AdminHeader onLogout={logout} />
+      <AdminHeader setIsLoggedIn={setIsLoggedIn} />
       <main className="admin-cat-main">
         <div className="maxw">
           <div className="toolbar">

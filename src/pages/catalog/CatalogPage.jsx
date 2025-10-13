@@ -1,16 +1,12 @@
-"use client"
-
 import { useState } from "react";
-// Impor data terpusat
 import { products, categories } from "../../data/Products";
-// Impor semua komponen yang baru dibuat
 import Header from "../../components/ui/Layout/Header"
 import Footer from "../../components/ui/Layout/Footer";
 import CategorySidebar from "../../components/features/Catalog/CategorySidebar";
 import ProductGrid from "../../components/features/Catalog/ProductGrid";
 import Pagination from "../../components/features/Catalog/Pagination";
-// (Anda juga bisa membuat komponen terpisah untuk ProductControls, StepNavigation, dan FloatingChat)
 import StepNavigation from "../../components/ui/StepNavigation/StepNavigation";
+import ChatWidget from "../../components/features/chat/ChatWidget";
 import "./CatalogPage.css";
 
 const CatalogPage = () => {
@@ -99,7 +95,7 @@ const CatalogPage = () => {
         </div>
       </main>
       <Footer />
-      {/* FloatingChat bisa jadi komponen sendiri juga */}
+      <ChatWidget />
     </div>
   );
 };

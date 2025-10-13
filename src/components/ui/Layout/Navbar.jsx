@@ -8,6 +8,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const role = localStorage.getItem("role");
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -18,6 +19,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     setIsLoggedIn(false); 
     handleLinkClick(); 
     toast.success("Logout berhasil")
@@ -48,7 +50,7 @@ export default function Navbar() {
         <div className="nav-buttons-desktop">
           {isLoggedIn ? (
             <>
-              <Link to="/catalog" className="btn-login">Katalog</Link>
+              <Link to={role === "ADMIN" ? "/admin/catalog" : "/catalog"} className="btn-login">Katalog</Link>
               <button onClick={handleLogout} className="btn-signup">Logout</button>
             </>
           ) : (
@@ -73,7 +75,7 @@ export default function Navbar() {
         <div className="mobile-buttons">
           {isLoggedIn ? (
             <>
-              <Link to="/catalog" className="btn-login" onClick={handleLinkClick}>Katalog</Link>
+              <Link to={role === "ADMIN" ? "/admin/catalog" : "/catalog"} className="btn-login" onClick={handleLinkClick}>Katalog</Link>
               <button onClick={handleLogout} className="btn-signup">Logout</button>
             </>
           ) : (
