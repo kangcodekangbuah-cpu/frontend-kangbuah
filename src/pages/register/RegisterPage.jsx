@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { auth, googleProvider } from "../../services/firebase"
 import { signInWithPopup } from "firebase/auth"
@@ -7,9 +7,12 @@ import AuthLayout from "../../components/features/Auth/AuthLayout";
 import AuthInput from "../../components/features/Auth/AuthInput";
 import PasswordInput from "../../components/features/Auth/PasswordInput";
 import GoogleAuthButton from "../../components/features/Auth/GoogleAuthButton";
+import { toast } from 'react-toastify';
+import { jwtDecode } from "jwt-decode";
 import "./RegisterPage.css"
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -34,7 +37,7 @@ export default function RegisterPage() {
     e.preventDefault()
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Password dan konfirmasi password tidak sama!")
+      toast.error("Password dan konfirmasi password tidak sama!")
       return
     }
 
@@ -49,12 +52,13 @@ export default function RegisterPage() {
         npwp: null,
       })
 
-      console.log("Signup success:", res.data)
-      alert("Registrasi berhasil! Silakan cek email untuk verifikasi lalu login.")
-      window.location.href = "/login"
+      toast.success("Registrasi berhasil! Silakan cek email untuk verifikasi lalu login.")
+      setTimeout(() => {
+          navigate("/login");
+        }, 1500);
     } catch (err) {
       console.error("Signup error:", err)
-      alert(err.response?.data?.message || "Signup gagal")
+      toast.error(err.response?.data?.message || "Signup gagal")
     }
   }
 
@@ -66,11 +70,35 @@ export default function RegisterPage() {
 
       const res = await axios.post("http://localhost:3000/auth/google/login", { token })
 
-      console.log("Google signup success:", res.data)
-      window.location.href = "/catalog"
+      const accessToken = res.data?.data?.accessToken;
+      if (!accessToken) {
+        throw new Error("Token tidak diterima dari server.");
+      }
+
+      localStorage.setItem("token", res.data.data.accessToken)
+      const decodeToken = jwtDecode(res.data.data.accessToken)
+      localStorage.setItem("role", decodeToken.role)
+      toast.success('Login berhasil! Mengalihkan...');
+
+      if (decodeToken.role == "ADMIN") {
+        setTimeout(() => {
+          navigate("/admin/catalog");
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      }
     } catch (err) {
-      console.error("Google signup error:", err)
-      alert("Gagal daftar dengan Google")
+      console.error("Detail Error Google Login:", err);
+
+      if (err.code === 'auth/popup-closed-by-user') {
+        toast.info("Proses login dengan Google dibatalkan.");
+      } else if (err.response) {
+        toast.error(err.response.data.message || "Gagal login dengan Google.");
+      } else {
+        toast.error("Gagal login dengan Google. Coba lagi nanti.");
+      }
     }
   }
 
