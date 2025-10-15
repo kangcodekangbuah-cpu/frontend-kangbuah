@@ -7,6 +7,7 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
   return (
     <section className="form-card">
       <h3>{editingId ? "Ubah Produk" : "Tambah Produk"}</h3>
+
       <form onSubmit={onSubmit} className="form">
         <label>
           Nama
@@ -17,6 +18,7 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
             required
           />
         </label>
+
         <label>
           Kategori
           <select
@@ -29,6 +31,7 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
             <option value="LAIN_LAIN">Permintaan Khusus</option>
           </select>
         </label>
+
         <label>
           Harga
           <input
@@ -40,6 +43,7 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
             required
           />
         </label>
+
         <label>
           Deskripsi
           <textarea
@@ -49,6 +53,7 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
             rows="2"
           />
         </label>
+
         <label>
           Satuan
           <input
@@ -58,6 +63,7 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
             required
           />
         </label>
+
         <label>
           Stok
           <input
@@ -67,16 +73,29 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
             required
           />
         </label>
+
+        {/* 🟢 Bagian Upload Gambar */}
         <label>
           Gambar Produk (Maks. 5)
           <input
             id="image-upload"
             type="file"
-            multiple 
-            accept="image/*" 
+            multiple
+            accept="image/*"
             onChange={onFilesChange}
           />
+          {editingId ? (
+            <small className="text-gray-500">
+              *Kosongkan jika tidak ingin mengubah gambar produk.
+            </small>
+          ) : (
+            <small className="text-gray-500">
+              *Wajib upload minimal satu gambar produk.
+            </small>
+          )}
         </label>
+
+        {/* Tombol aksi */}
         <div className="actions">
           <button type="submit" className="save">
             {editingId ? "Simpan Perubahan" : "Tambah"}

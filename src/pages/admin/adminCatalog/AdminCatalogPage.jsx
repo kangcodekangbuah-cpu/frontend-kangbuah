@@ -67,40 +67,41 @@ export default function AdminCatalogPage() {
     setSelectedFiles(e.target.files);
   };
   
-  const onSubmit = async (e) => {
+const onSubmit = async (e) => {
   e.preventDefault();
 
   const formData = new FormData();
-  formData.append('name', form.name);
-  formData.append('type', form.category);
-  formData.append('price', form.price);
-  formData.append('unit', form.unit);
-  formData.append('description', form.description);
-  formData.append('stock', form.stock);
+  formData.append("name", form.name);
+  formData.append("type", form.category);
+  formData.append("price", form.price);
+  formData.append("unit", form.unit);
+  formData.append("description", form.description);
+  formData.append("stock", form.stock);
 
-
-  if (selectedFiles) {
+  // ✅ hanya tambahkan image kalau user upload baru
+  if (selectedFiles && selectedFiles.length > 0) {
     for (let i = 0; i < selectedFiles.length; i++) {
-      formData.append('image', selectedFiles[i]);
+      formData.append("image", selectedFiles[i]);
     }
   }
-  
+
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     let res;
 
     if (editingId) {
-
+      // ✅ Kalau tidak upload gambar, jangan kirim field 'image' ke backend
       res = await axios.patch(`http://localhost:3000/products/${editingId}`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Produk berhasil diperbarui!");
     } else {
-
+      // ✅ Saat tambah produk baru, wajib ada gambar
       if (!selectedFiles || selectedFiles.length === 0) {
         toast.error("Minimal satu gambar per produk.");
         return;
       }
+
       res = await axios.post("http://localhost:3000/products", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -109,15 +110,16 @@ export default function AdminCatalogPage() {
 
     fetchProducts(pagination.page);
     resetForm();
-
   } catch (err) {
     toast.error(err.response?.data?.message || "Terjadi kesalahan saat menyimpan produk.");
   }
 };
+
   
   const onEdit = (p) => {
-    setEditingId(p.id);
-    setForm({ name: p.name, category: p.category, price: String(p.price), unit: p.unit, stock: p.stock, description: p.description });
+    setEditingId(p.product_id);
+    setForm({ name: p.name, category: p.type, price: String(p.price), unit: p.unit, stock: p.stock, description: p.description,
+    image_url: p.image_url || [], });
   };
   
   const onDelete = async (id) => {
