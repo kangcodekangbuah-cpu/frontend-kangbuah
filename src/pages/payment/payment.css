@@ -1,0 +1,88 @@
+.payment-page {
+  background: linear-gradient(135deg, #f8fffe 0%, #e8f5f0 100%);
+  min-height: 100vh;
+}
+
+.payment-header .container {
+  padding: 1.5rem 0 0.5rem;
+}
+
+.payment-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.payment-back-btn {
+  background: transparent;
+  border: none;
+  color: #4caf50;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+.payment-back-btn:hover {
+  text-decoration: underline;
+}
+
+.method {
+  margin-bottom: 2rem;
+}
+
+.method-box {
+  border: 1px dashed #ccc;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.qris-image {
+  max-width: 180px;
+  display: block;
+  margin: 0 auto 1rem;
+  border-radius: 8px;
+}
+
+.upload-box {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.upload-label input {
+  display: none;
+}
+
+.upload-placeholder {
+  cursor: pointer;
+  border: 2px dashed #bbb;
+  padding: 1rem;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.upload-placeholder:hover {
+  border-color: #444;
+  background: #f5f5f5;
+}
+
+.file-name {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: green;
+}
+
+.confirm-btn {
+  width: 100%;
+  background: #22c55e;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.confirm-btn:hover {
+  background: #16a34a;
+}
