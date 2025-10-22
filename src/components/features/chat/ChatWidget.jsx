@@ -15,20 +15,19 @@ const getUserIdFromToken = () => {
     if (!token) return null;
     try {
         const decoded = jwtDecode(token);
-        return decoded.sub; // 'sub' biasanya berisi user_id
+        return decoded.sub; 
     } catch (error) {
         console.error("Token tidak valid:", error);
         return null;
     }
 };
 
-export default function ChatWidget() {
+export default function ChatWidget({isLoggedIn}) {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
-    const [roomId, setRoomId] = useState(null); // <-- State baru untuk menyimpan room ID
-    const [isLoading, setIsLoading] = useState(false); // <-- State baru untuk loading
-
+    const [roomId, setRoomId] = useState(null); 
+    const [isLoading, setIsLoading] = useState(false); 
     const messagesEndRef = useRef(null);
     const customerId = getUserIdFromToken();
 
@@ -37,47 +36,47 @@ export default function ChatWidget() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    // --- Logika Inti: Inisialisasi Chat Saat Dibuka ---
-    useEffect(() => {
-        // Hanya jalankan jika widget dibuka, belum punya roomId, dan user sudah login
-        if (isOpen && !roomId && customerId) {
-            const initializeChat = async () => {
-                setIsLoading(true);
-                try {
-                    const token = getToken();
-                    
-                    // 1. Buat atau dapatkan room chat yang sudah ada untuk customer ini
-                    const roomResponse = await axios.post("http://localhost:3000/chat/create-room", 
-                        { customerId },
-                        { headers: { Authorization: `Bearer ${token}` } }
-                    );
-                    const currentRoomId = roomResponse.data.data.room_id;
-                    setRoomId(currentRoomId);
+    const handleOpenChat = async () => {
+        // Balikkan state isOpen
+        setIsOpen(prev => !prev);
 
-                    // 2. Ambil riwayat pesan untuk room tersebut
-                    const messagesResponse = await axios.get(`http://localhost:3000/chat/messages/${currentRoomId}`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
+        // Jika widget akan dibuka (state sebelumnya adalah false)
+        // dan user sudah login, maka fetch data terbaru.
+        if (!isOpen && isLoggedIn) {
+            setIsLoading(true);
+            setMessages([]); // Kosongkan pesan lama agar tidak ada flash content
+            try {
+                const token = getToken();
+                
+                // 1. Buat atau dapatkan room chat
+                const roomResponse = await axios.post("http://localhost:3000/chat/create-room", 
+                    { customerId },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                const currentRoomId = roomResponse.data.data.room_id;
+                setRoomId(currentRoomId);
 
-                    // 3. Format pesan agar sesuai dengan UI
-                    const formattedMessages = messagesResponse.data.data.map(msg => ({
-                        id: msg.message_id,
-                        role: msg.user_id === customerId ? 'user' : 'admin',
-                        content: msg.message_content,
-                        time: new Date(msg.timestamp).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
-                    }));
-                    setMessages(formattedMessages);
+                // 2. Ambil riwayat pesan terbaru untuk room tersebut
+                const messagesResponse = await axios.get(`http://localhost:3000/chat/messages/${currentRoomId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
 
-                } catch (error) {
-                    console.error("Gagal memulai chat:", error);
-                    // TODO: Tampilkan pesan error di UI
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-            initializeChat();
+                // 3. Format pesan untuk UI
+                const formattedMessages = messagesResponse.data.data.map(msg => ({
+                    id: msg.message_id,
+                    role: msg.user_id === customerId ? 'user' : 'admin',
+                    content: msg.message_content,
+                    time: new Date(msg.timestamp).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+                }));
+                setMessages(formattedMessages);
+
+            } catch (error) {
+                console.error("Gagal memulai chat:", error);
+            } finally {
+                setIsLoading(false);
+            }
         }
-    }, [isOpen, roomId, customerId]);
+    };
 
     const handleSendMessage = async () => {
         const trimmedMessage = newMessage.trim();
@@ -110,13 +109,13 @@ export default function ChatWidget() {
     };
 
     // Jangan render widget sama sekali jika pengguna belum login
-    if (!customerId) {
+    if (!isLoggedIn) {
         return null;
     }
 
     return (
         <div className="floating-chat">
-            <button className="chat-toggle-btn" onClick={() => setIsOpen(!isOpen)}>
+            <button className="chat-toggle-btn" onClick={handleOpenChat}>
                 {isOpen ? "✕" : "💬"}
             </button>
 

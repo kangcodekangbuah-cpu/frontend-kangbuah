@@ -29,6 +29,19 @@ const CatalogPage = () => {
     const [pagination, setPagination] = useState({ page: 1, max_page: 1 });
     const [isLoading, setIsLoading] = useState(true);
 
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    // Cek status login saat halaman dimuat
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
+        }
+    }, []);
+
     const itemsPerPage = 12;
 
     useEffect(() => {
@@ -140,7 +153,7 @@ const CatalogPage = () => {
                 </div>
             </main>
             <Footer />
-            <ChatWidget />
+            <ChatWidget isLoggedIn={isLoggedIn}/>
         </div>
     );
 };

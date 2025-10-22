@@ -3,26 +3,23 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import "./Navbar.css";
 
-export default function Navbar() {
+export default function Navbar({isLoggedIn, onLogout}) {
   // 2. Buat state untuk mengontrol menu mobile
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const navigate = useNavigate();
   const role = localStorage.getItem("role");
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token');
+  //   if (token) {
+  //     setIsLoggedIn(true);
+  //   }
+  // }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    setIsLoggedIn(false); 
-    handleLinkClick(); 
-    toast.success("Logout berhasil")
+  const handleLogoutClick = () => {
+    onLogout();
+    handleLinkClick();
   };
 
   // Fungsi untuk menutup menu saat link diklik
@@ -51,7 +48,7 @@ export default function Navbar() {
           {isLoggedIn ? (
             <>
               <Link to={role === "ADMIN" ? "/admin/catalog" : "/catalog"} className="btn-login">Katalog</Link>
-              <button onClick={handleLogout} className="btn-signup">Logout</button>
+              <button onClick={handleLogoutClick} className="btn-signup">Logout</button>
             </>
           ) : (
             <>
@@ -76,7 +73,7 @@ export default function Navbar() {
           {isLoggedIn ? (
             <>
               <Link to={role === "ADMIN" ? "/admin/catalog" : "/catalog"} className="btn-login" onClick={handleLinkClick}>Katalog</Link>
-              <button onClick={handleLogout} className="btn-signup">Logout</button>
+              <button onClick={handleLogoutClick} className="btn-signup">Logout</button>
             </>
           ) : (
             <>
