@@ -22,7 +22,6 @@ export default function OrderPage() {
     }
   }, []);
 
-  // Hitung subtotal dan total (tanpa diskon)
   const subtotal = useMemo(() => {
     return cart
       .filter((item) => (item.qty || 0) > 0)
@@ -30,12 +29,40 @@ export default function OrderPage() {
   }, [cart]);
 
   const shipping = 5000;
-  const total = Math.max(0, subtotal + shipping);
+  const discount = 0; // ✅ Tambahkan variabel diskon (bisa dikembangkan nanti)
+  const total = Math.max(0, subtotal + shipping - discount);
 
   // Konfirmasi pesanan
   const handleConfirm = (e) => {
     e.preventDefault();
-    alert("Pesanan dikonfirmasi! (demo)");
+    const formData = new FormData(e.target);
+
+    const order = {
+      id: Date.now(),
+      firstName: formData.get("firstName") || "",
+      lastName: formData.get("lastName") || "",
+      address: formData.get("address") || "",
+      city: formData.get("city") || "",
+      province: formData.get("province") || "",
+      postalCode: formData.get("postalCode") || "",
+      phone: formData.get("phone") || "",
+      items: cart,
+      subtotal,
+      discount,
+      shipping,
+      total,
+      paymentMethod: formData.get("pay") || "transfer",
+      status: "MENUNGGU_PERSETUJUAN",
+      createdAt: new Date().toISOString(),
+    };
+
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    orders.push(order);
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    // Clear cart and redirect to order history
+    localStorage.removeItem("cart");
+    navigate("/order-history"); // ✅ ganti dari router.push()
   };
 
   // Update quantity (bisa sampai 0)
@@ -78,39 +105,39 @@ export default function OrderPage() {
             <form onSubmit={handleConfirm} className="form-grid">
               <div className="field-group">
                 <label>Nama Depan*</label>
-                <input required placeholder="Nama depan" />
+                <input name="firstName" required placeholder="Nama depan" />
               </div>
               <div className="field-group">
                 <label>Nama Belakang*</label>
-                <input required placeholder="Nama belakang" />
+                <input name="lastName" required placeholder="Nama belakang" />
               </div>
               <div className="field-group">
                 <label>Kelurahan*</label>
-                <input required placeholder="Kelurahan" />
+                <input name="address" required placeholder="Kelurahan" />
               </div>
               <div className="field-group">
                 <label>Nama Perusahaan/Lembaga</label>
-                <input placeholder="Nama perusahaan/lembaga" />
+                <input name="company" placeholder="Nama perusahaan/lembaga" />
               </div>
               <div className="field-group col-2">
                 <label>Alamat*</label>
-                <input required placeholder="Alamat" />
+                <input name="address" required placeholder="Alamat" />
               </div>
               <div className="field-group">
                 <label>Kota*</label>
-                <input required placeholder="Kota" />
+                <input name="city" required placeholder="Kota" />
               </div>
               <div className="field-group">
                 <label>Provinsi*</label>
-                <input required placeholder="Provinsi" />
+                <input name="province" required placeholder="Provinsi" />
               </div>
               <div className="field-group">
                 <label>Kode Pos*</label>
-                <input required placeholder="Kode pos" />
+                <input name="postalCode" required placeholder="Kode pos" />
               </div>
               <div className="field-group">
                 <label>No. Telepon*</label>
-                <input required placeholder="No. telepon" />
+                <input name="phone" required placeholder="No. telepon" />
               </div>
 
               <div className="save-info">
@@ -145,11 +172,11 @@ export default function OrderPage() {
                 <h3>Metode Pembayaran</h3>
 
                 <label className="radio-row">
-                  <input type="radio" name="pay" defaultChecked />
+                  <input type="radio" name="pay" value="transfer" defaultChecked />
                   <span>Transfer Bank</span>
                 </label>
                 <label className="radio-row">
-                  <input type="radio" name="pay" />
+                  <input type="radio" name="pay" value="qris" />
                   <span>QRIS</span>
                 </label>
               </section>

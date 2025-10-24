@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../../components/ui/Layout/Header";
+import CustomerHeader from "../CustomerHeader";
 import Footer from "../../components/ui/Layout/Footer";
 import CategorySidebar from "../../components/features/Catalog/CategorySidebar";
 import ProductGrid from "../../components/features/Catalog/ProductGrid";
@@ -136,6 +137,7 @@ const CatalogPage = () => {
 
   return (
     <div className="catalog-page">
+      <CustomerHeader setIsLoggedIn={setIsLoggedIn} />
       <Header />
       <StepNavigation currentStep={1} />
 

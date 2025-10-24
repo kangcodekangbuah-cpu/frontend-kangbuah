@@ -30,6 +30,9 @@ const AdminHeader = ({ setIsLoggedIn}) => {
                         <NavLink to="/admin/chat" className="nav-item">
                             Chat Admin
                         </NavLink>
+                        <NavLink to="/admin/orders" className="nav-item">
+                            Pemesanan
+                        </NavLink>
                     </nav>
                     <div className="right">
                         <button className="logout" onClick={handleLogout}>
