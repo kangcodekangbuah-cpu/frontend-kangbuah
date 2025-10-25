@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const CustomerHeader = () => {
+const CustomerHeader = ({ isLoggedIn }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -30,9 +31,11 @@ const CustomerHeader = () => {
             </NavLink>
           </nav>
           <div className="right">
-            <button className="logout" onClick={handleLogout}>
-              Logout
-            </button>
+            {isLoggedIn && (
+              <button className="logout" onClick={handleLogout}>
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </div>
