@@ -1,4 +1,17 @@
 const ProductTable = ({ products, onEdit, onDelete, formatPrice }) => {
+
+    const getStatusClass = (status) => {
+        switch (status) {
+            case 'STOK_MENIPIS':
+                return 'status-warning';
+            case 'STOK_HABIS':
+            case 'TIDAK_AKTIF':
+                return 'status-danger';
+            default:
+                return '';
+        }
+    };
+
     return (
         <section className="table-card">
             <h3>Daftar Produk</h3>
@@ -11,12 +24,14 @@ const ProductTable = ({ products, onEdit, onDelete, formatPrice }) => {
                             <th>Kategori</th>
                             <th>Harga</th>
                             <th>Satuan</th>
+                            <th>Persediaan</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {products.map((p) => (
-                            <tr key={p.product_id}>
+                            <tr key={p.product_id} className={getStatusClass(p.status)}>
                                 <td>
                                     {/* Cek jika p.image_url adalah array dan punya isi */}
                                     {Array.isArray(p.image_url) && p.image_url.length > 0 ? (
@@ -33,6 +48,8 @@ const ProductTable = ({ products, onEdit, onDelete, formatPrice }) => {
                                 <td>{p.type}</td>
                                 <td>{formatPrice(p.price)}</td>
                                 <td>{p.unit}</td>
+                                <td>{p.stock}</td>
+                                <td>{p.status}</td>
                                 <td className="actions-td">
                                     <button className="edit" onClick={() => onEdit(p)}>
                                         Ubah
