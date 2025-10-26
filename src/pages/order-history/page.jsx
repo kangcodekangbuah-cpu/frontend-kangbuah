@@ -27,20 +27,22 @@ export default function OrderHistoryPage() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(true)
 
-//   // Guard: harus login dan bukan admin
-//   useEffect(() => {
-//     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-//     const role = localStorage.getItem("role");
-//     if (!isLoggedIn) {
-//       navigate("/login");
-//       return;
-//     }
-//     if (role === "admin") {
-//       navigate("/admin/orders");
-//       return;
-//     }
-//   }, [navigate]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    if (!token) {
+      setIsLoggedIn(false)
+      navigate("/");
+      return;
+    }
+    if (role === "ADMIN") {
+      navigate("/admin/orders");
+      return;
+    }
+  }, [navigate]);
 
   // Load orders dari localStorage
   useEffect(() => {
@@ -54,12 +56,9 @@ export default function OrderHistoryPage() {
 
   return (
     <div className="order-history-page">
-        <CustomerHeader />
+        <CustomerHeader isLoggedIn={isLoggedIn} />
       <header className="order-history-header">
         <div className="container">
-          <Link to="/catalog" className="back-link">
-            ← Kembali ke Katalog
-          </Link>
           <h1>Riwayat Pesanan</h1>
         </div>
       </header>

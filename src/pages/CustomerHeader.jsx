@@ -12,7 +12,7 @@ const CustomerHeader = ({ isLoggedIn }) => {
     toast.success("Logout berhasil");
     setTimeout(() => {
       navigate("/");
-    }, 1500);
+    }, 500);
   };
 
   return (
