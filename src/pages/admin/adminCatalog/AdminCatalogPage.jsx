@@ -150,7 +150,7 @@ const onSubmit = async (e) => {
   const formatPrice = (price) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(price);
   
   const logout = () => {
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("token");
     localStorage.removeItem("role");
     router("/", { replace: true });
   };

@@ -16,7 +16,7 @@ const ProductTable = ({ products, onEdit, onDelete, formatPrice }) => {
                     </thead>
                     <tbody>
                         {products.map((p) => (
-                            <tr key={p.id}>
+                            <tr key={p.product_id}>
                                 <td>
                                     {/* Cek jika p.image_url adalah array dan punya isi */}
                                     {Array.isArray(p.image_url) && p.image_url.length > 0 ? (

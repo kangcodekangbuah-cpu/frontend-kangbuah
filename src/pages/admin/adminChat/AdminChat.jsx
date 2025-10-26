@@ -36,7 +36,7 @@ export default function AdminChat() {
 
     useEffect(() => {
         if (!currentUser) {
-            router("/login", { replace: true });
+            router("/", { replace: true });
         } else if (currentUser.role !== 'ADMIN') {
             router("/catalog", { replace: true });
         }

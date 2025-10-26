@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import "./AdminOrders.css"
+import AdminHeader from "../../../components/features/Admin/AdminHeader"
 
 const statusLabels = {
   MENUNGGU_PERSETUJUAN: "Menunggu Persetujuan",
@@ -36,14 +37,22 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([])
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [filterStatus, setFilterStatus] = useState("all")
+  const [isLoggedIn, setIsLoggedIn] = useState(true)
 
-//   // Guard: must be admin
-//   useEffect(() => {
-//     const loggedIn = localStorage.getItem("isLoggedIn") === "true"
-//     const role = localStorage.getItem("role")
-//     if (!loggedIn) navigate("/login")
-//     else if (role !== "admin") navigate("/catalog")
-//   }, [navigate])
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    if (!token) {
+      setIsLoggedIn(false);
+      navigate("/")
+    } else if (role !== "ADMIN") {
+      setIsLoggedIn(true);
+      navigate("/catalog")
+    } else {
+      setIsLoggedIn(true); 
+    }
+  })
 
   // Load orders
   useEffect(() => {
@@ -64,41 +73,11 @@ export default function AdminOrdersPage() {
     }
   }
 
-  const logout = () => {
-    localStorage.removeItem("isLoggedIn")
-    localStorage.removeItem("role")
-    navigate("/login")
-  }
-
   const filteredOrders = filterStatus === "all" ? orders : orders.filter((o) => o.status === filterStatus)
 
   return (
     <div className="admin-orders-page">
-      <header className="admin-orders-header">
-        <div className="container">
-          <div className="hdr-row">
-            <Link to="/" className="logo-ans">
-              ANS
-            </Link>
-            <nav className="admin-nav">
-              <Link to="/admin/catalog" className="nav-item">
-                Katalog Admin
-              </Link>
-              <Link to="/admin/chat" className="nav-item">
-                Chat Admin
-              </Link>
-              <Link to="/admin/orders" className="nav-item active">
-                Manajemen Pesanan
-              </Link>
-            </nav>
-            <div className="right">
-              <button className="logout" onClick={logout}>
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AdminHeader setIsLoggedIn={setIsLoggedIn} />
 
       <main className="admin-orders-main">
         <div className="container admin-orders-grid">
