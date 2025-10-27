@@ -7,8 +7,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StepNavigation from "../../components/ui/StepNavigation/StepNavigation";
-import Header from "../../components/ui/Layout/Header";
-import Footer from "../../components/ui/Layout/Footer";
 import "./order.css";
 
 const API_URL = "http://localhost:3000"; 
@@ -61,7 +59,7 @@ export default function OrderPage() {
     }
   }, []);
 
-  // Hitung subtotal dan total (tanpa diskon)
+  // Hitung subtotal dan total
   const subtotal = useMemo(() => {
     return cart
       .filter((item) => (item.qty || 0) > 0)
@@ -69,15 +67,108 @@ export default function OrderPage() {
   }, [cart]);
 
   const shipping = 5000;
-  const total = Math.max(0, subtotal + shipping);
+  const discount = 0; // Tambahkan variabel diskon (bisa dikembangkan nanti)
+  const total = Math.max(0, subtotal + shipping - discount);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   // Konfirmasi pesanan
   const handleConfirm = async (e) => {
-    e.preventDefault();
-    alert("Pesanan dikonfirmasi! (demo)");
+  e.preventDefault();
+
+  if (!userId) {
+    toast.error("User belum login");
+    return;
+  }
+
+  if (cart.length === 0) {
+    toast.error("Keranjang masih kosong!");
+    return;
+  }
+
+  // 🟢 Ini payload untuk dikirim ke backend
+  const products = cart
+    .filter((item) => item.qty > 0)
+    .map((item) => ({
+      product_id: item.product_id || item.id,
+      quantity: item.qty,
+    }));
+
+  const orderPayload = {
+    products,
+    formData: {
+      company_name: formData.company_name || "",
+      phone_number: formData.phone_number || "",
+      delivery_address: {
+        street: formData.street,
+        kelurahan: formData.kelurahan || "",
+        city: formData.city,
+        province: formData.province,
+        postal_code: formData.postal_code,
+        pic_name: `${formData.first_name} ${formData.last_name}`,
+      },
+    },
   };
 
-  // Update quantity (bisa sampai 0)
+  try {
+    const res = await axios.post(
+      `${API_URL}/orders/create/${userId}`,
+      orderPayload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    toast.success("Pesanan berhasil dibuat!");
+    console.log("Order success:", res.data);
+
+    localStorage.removeItem("cart");
+    navigate("/order-history");
+  } catch (err) {
+    console.error("Error membuat pesanan:", err);
+    toast.error("Gagal membuat pesanan ke server. Disimpan lokal sementara.");
+
+    //  Ini bagian fallback — data disimpan lokal
+    const paymentMethod = document.querySelector('input[name="pay"]:checked')?.value || "transfer";
+
+    const order = {
+      id: Date.now(),
+      userId,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      address: formData.street,
+      city: formData.city,
+      province: formData.province,
+      postal_code: formData.postal_code,
+      kelurahan: formData.kelurahan || "",
+      phone: formData.phone_number || "",
+      company_name: formData.company_name || "",
+      items: cart,
+      subtotal,
+      discount,
+      shipping,
+      total,
+      paymentMethod,
+      status: "MENUNGGU_PERSETUJUAN",
+      createdAt: new Date().toISOString(),
+    };
+
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    orders.push(order);
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    localStorage.removeItem("cart");
+    navigate("/order-history");
+  }
+};
+
+
   const updateQuantity = (id, delta) => {
     const updated = cart.map((item) => {
       const itemId = item.id || item.product_id || item.uniqueId;
@@ -109,39 +200,92 @@ export default function OrderPage() {
             <form onSubmit={handleConfirm} className="form-grid">
               <div className="field-group">
                 <label>Nama Depan*</label>
-                <input required placeholder="Nama depan" />
+                <input
+                  required
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  placeholder="Nama depan"
+                />
               </div>
               <div className="field-group">
                 <label>Nama Belakang*</label>
-                <input required placeholder="Nama belakang" />
+                <input
+                  required
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  placeholder="Nama belakang"
+                />
               </div>
               <div className="field-group">
                 <label>Kelurahan*</label>
-                <input required placeholder="Kelurahan" />
+                <input
+                  required
+                  name="kelurahan"
+                  value={formData.kelurahan}
+                  onChange={handleChange}
+                  placeholder="Kelurahan"
+                />
               </div>
               <div className="field-group">
                 <label>Nama Perusahaan/Lembaga</label>
-                <input placeholder="Nama perusahaan/lembaga" />
+                <input
+                  name="company_name"
+                  value={formData.company_name}
+                  onChange={handleChange}
+                  placeholder="Nama perusahaan/lembaga"
+                />
               </div>
               <div className="field-group col-2">
                 <label>Alamat*</label>
-                <input required placeholder="Alamat" />
+                <input
+                  required
+                  name="street"
+                  value={formData.street}
+                  onChange={handleChange}
+                  placeholder="Alamat lengkap"
+                />
               </div>
               <div className="field-group">
                 <label>Kota*</label>
-                <input required placeholder="Kota" />
+                <input
+                  required
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  placeholder="Kota"
+                />
               </div>
               <div className="field-group">
                 <label>Provinsi*</label>
-                <input required placeholder="Provinsi" />
+                <input
+                  required
+                  name="province"
+                  value={formData.province}
+                  onChange={handleChange}
+                  placeholder="Provinsi"
+                />
               </div>
               <div className="field-group">
                 <label>Kode Pos*</label>
-                <input required placeholder="Kode pos" />
+                <input
+                  required
+                  name="postal_code"
+                  value={formData.postal_code}
+                  onChange={handleChange}
+                  placeholder="Kode pos"
+                />
               </div>
               <div className="field-group">
                 <label>No. Telepon*</label>
-                <input required placeholder="No. telepon" />
+                <input
+                  required
+                  name="phone_number"
+                  value={formData.phone_number}
+                  onChange={handleChange}
+                  placeholder="No. telepon"
+                />
               </div>
 
               <div className="save-info">
