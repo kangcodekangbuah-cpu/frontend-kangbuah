@@ -70,7 +70,10 @@ const FeaturedProducts = () => {
         </div>
         <div className="products-grid">
           {featuredItems.map((product) => (
-            <ProductCard key={product.product_id} product={product} /> // Gunakan ID dari database
+            <ProductCard 
+            key={product.product_id} 
+            product={product}
+            showAddtoCart={false} />
           ))}
         </div>
         <div className="featured-footer">

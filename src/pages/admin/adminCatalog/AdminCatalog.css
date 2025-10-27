@@ -110,6 +110,26 @@
   align-items: flex-start;
 }
 
+/* Style untuk baris status warning (kuning) */
+.table tbody tr.status-warning {
+  background-color: #fffbeb;
+}
+
+/* Style untuk baris status danger (merah) */
+.table tbody tr.status-danger {
+  background-color: #fff5f5; 
+  color: #7f1d1d; 
+}
+
+/*Buat warna lebih kuat saat di-hover */
+.table tbody tr.status-warning:hover {
+  background-color: #fef3c7;
+}
+
+.table tbody tr.status-danger:hover {
+  background-color: #fee2e2;
+}
+
 /* --- Card (Style dasar untuk form dan tabel) --- */
 .form-card,
 .table-card {
@@ -262,6 +282,68 @@
   color: #888;
   padding: 2rem;
   font-style: italic;
+}
+
+/* --- CSS untuk Preview Gambar di Form --- */
+
+/* 1. Judul untuk setiap bagian */
+.preview-title {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* 2. Kontainer yang menampung semua kotak gambar */
+.image-preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* 3. Kotak untuk satu gambar */
+.preview-item {
+  position: relative; 
+  width: 90px;
+  height: 90px;
+  border-radius: 8px; 
+  border: 1px solid #ddd;
+  overflow: hidden;
+  background: #f4f7f6;
+}
+
+/* 4. Gambar di dalam kotak  */
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center; 
+}
+
+/* 5. Tombol 'Hapus' di atas gambar */
+.preview-item button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.5); 
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  font-size: 14px; 
+  font-weight: bold;
+  line-height: 22px; 
+  padding: 0;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preview-item button:hover {
+  background: #F44336;
+  transform: scale(1.1);
 }
 
 

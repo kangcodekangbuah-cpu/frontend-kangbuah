@@ -2,18 +2,16 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 
-const AdminHeader = ({ setIsLoggedIn}) => {
+const AdminHeader = ({ setIsLoggedIn }) => {
     const navigate = useNavigate();
-    
+
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('role')
         setIsLoggedIn(false);
         toast.success("Logout berhasil");
-        setTimeout(() => {
-            navigate("/");
-        }, 1500);
+        navigate("/", { replace: true });
     };
 
     return (
@@ -29,6 +27,9 @@ const AdminHeader = ({ setIsLoggedIn}) => {
                         </NavLink>
                         <NavLink to="/admin/chat" className="nav-item">
                             Chat Admin
+                        </NavLink>
+                        <NavLink to="/admin/orders" className="nav-item">
+                            Pemesanan
                         </NavLink>
                     </nav>
                     <div className="right">

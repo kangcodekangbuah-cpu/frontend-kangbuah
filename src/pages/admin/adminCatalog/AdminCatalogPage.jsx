@@ -14,14 +14,15 @@ export default function AdminCatalogPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(true); 
-  const [pagination, setPagination] = useState({ 
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
     page: 1,
     max_page: 1,
     total: 0,
   });
-  const [form, setForm] = useState({ name: "", category: "BUAH", price: "", description: "", unit: "", stock: ""});
+  const [form, setForm] = useState({ name: "", category: "BUAH", price: "", description: "", unit: "", stock: "", image_url: [], status: "TERSEDIA" });
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [newImagePreviews, setNewImagePreviews] = useState([]);
 
   const fetchProducts = async (page = 1) => {
     setLoading(true);
@@ -32,7 +33,7 @@ export default function AdminCatalogPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       setProducts(res.data.data.data);
       setPagination({
         page: res.data.data.page,
@@ -47,7 +48,28 @@ export default function AdminCatalogPage() {
     }
   };
 
- useEffect(() => {
+  useEffect(() => {
+    return () => {
+      newImagePreviews.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [newImagePreviews]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    if (!token) {
+      setIsLoggedIn(false);
+      router("/")
+    } else if (role !== "ADMIN") {
+      setIsLoggedIn(true);
+      router("/catalog")
+    } else {
+      setIsLoggedIn(true);
+    }
+  })
+
+  useEffect(() => {
     fetchProducts(pagination.page);
   }, [pagination.page]);
 
@@ -55,102 +77,164 @@ export default function AdminCatalogPage() {
     setProducts(next);
     localStorage.setItem("adminProducts", JSON.stringify(next));
   };
-  
+
   const resetForm = () => {
     setEditingId(null);
-    setForm({ name: "", category: "BUAH", price: "", description: "", unit: "", stock:"" });
+    setForm({ name: "", category: "BUAH", price: "", description: "", unit: "", stock: "", image_url: [], status: "TERSEDIA" });
     setSelectedFiles(null);
     document.getElementById('image-upload').value = null;
+
+    newImagePreviews.forEach(url => URL.revokeObjectURL(url));
+    setNewImagePreviews([]);
   };
 
   const handleFileChange = (e) => {
     setSelectedFiles(e.target.files);
-  };
-  
-const onSubmit = async (e) => {
-  e.preventDefault();
 
-  const formData = new FormData();
-  formData.append("name", form.name);
-  formData.append("type", form.category);
-  formData.append("price", form.price);
-  formData.append("unit", form.unit);
-  formData.append("description", form.description);
-  formData.append("stock", form.stock);
+    newImagePreviews.forEach(url => URL.revokeObjectURL(url));
 
-  // ✅ hanya tambahkan image kalau user upload baru
-  if (selectedFiles && selectedFiles.length > 0) {
-    for (let i = 0; i < selectedFiles.length; i++) {
-      formData.append("image", selectedFiles[i]);
-    }
-  }
-
-  try {
-    const token = localStorage.getItem("token");
-    let res;
-
-    if (editingId) {
-      // ✅ Kalau tidak upload gambar, jangan kirim field 'image' ke backend
-      res = await axios.patch(`http://localhost:3000/products/${editingId}`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Produk berhasil diperbarui!");
+    if (e.target.files && e.target.files.length > 0) {
+      const previews = Array.from(e.target.files).map(file => URL.createObjectURL(file));
+      setNewImagePreviews(previews);
     } else {
-      // ✅ Saat tambah produk baru, wajib ada gambar
-      if (!selectedFiles || selectedFiles.length === 0) {
-        toast.error("Minimal satu gambar per produk.");
-        return;
+      setNewImagePreviews([]);
+    }
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("type", form.category);
+    formData.append("price", form.price);
+    formData.append("unit", form.unit);
+    formData.append("description", form.description);
+    formData.append("stock", form.stock);
+
+    if (selectedFiles && selectedFiles.length > 0) {
+      for (let i = 0; i < selectedFiles.length; i++) {
+        formData.append("image", selectedFiles[i]);
+      }
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      let res;
+
+      if (editingId) {
+
+        const existingImageCount = form.image_url ? form.image_url.length : 0;
+        const newImageCount = selectedFiles ? selectedFiles.length : 0;
+        formData.append("status", form.status)
+
+        if (existingImageCount + newImageCount === 0) {
+          toast.error("Produk harus memiliki minimal 1 gambar.");
+          return;
+        }
+
+        if (form.image_url && form.image_url.length > 0) {
+          form.image_url.forEach(url => {
+            formData.append("existing_image_url", url);
+          });
+        } else {
+          formData.append("existing_image_url", "");
+        }
+
+        res = await axios.patch(`http://localhost:3000/products/${editingId}`, formData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        toast.success("Produk berhasil diperbarui!");
+      } else {
+        if (!selectedFiles || selectedFiles.length === 0) {
+          toast.error("Minimal satu gambar per produk.");
+          return;
+        }
+
+        res = await axios.post("http://localhost:3000/products", formData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        toast.success("Produk baru berhasil ditambahkan!");
       }
 
-      res = await axios.post("http://localhost:3000/products", formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Produk baru berhasil ditambahkan!");
+      fetchProducts(pagination.page);
+      resetForm();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Terjadi kesalahan saat menyimpan produk.");
     }
+  };
 
-    fetchProducts(pagination.page);
-    resetForm();
-  } catch (err) {
-    toast.error(err.response?.data?.message || "Terjadi kesalahan saat menyimpan produk.");
-  }
-};
 
-  
   const onEdit = (p) => {
     setEditingId(p.product_id);
-    setForm({ name: p.name, category: p.type, price: String(p.price), unit: p.unit, stock: p.stock, description: p.description,
-    image_url: p.image_url || [], });
-  };
-  
-  const onDelete = async (id) => {
-  if (!confirm("Anda yakin ingin menghapus produk ini?")) return;
-
-  try {
-    const token = localStorage.getItem('token');
-    await axios.delete(`http://localhost:3000/products/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
+    setForm({
+      name: p.name,
+      category: p.type,
+      status: p.status,
+      price: String(p.price),
+      unit: p.unit,
+      stock: p.stock,
+      description: p.description,
+      image_url: p.image_url || [],
     });
-    toast.success("Produk berhasil dihapus!");
-    fetchProducts(pagination.page); // Muat ulang data
-  } catch (err) {
-    
-    toast.error(err.response?.data?.message || "Gagal menghapus produk.");
-  }
-};
-  
+
+    newImagePreviews.forEach(url => URL.revokeObjectURL(url));
+    setNewImagePreviews([]);
+    setSelectedFiles(null);
+    document.getElementById('image-upload').value = null;
+  };
+
+  const onDelete = async (id) => {
+    if (!confirm("Anda yakin ingin menghapus produk ini?")) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:3000/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Produk berhasil dihapus!");
+      fetchProducts(pagination.page); // Muat ulang data
+    } catch (err) {
+
+      toast.error(err.response?.data?.message || "Gagal menghapus produk.");
+    }
+  };
+
+  const getStatusPriority = (status) => {
+    switch (status) {
+      case 'STOK_MENIPIS':
+        return 1;
+      case 'STOK_HABIS':
+        return 2;
+      case 'TIDAK_AKTIF':
+        return 3;
+      default:
+        return 4;
+    }
+  };
+
   const filtered = useMemo(() => {
-  if (!Array.isArray(products)) return [];
-  
-  return products
-    .filter((p) => (filter === "all" ? true : p.type === filter))
-    .filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
-    .sort((a, b) => a.name.localeCompare(b.name));
-}, [products, query, filter]);
-  
+    if (!Array.isArray(products)) return [];
+
+    return products
+      .filter((p) => (filter === "all" ? true : p.type === filter))
+      .filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
+      .sort((a, b) => {
+        const priorityA = getStatusPriority(a.status);
+        const priorityB = getStatusPriority(b.status);
+
+        if (priorityA !== priorityB) {
+          return priorityA - priorityB;
+        }
+
+        return a.name.localeCompare(b.name)
+      });
+  }, [products, query, filter]);
+
   const formatPrice = (price) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(price);
-  
+
   const logout = () => {
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("token");
     localStorage.removeItem("role");
     router("/", { replace: true });
   };
@@ -186,6 +270,7 @@ const onSubmit = async (e) => {
               onFilesChange={handleFileChange}
               onSubmit={onSubmit}
               onCancel={resetForm}
+              newImagePreviews={newImagePreviews}
             />
             <ProductTable
               products={filtered}

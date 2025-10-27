@@ -2,13 +2,17 @@ import { formatPrice } from "../../../utils/formatPrice"; // Impor fungsi format
 import defaultImage from "../../../assets/kiwi.jpg";
 import "./ProductCard.css";
 
-const ProductCard = ({ product, onAddToCart }) => { // ✅ tambahkan onAddToCart
+const ProductCard = ({ product, onAddToCart, showAddtoCart = true }) => {
   const imageUrl =
     product.image_url &&
-    Array.isArray(product.image_url) &&
-    product.image_url.length > 0
+      Array.isArray(product.image_url) &&
+      product.image_url.length > 0
       ? product.image_url[0]
       : defaultImage;
+
+  const hasStock = (product.stock ?? 0) > 0;
+  const stockText = hasStock ? `Persediaan : ${product.stock}` : 'Persediaan Habis'
+  const stockClass = hasStock ? 'stockIn' : 'stockOut'
 
   return (
     <div className="product-card">
@@ -25,18 +29,20 @@ const ProductCard = ({ product, onAddToCart }) => { // ✅ tambahkan onAddToCart
         </div>
 
         <div className="product-stock">
-          <span>Stok: {product.stock ?? 0}</span>
+          <span className={`stock-badge ${stockClass}`}>{stockText}</span>
         </div>
 
         <button className="product-detail-btn">Detail</button>
 
-        {/* ✅ pastikan handler aman dipanggil */}
+        { showAddtoCart && (
         <button
           className="add-to-cart-btn"
           onClick={() => onAddToCart && onAddToCart(product)}
+          disabled={!hasStock}
         >
           Tambah ke Keranjang
         </button>
+        )}
       </div>
     </div>
   );

@@ -61,7 +61,7 @@ export default function OrderPage() {
     }
   }, []);
 
-  // Hitung subtotal dan total
+  // Hitung subtotal dan total (tanpa diskon)
   const subtotal = useMemo(() => {
     return cart
       .filter((item) => (item.qty || 0) > 0)
@@ -69,68 +69,15 @@ export default function OrderPage() {
   }, [cart]);
 
   const shipping = 5000;
-  const discount = 0; // ✅ Tambahkan variabel diskon (bisa dikembangkan nanti)
   const total = Math.max(0, subtotal + shipping);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
   // Konfirmasi pesanan
   const handleConfirm = async (e) => {
     e.preventDefault();
-    if (!userId) return toast.error("User belum login");
-    if (cart.length === 0) {
-      return toast.error("Keranjang masih kosong!");
-    }
-
-    try {
-      const products = cart
-        .filter((item) => item.qty > 0)
-        .map((item) => ({
-          product_id: item.product_id || item.id,
-          quantity: item.qty,
-        }));
-
-      const orderPayload = {
-        products,
-        formData: {
-          company_name: formData.company_name,
-          phone_number: formData.phone_number,
-          delivery_address: {
-            street: formData.street,
-            city: formData.city,
-            province: formData.province,
-            postal_code: formData.postal_code,
-            pic_name: `${formData.first_name} ${formData.last_name}`,
-          },
-        },
-      };
-
-      const res = await axios.post(
-        `${API_URL}/orders/create/${userId}`,
-        orderPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      toast.success("Pesanan berhasil dibuat!");
-      console.log("Order success:", res.data);
-
-      localStorage.removeItem("cart");
-      navigate("/order-success");
-    } catch (err) {
-      console.error("Error membuat pesanan:", err);
-      toast.error(
-        err.response?.data?.message || "Gagal membuat pesanan, coba lagi."
-      );
-    }
+    alert("Pesanan dikonfirmasi! (demo)");
   };
 
+  // Update quantity (bisa sampai 0)
   const updateQuantity = (id, delta) => {
     const updated = cart.map((item) => {
       const itemId = item.id || item.product_id || item.uniqueId;
@@ -162,92 +109,39 @@ export default function OrderPage() {
             <form onSubmit={handleConfirm} className="form-grid">
               <div className="field-group">
                 <label>Nama Depan*</label>
-                <input
-                  required
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                  placeholder="Nama depan"
-                />
+                <input required placeholder="Nama depan" />
               </div>
               <div className="field-group">
                 <label>Nama Belakang*</label>
-                <input
-                  required
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                  placeholder="Nama belakang"
-                />
+                <input required placeholder="Nama belakang" />
               </div>
               <div className="field-group">
                 <label>Kelurahan*</label>
-                <input
-                  required
-                  name="kelurahan"
-                  value={formData.kelurahan}
-                  onChange={handleChange}
-                  placeholder="Kelurahan"
-                />
+                <input required placeholder="Kelurahan" />
               </div>
               <div className="field-group">
                 <label>Nama Perusahaan/Lembaga</label>
-                <input
-                  name="company_name"
-                  value={formData.company_name}
-                  onChange={handleChange}
-                  placeholder="Nama perusahaan/lembaga"
-                />
+                <input placeholder="Nama perusahaan/lembaga" />
               </div>
               <div className="field-group col-2">
                 <label>Alamat*</label>
-                <input
-                  required
-                  name="street"
-                  value={formData.street}
-                  onChange={handleChange}
-                  placeholder="Alamat lengkap"
-                />
+                <input required placeholder="Alamat" />
               </div>
               <div className="field-group">
                 <label>Kota*</label>
-                <input
-                  required
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder="Kota"
-                />
+                <input required placeholder="Kota" />
               </div>
               <div className="field-group">
                 <label>Provinsi*</label>
-                <input
-                  required
-                  name="province"
-                  value={formData.province}
-                  onChange={handleChange}
-                  placeholder="Provinsi"
-                />
+                <input required placeholder="Provinsi" />
               </div>
               <div className="field-group">
                 <label>Kode Pos*</label>
-                <input
-                  required
-                  name="postal_code"
-                  value={formData.postal_code}
-                  onChange={handleChange}
-                  placeholder="Kode pos"
-                />
+                <input required placeholder="Kode pos" />
               </div>
               <div className="field-group">
                 <label>No. Telepon*</label>
-                <input
-                  required
-                  name="phone_number"
-                  value={formData.phone_number}
-                  onChange={handleChange}
-                  placeholder="No. telepon"
-                />
+                <input required placeholder="No. telepon" />
               </div>
 
               <div className="save-info">
@@ -282,11 +176,11 @@ export default function OrderPage() {
                 <h3>Metode Pembayaran</h3>
 
                 <label className="radio-row">
-                  <input type="radio" name="pay" defaultChecked />
+                  <input type="radio" name="pay" value="transfer" defaultChecked />
                   <span>Transfer Bank</span>
                 </label>
                 <label className="radio-row">
-                  <input type="radio" name="pay" />
+                  <input type="radio" name="pay" value="qris" />
                   <span>QRIS</span>
                 </label>
               </section>

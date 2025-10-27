@@ -220,13 +220,41 @@
   color: #fff;
   border-bottom-right-radius: 4px;
 }
-.bubble.recv {
+
+
+.bubble.recv-user,
+.bubble.recv-admin {
   align-self: flex-start;
 }
-.bubble.recv .text {
-  background: #f1f5f9;
-  color: var(--text);
-  border-bottom-left-radius: 4px;
+
+.bubble.recv-user .text {
+  background-color: #f0f0f0; 
+  color: #333;
+  border-bottom-left-radius: 4px; 
+}
+
+
+.bubble.recv-admin .text {
+  background-color:var(--brand); 
+  color: #fff;
+  border: 1px solid #b3e0ff;
+  border-bottom-left-radius: 4px; 
+}
+
+
+.sender-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+
+.bubble.recv-admin .sender-name {
+  color: #49774a;
+}
+
+.bubble.recv-user .sender-name {
+  color: #555;
 }
 
 /* Composer */

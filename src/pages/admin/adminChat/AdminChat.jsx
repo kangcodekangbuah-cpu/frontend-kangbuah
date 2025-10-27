@@ -6,14 +6,19 @@ import "./AdminChat.css";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-const getUserIdFromToken = () => {
+const getUserInfoFromToken = () => {
     const token = localStorage.getItem("token");
     if (!token) return null;
     try {
         const decoded = jwtDecode(token);
-        return decoded.sub;
+        return {
+            id: decoded.sub,
+            name: decoded.username,
+            role: decoded.role
+        }
     } catch (error) {
-        return null;
+        console.error("Token decode error:", error);
+        return error;
     }
 };
 
@@ -25,15 +30,17 @@ export default function AdminChat() {
     const [text, setText] = useState("");
     const endRef = useRef(null);
     const [isLoggedIn, setIsLoggedIn] = useState(true);
-    const currentUserId = getUserIdFromToken();
+    const currentUser = getUserInfoFromToken();
+    const currentUserId = currentUser?.id;
 
 
     useEffect(() => {
-        const loggedIn = localStorage.getItem("token");
-        const role = localStorage.getItem("role");
-        if (!loggedIn) router("/login", { replace: true });
-        else if (role !== "ADMIN") router("/catalog", { replace: true });
-    }, [router]);
+        if (!currentUser) {
+            router("/", { replace: true });
+        } else if (currentUser.role !== 'ADMIN') {
+            router("/catalog", { replace: true });
+        }
+    }, [router, currentUser]);
 
 
     useEffect(() => {
@@ -72,7 +79,9 @@ export default function AdminChat() {
                 const formattedMessages = res.data.data.map(msg => ({
                     text: msg.message_content,
                     at: msg.timestamp,
-                    role: msg.user_id === currentUserId ? 'admin' : 'user'
+                    senderId: msg.user_id,
+                    senderName: msg.users.username,
+                    senderRole: msg.users.role
                 }));
 
                 setStore(prevStore => ({ ...prevStore, [activeId]: formattedMessages }));
@@ -81,7 +90,7 @@ export default function AdminChat() {
             }
         };
         fetchMessages();
-    }, [activeId, currentUserId]);
+    }, [activeId]);
 
     useEffect(() => {
         endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -92,9 +101,15 @@ export default function AdminChat() {
     // --- Functions ---
     const send = async () => {
         const msg = text.trim();
-        if (!msg || !activeId || !currentUserId) return;
+        if (!msg || !activeId || !currentUser) return;
 
-        const newMessage = { role: "admin", text: msg, at: new Date().toISOString() };
+        const newMessage = {
+            text: msg,
+            at: new Date().toISOString(),
+            senderId: currentUser.id,
+            senderName: currentUser.username,
+            senderRole: 'ADMIN'
+        };
         // Optimistic UI update: langsung tampilkan pesan di layar
         setStore(prevStore => ({
             ...prevStore,
@@ -163,14 +178,26 @@ export default function AdminChat() {
                             </div>
 
                             <div className="messages">
-                                {messages.map((m, idx) => (
-                                    <div key={idx} className={`bubble ${m.role === "admin" ? "sent" : "recv"}`}>
-                                        <div className="text">{m.text}</div>
-                                        <div className="time">
-                                            {new Date(m.at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                                {messages.map((m, idx) => {
+                                    const isMe = m.senderId === currentUser.id;
+                                    const isAdminSender = m.senderRole === 'ADMIN';
+
+                                    const bubbleClass = isMe ? 'sent' : isAdminSender ? 'recv-admin' : 'recv-user'
+
+                                    return (
+                                        <div key={idx} className={`bubble ${bubbleClass}`}>
+                                            {!isMe && (
+                                                <div className="sender-name">
+                                                    {m.senderName}
+                                                </div>
+                                            )}
+                                            <div className="text">{m.text}</div>
+                                            <div className="time">
+                                                {new Date(m.at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                                 <div ref={endRef} />
                             </div>
 
