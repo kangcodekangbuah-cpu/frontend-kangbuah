@@ -2,17 +2,56 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import StepNavigation from "../../components/ui/StepNavigation/StepNavigation";
+import Header from "../../components/ui/Layout/Header";
+import Footer from "../../components/ui/Layout/Footer";
 import "./order.css";
+
+const API_URL = "http://localhost:3000"; 
 
 export default function OrderPage() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    company_name: "",
+    street: "",
+    kelurahan: "",
+    city: "",
+    province: "",
+    postal_code: "",
+    phone_number: "",
+  });
+
+  const token = localStorage.getItem("token");
+  let userId = null;
+
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+      userId = decoded.sub;
+    } catch (err) {
+      console.error("Gagal decode token:", err);
+    }
+  }
+
+  // Cek status login saat halaman dimuat
+  useEffect(() => {
+    if (!token) {
+      toast.error("Silakan login terlebih dahulu!");
+      navigate("/login");
+    }
+  }, [navigate, token]); 
 
   // Load cart dari localStorage
   useEffect(() => {
-    const stored =
-      typeof window !== "undefined" ? localStorage.getItem("cart") : null;
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("cart");
     if (stored) {
       try {
         setCart(JSON.parse(stored));
@@ -22,7 +61,7 @@ export default function OrderPage() {
     }
   }, []);
 
-  // Hitung subtotal dan total (tanpa diskon)
+  // Hitung subtotal dan total
   const subtotal = useMemo(() => {
     return cart
       .filter((item) => (item.qty || 0) > 0)
@@ -30,15 +69,68 @@ export default function OrderPage() {
   }, [cart]);
 
   const shipping = 5000;
+  const discount = 0; // ✅ Tambahkan variabel diskon (bisa dikembangkan nanti)
   const total = Math.max(0, subtotal + shipping);
 
-  // Konfirmasi pesanan
-  const handleConfirm = (e) => {
-    e.preventDefault();
-    alert("Pesanan dikonfirmasi! (demo)");
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Update quantity (bisa sampai 0)
+  // Konfirmasi pesanan
+  const handleConfirm = async (e) => {
+    e.preventDefault();
+    if (!userId) return toast.error("User belum login");
+    if (cart.length === 0) {
+      return toast.error("Keranjang masih kosong!");
+    }
+
+    try {
+      const products = cart
+        .filter((item) => item.qty > 0)
+        .map((item) => ({
+          product_id: item.product_id || item.id,
+          quantity: item.qty,
+        }));
+
+      const orderPayload = {
+        products,
+        formData: {
+          company_name: formData.company_name,
+          phone_number: formData.phone_number,
+          delivery_address: {
+            street: formData.street,
+            city: formData.city,
+            province: formData.province,
+            postal_code: formData.postal_code,
+            pic_name: `${formData.first_name} ${formData.last_name}`,
+          },
+        },
+      };
+
+      const res = await axios.post(
+        `${API_URL}/orders/create/${userId}`,
+        orderPayload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("Pesanan berhasil dibuat!");
+      console.log("Order success:", res.data);
+
+      localStorage.removeItem("cart");
+      navigate("/order-success");
+    } catch (err) {
+      console.error("Error membuat pesanan:", err);
+      toast.error(
+        err.response?.data?.message || "Gagal membuat pesanan, coba lagi."
+      );
+    }
+  };
+
   const updateQuantity = (id, delta) => {
     const updated = cart.map((item) => {
       const itemId = item.id || item.product_id || item.uniqueId;
@@ -54,18 +146,11 @@ export default function OrderPage() {
 
   return (
     <div className="order-page">
+      
       <StepNavigation currentStep={2} />
 
       <header className="order-header">
         <div className="container">
-          <button
-            type="button"
-            className="order-back-btn"
-            onClick={() => navigate("/catalog")}
-            aria-label="Kembali ke Katalog"
-          >
-            ← Kembali ke Katalog
-          </button>
           <h1>Pemesanan</h1>
           <p className="subtitle">Detail Pesanan</p>
         </div>
@@ -73,44 +158,96 @@ export default function OrderPage() {
 
       <main className="order-main">
         <div className="container order-grid">
-          {/* Kiri: Form Pemesanan */}
           <section className="order-form">
             <form onSubmit={handleConfirm} className="form-grid">
               <div className="field-group">
                 <label>Nama Depan*</label>
-                <input required placeholder="Nama depan" />
+                <input
+                  required
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  placeholder="Nama depan"
+                />
               </div>
               <div className="field-group">
                 <label>Nama Belakang*</label>
-                <input required placeholder="Nama belakang" />
+                <input
+                  required
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  placeholder="Nama belakang"
+                />
               </div>
               <div className="field-group">
                 <label>Kelurahan*</label>
-                <input required placeholder="Kelurahan" />
+                <input
+                  required
+                  name="kelurahan"
+                  value={formData.kelurahan}
+                  onChange={handleChange}
+                  placeholder="Kelurahan"
+                />
               </div>
               <div className="field-group">
                 <label>Nama Perusahaan/Lembaga</label>
-                <input placeholder="Nama perusahaan/lembaga" />
+                <input
+                  name="company_name"
+                  value={formData.company_name}
+                  onChange={handleChange}
+                  placeholder="Nama perusahaan/lembaga"
+                />
               </div>
               <div className="field-group col-2">
                 <label>Alamat*</label>
-                <input required placeholder="Alamat" />
+                <input
+                  required
+                  name="street"
+                  value={formData.street}
+                  onChange={handleChange}
+                  placeholder="Alamat lengkap"
+                />
               </div>
               <div className="field-group">
                 <label>Kota*</label>
-                <input required placeholder="Kota" />
+                <input
+                  required
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  placeholder="Kota"
+                />
               </div>
               <div className="field-group">
                 <label>Provinsi*</label>
-                <input required placeholder="Provinsi" />
+                <input
+                  required
+                  name="province"
+                  value={formData.province}
+                  onChange={handleChange}
+                  placeholder="Provinsi"
+                />
               </div>
               <div className="field-group">
                 <label>Kode Pos*</label>
-                <input required placeholder="Kode pos" />
+                <input
+                  required
+                  name="postal_code"
+                  value={formData.postal_code}
+                  onChange={handleChange}
+                  placeholder="Kode pos"
+                />
               </div>
               <div className="field-group">
                 <label>No. Telepon*</label>
-                <input required placeholder="No. telepon" />
+                <input
+                  required
+                  name="phone_number"
+                  value={formData.phone_number}
+                  onChange={handleChange}
+                  placeholder="No. telepon"
+                />
               </div>
 
               <div className="save-info">
@@ -173,10 +310,7 @@ export default function OrderPage() {
                 <li key={item.id} className="summary-item">
                   <div className="thumb">
                     <img
-                      src={
-                        item.image ||
-                        "/placeholder.svg?height=48&width=48&query=produk"
-                      }
+                      src={item.image_url || "/placeholder.svg"}
                       alt={item.name}
                       width={48}
                       height={48}
@@ -184,12 +318,9 @@ export default function OrderPage() {
                   </div>
                   <div className="meta">
                     <div className="name">{item.name}</div>
-
-                    {/* 🔢 Kontrol Quantity */}
                     <div className="qty-control">
                       <button
                         type="button"
-                        className="qty-btn"
                         onClick={() =>
                           updateQuantity(
                             item.id || item.product_id || item.uniqueId,
@@ -199,10 +330,9 @@ export default function OrderPage() {
                       >
                         −
                       </button>
-                      <span className="qty-value">{item.qty || 0}</span>
+                      <span>{item.qty || 0}</span>
                       <button
                         type="button"
-                        className="qty-btn"
                         onClick={() =>
                           updateQuantity(
                             item.id || item.product_id || item.uniqueId,
@@ -223,9 +353,7 @@ export default function OrderPage() {
 
             <div className="totals">
               <div className="row">
-                <span>
-                  Subtotal ({cart.length} item{cart.length > 1 ? "s" : ""})
-                </span>
+                <span>Subtotal</span>
                 <span>Rp {subtotal.toLocaleString("id-ID")}</span>
               </div>
               <div className="row">
