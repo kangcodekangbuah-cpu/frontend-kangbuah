@@ -89,7 +89,7 @@ export default function OrderPage() {
     return;
   }
 
-  // 🟢 Ini payload untuk dikirim ke backend
+  // payload untuk dikirim ke backend
   const products = cart
     .filter((item) => item.qty > 0)
     .map((item) => ({
@@ -130,41 +130,35 @@ export default function OrderPage() {
 
     localStorage.removeItem("cart");
     navigate("/order-history");
+
   } catch (err) {
     console.error("Error membuat pesanan:", err);
     toast.error("Gagal membuat pesanan ke server. Disimpan lokal sementara.");
 
     //  Ini bagian fallback — data disimpan lokal
-    const paymentMethod = document.querySelector('input[name="pay"]:checked')?.value || "transfer";
+    // const paymentMethod = document.querySelector('input[name="pay"]:checked')?.value || "transfer";
 
-    const order = {
-      id: Date.now(),
-      userId,
-      first_name: formData.first_name,
-      last_name: formData.last_name,
-      address: formData.street,
-      city: formData.city,
-      province: formData.province,
-      postal_code: formData.postal_code,
-      kelurahan: formData.kelurahan || "",
-      phone: formData.phone_number || "",
-      company_name: formData.company_name || "",
-      items: cart,
-      subtotal,
-      discount,
-      shipping,
-      total,
-      paymentMethod,
-      status: "MENUNGGU_PERSETUJUAN",
-      createdAt: new Date().toISOString(),
-    };
-
-    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-    orders.push(order);
-    localStorage.setItem("orders", JSON.stringify(orders));
-
-    localStorage.removeItem("cart");
-    navigate("/order-history");
+    // const order = {
+    //   id: Date.now(),
+    //   userId,
+    //   firstName: formData.first_name,
+    //   lastName: formData.last_name,
+    //   address: formData.street,
+    //   city: formData.city,
+    //   province: formData.province,
+    //   postalCode: formData.postal_code,
+    //   kelurahan: formData.kelurahan || "",
+    //   phone: formData.phone_number || "",
+    //   companyName: formData.company_name || "",
+    //   items: cart,
+    //   subtotal,
+    //   discount,
+    //   shipping,
+    //   total,
+    //   paymentMethod,
+    //   status: "MENUNGGU_PERSETUJUAN",
+    //   createdAt: new Date().toISOString(),
+    // };
   }
 };
 
@@ -330,7 +324,7 @@ export default function OrderPage() {
               </section>
 
               <div className="confirm-row">
-                <button type="submit" className="confirm-btn">
+                <button type="submit" className="confirm-btn" disabled={cart.length === 0}>
                   Konfirmasi Pesanan
                 </button>
               </div>

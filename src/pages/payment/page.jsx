@@ -48,9 +48,29 @@ export default function PaymentPage() {
       alert("Silakan upload bukti pembayaran terlebih dahulu.");
       return;
     }
-    alert("Pembayaran berhasil dikonfirmasi! (demo)");
-    navigate("/invoice");
+
+    // Ambil semua pesanan dari localStorage
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    const orderId = window.location.pathname.split("/").pop(); // ambil ID dari URL
+
+    const updatedOrders = orders.map(order => {
+      if (String(order.id) === orderId) {
+        return {
+          ...order,
+          paymentProof: proofs[selectedMethod].name,
+          paymentMethod: selectedMethod,
+          status: "MENUNGGU_KONFIRMASI"
+        };
+      }
+      return order;
+    });
+
+    localStorage.setItem("orders", JSON.stringify(updatedOrders));
+
+    alert("Bukti pembayaran berhasil dikirim! Menunggu konfirmasi admin.");
+    navigate("/order-history");
   };
+
 
   return (
     <div className="payment-page">

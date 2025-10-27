@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import axios from "axios";
+import { toast } from "react-toastify";
 import "./AdminOrders.css"
 import AdminHeader from "../../../components/features/Admin/AdminHeader"
+
+const API_URL = "http://localhost:3000";
 
 const statusLabels = {
   MENUNGGU_PERSETUJUAN: "Menunggu Persetujuan",
@@ -38,40 +42,55 @@ export default function AdminOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [filterStatus, setFilterStatus] = useState("all")
   const [isLoggedIn, setIsLoggedIn] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/orders/list`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        setOrders(res.data.data || res.data.orders || []);
+      } catch (err) {
+        console.error("Gagal ambil data dari backend:", err);
+        toast.error("Gagal mengambil data dari backend!");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (!token) {
-      setIsLoggedIn(false);
-      navigate("/")
-    } else if (role !== "ADMIN") {
-      setIsLoggedIn(true);
-      navigate("/catalog")
-    } else {
-      setIsLoggedIn(true); 
-    }
-  })
+    fetchOrders();
+  }, []);
 
-  // Load orders
-  useEffect(() => {
-    const stored = localStorage.getItem("orders") || "[]"
-    try {
-      setOrders(JSON.parse(stored))
-    } catch {
-      setOrders([])
-    }
-  }, [])
-
-  const updateOrderStatus = (orderId, newStatus) => {
-    const updated = orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
-    setOrders(updated)
-    localStorage.setItem("orders", JSON.stringify(updated))
-    if (selectedOrder?.id === orderId) {
-      setSelectedOrder({ ...selectedOrder, status: newStatus })
-    }
+  if (loading) {
+    return <div className="loading">Memuat data pesanan...</div>;
   }
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await axios.patch(
+        `${API_URL}/orders/status/${orderId}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
+
+      const updatedOrders = orders.map((order) =>
+        order.order_id === orderId ? { ...order, status: newStatus } : order
+      );
+      setOrders(updatedOrders);
+
+      setSelectedOrder((prev) =>
+        prev && prev.order_id === orderId
+          ? { ...prev, status: newStatus }
+          : prev
+      );
+
+      toast.success(`Status pesanan #${orderId} diubah ke ${statusLabels[newStatus]}`);
+    } catch (error) {
+      console.error("Gagal update status:", error);
+      toast.error("Gagal menyinkronkan ke backend!");
+    }
+  };
 
   const filteredOrders = filterStatus === "all" ? orders : orders.filter((o) => o.status === filterStatus)
 
@@ -104,20 +123,20 @@ export default function AdminOrdersPage() {
                 <ul>
                   {filteredOrders.map((order) => (
                     <li
-                      key={order.id}
-                      className={`order-item ${selectedOrder?.id === order.id ? "active" : ""}`}
+                      key={order.order_id}
+                      className={`order-item ${selectedOrder?.id === order.order_id ? "active" : ""}`}
                       onClick={() => setSelectedOrder(order)}
                     >
                       <div className="order-item-header">
-                        <div className="order-id">Pesanan #{order.id}</div>
+                        <div className="order-id">Pesanan #{order.order_id}</div>
                         <div className="status-badge" style={{ backgroundColor: statusColors[order.status] }}>
                           {statusLabels[order.status]}
                         </div>
                       </div>
                       <div className="order-item-customer">
-                        {order.firstName} {order.lastName}
+                        {order.user?.first_name} {order.user?.last_name}
                       </div>
-                      <div className="order-item-total">Rp {order.total.toLocaleString("id-ID")}</div>
+                      <div className="order-item-total">Rp {order.total_price?.toLocaleString("id-ID")}</div>
                     </li>
                   ))}
                 </ul>
@@ -134,6 +153,7 @@ export default function AdminOrdersPage() {
                 <div className="detail-section">
                   <h3>Ubah Status Pesanan</h3>
                   <div className="status-selector">
+                    {console.log("Selected Order:", selectedOrder)}
                     {statusOrder.map((status) => (
                       <button
                         key={status}
@@ -142,7 +162,7 @@ export default function AdminOrdersPage() {
                           backgroundColor: selectedOrder.status === status ? statusColors[status] : "#e0e0e0",
                           color: selectedOrder.status === status ? "#fff" : "#666",
                         }}
-                        onClick={() => updateOrderStatus(selectedOrder.id, status)}
+                        onClick={() => updateOrderStatus(selectedOrder.order_id, status)}
                       >
                         {statusLabels[status]}
                       </button>
@@ -154,28 +174,30 @@ export default function AdminOrdersPage() {
                   <h3>Informasi Pelanggan</h3>
                   <p>
                     <strong>
-                      {selectedOrder.firstName} {selectedOrder.lastName}
+                      {selectedOrder.user?.first_name} {selectedOrder.user?.last_name}
                     </strong>
                   </p>
-                  <p>{selectedOrder.address}</p>
+                  <p>{selectedOrder.user?.address}</p>
                   <p>
-                    {selectedOrder.city}, {selectedOrder.province} {selectedOrder.postalCode}
+                    {selectedOrder.user?.city}, {selectedOrder.user?.province} {selectedOrder.user?.postalCode}
                   </p>
-                  <p>Telepon: {selectedOrder.phone}</p>
+                  <p>Telepon: {selectedOrder.user?.phone}</p>
                 </div>
 
                 <div className="detail-section">
                   <h3>Item Pesanan</h3>
                   <ul className="items-list">
-                    {selectedOrder.items.map((item) => (
-                      <li key={item.id} className="item-row">
-                        <div className="item-info">
-                          <div className="item-name">{item.name}</div>
-                          <div className="item-qty">Qty: {item.qty || 1}</div>
-                        </div>
-                        <div className="item-price">Rp {(item.price * (item.qty || 1)).toLocaleString("id-ID")}</div>
-                      </li>
-                    ))}
+                  {selectedOrder.order_details?.map((item) => (
+                    <li key={item.id} className="item-row">
+                      <div className="item-info">
+                        <div className="item-name">{item.product?.name}</div>
+                        <div className="item-qty">Qty: {item.quantity}</div>
+                      </div>
+                      <div className="item-price">
+                        Rp {(item.product?.price * item.quantity).toLocaleString("id-ID")}
+                      </div>
+                    </li>
+                  ))}
                   </ul>
                 </div>
 
@@ -184,19 +206,19 @@ export default function AdminOrdersPage() {
                   <div className="payment-summary">
                     <div className="summary-row">
                       <span>Subtotal</span>
-                      <span>Rp {selectedOrder.subtotal.toLocaleString("id-ID")}</span>
+                      <span>Rp {(selectedOrder.subtotal || 0).toLocaleString("id-ID")}</span>
                     </div>
                     <div className="summary-row">
                       <span>Diskon</span>
-                      <span>- Rp {selectedOrder.discount.toLocaleString("id-ID")}</span>
+                      <span>- Rp {(selectedOrder.discount || 0).toLocaleString("id-ID")}</span>
                     </div>
                     <div className="summary-row">
                       <span>Biaya Pengiriman</span>
-                      <span>Rp {selectedOrder.shipping.toLocaleString("id-ID")}</span>
+                      <span>Rp {(selectedOrder.shipping || 0).toLocaleString("id-ID")}</span>
                     </div>
                     <div className="summary-row total">
                       <strong>Total</strong>
-                      <strong>Rp {selectedOrder.total.toLocaleString("id-ID")}</strong>
+                      <strong>Rp {(selectedOrder.total_price || 0).toLocaleString("id-ID")}</strong>
                     </div>
                   </div>
                 </div>
@@ -208,7 +230,7 @@ export default function AdminOrdersPage() {
 
                 <div className="detail-section">
                   <h3>Tanggal Pesanan</h3>
-                  <p>{new Date(selectedOrder.createdAt).toLocaleDateString("id-ID")}</p>
+                  <p>{new Date(selectedOrder.created_at).toLocaleDateString("id-ID")}</p>
                 </div>
               </>
             ) : (

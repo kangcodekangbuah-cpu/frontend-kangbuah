@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
+import { toast } from "react-toastify";
 import CustomerHeader from "../CustomerHeader";
 import "./order-history.css";
+
+const API_URL = "http://localhost:3000";
 
 const statusLabels = {
   MENUNGGU_PERSETUJUAN: "Menunggu Persetujuan",
@@ -27,36 +32,49 @@ export default function OrderHistoryPage() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
-
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    if (!token) {
-      setIsLoggedIn(false)
-      navigate("/");
+    let userId;
+
+    if (token) {
+      const decoded = jwtDecode(token);
+      userId = decoded?.sub || decoded?.id || decoded?.userId;
+    } else {
+      navigate("/login");
       return;
     }
-    if (role === "ADMIN") {
-      navigate("/admin/orders");
-      return;
-    }
+
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/orders/history/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Fetched orders:", res.data);
+
+        setOrders(res.data.data || res.data.orders || []);
+      } catch (err) {
+        console.error("Gagal mengambil data pesanan:", err);
+        toast.error("Gagal memuat riwayat pesanan.");
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
   }, [navigate]);
 
-  // Load orders dari localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem("orders") || "[]";
-    try {
-      setOrders(JSON.parse(stored));
-    } catch {
-      setOrders([]);
-    }
-  }, []);
+  if (loading) {
+    return <div className="loading">Memuat data pesanan...</div>;
+  }
 
   return (
     <div className="order-history-page">
-        <CustomerHeader isLoggedIn={isLoggedIn} />
+      <CustomerHeader isLoggedIn={isLoggedIn} />
+
       <header className="order-history-header">
         <div className="container">
           <h1>Riwayat Pesanan</h1>
@@ -78,24 +96,30 @@ export default function OrderHistoryPage() {
               <ul>
                 {orders.map((order) => (
                   <li
-                    key={order.id}
-                    className={`order-item ${selectedOrder?.id === order.id ? "active" : ""}`}
+                    key={order.order_id || order.id}
+                    className={`order-item ${
+                      selectedOrder?.order_id === order.order_id ? "active" : ""
+                    }`}
                     onClick={() => setSelectedOrder(order)}
                   >
                     <div className="order-item-header">
-                      <div className="order-id">Pesanan #{order.id}</div>
+                      <div className="order-id">
+                        Pesanan #{order.order_id || order.id}
+                      </div>
                       <div
                         className="status-badge"
-                        style={{ backgroundColor: statusColors[order.status] }}
+                        style={{
+                          backgroundColor: statusColors[order.status],
+                        }}
                       >
-                        {statusLabels[order.status]}
+                        {statusLabels[order.status] || order.status}
                       </div>
                     </div>
                     <div className="order-item-date">
-                      {new Date(order.createdAt).toLocaleDateString("id-ID")}
+                      {new Date(order.created_at).toLocaleDateString("id-ID")}
                     </div>
                     <div className="order-item-total">
-                      Rp {order.total.toLocaleString("id-ID")}
+                      Rp {order.total_price?.toLocaleString("id-ID")}
                     </div>
                   </li>
                 ))}
@@ -113,43 +137,54 @@ export default function OrderHistoryPage() {
                   <h3>Status Pesanan</h3>
                   <div
                     className="status-badge large"
-                    style={{ backgroundColor: statusColors[selectedOrder.status] }}
+                    style={{
+                      backgroundColor: statusColors[selectedOrder.status],
+                    }}
                   >
                     {statusLabels[selectedOrder.status]}
                   </div>
+
+                  {selectedOrder.status === "MENUNGGU_PEMBAYARAN" && (
+                    <button
+                      className="btn-primary"
+                      style={{ marginTop: "1rem" }}
+                      onClick={() => navigate(`/payment/${selectedOrder.id}`)}
+                    >
+                      Bayar Sekarang
+                    </button>
+                  )}
                 </div>
 
                 <div className="detail-section">
                   <h3>Informasi Pengiriman</h3>
                   <p>
                     <strong>
-                      {selectedOrder.firstName} {selectedOrder.lastName}
+                      {selectedOrder.delivery_address_id?.street ||
+                        "Alamat tidak ditemukan"}
                     </strong>
                   </p>
-                  <p>{selectedOrder.address}</p>
-                  <p>
-                    {selectedOrder.city}, {selectedOrder.province}{" "}
-                    {selectedOrder.postalCode}
-                  </p>
-                  <p>Telepon: {selectedOrder.phone}</p>
                 </div>
 
                 <div className="detail-section">
                   <h3>Item Pesanan</h3>
                   <ul className="items-list">
-                    {selectedOrder.items.map((item) => (
-                      <li key={item.id} className="item-row">
+                    {selectedOrder.order_details?.map((detail, i) => (
+                      <li key={i} className="item-row">
                         <div className="item-info">
-                          <div className="item-name">{item.name}</div>
-                          <div className="item-qty">
-                            Qty: {item.qty || 1}
-                          </div>
+                          {/* 🧠 tampilkan gambar kalau ada */}
+                          {detail.product?.image_url && (
+                            <img
+                              src={detail.product.image_url}
+                              alt={detail.product.name}
+                              className="item-image"
+                            />
+                          )}
+                          <div className="item-name">{detail.product?.name || "Produk"}</div>
+                          <div className="item-qty">Qty: {detail.quantity}</div>
                         </div>
                         <div className="item-price">
                           Rp{" "}
-                          {(item.price * (item.qty || 1)).toLocaleString(
-                            "id-ID"
-                          )}
+                          {(detail.product?.price * detail.quantity).toLocaleString("id-ID")}
                         </div>
                       </li>
                     ))}
@@ -159,40 +194,13 @@ export default function OrderHistoryPage() {
                 <div className="detail-section">
                   <h3>Ringkasan Pembayaran</h3>
                   <div className="payment-summary">
-                    <div className="summary-row">
-                      <span>Subtotal</span>
-                      <span>
-                        Rp {selectedOrder.subtotal.toLocaleString("id-ID")}
-                      </span>
-                    </div>
-                    <div className="summary-row">
-                      <span>Diskon</span>
-                      <span>
-                        - Rp {selectedOrder.discount.toLocaleString("id-ID")}
-                      </span>
-                    </div>
-                    <div className="summary-row">
-                      <span>Biaya Pengiriman</span>
-                      <span>
-                        Rp {selectedOrder.shipping.toLocaleString("id-ID")}
-                      </span>
-                    </div>
                     <div className="summary-row total">
                       <strong>Total</strong>
                       <strong>
-                        Rp {selectedOrder.total.toLocaleString("id-ID")}
+                        Rp {selectedOrder.total_price?.toLocaleString("id-ID")}
                       </strong>
                     </div>
                   </div>
-                </div>
-
-                <div className="detail-section">
-                  <h3>Metode Pembayaran</h3>
-                  <p>
-                    {selectedOrder.paymentMethod === "transfer"
-                      ? "Transfer Bank"
-                      : "QRIS"}
-                  </p>
                 </div>
               </>
             ) : (
