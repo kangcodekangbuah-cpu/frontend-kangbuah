@@ -26,7 +26,7 @@ export default function App() {
         <Route path="/catalog" element={<CatalogPage />} />
         <Route path="/order" element={<OrderPage />} />
         <Route path="/order-history" element={<OrderHistoryPage />} />
-        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/payment/:orderId" element={<PaymentPage />} />
         <Route path="/admin/catalog" element={<AdminCatalogPage />} />
         <Route path="/admin/chat" element={<AdminChat />} />
         <Route path="/admin/orders" element={<AdminOrders />} />

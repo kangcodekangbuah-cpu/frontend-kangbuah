@@ -1,40 +1,40 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 import StepNavigation from "../../components/ui/StepNavigation/StepNavigation";
 import "./payment.css";
 
+const API_URL = "http://localhost:3000";
+
 export default function PaymentPage() {
   const navigate = useNavigate();
-  const [cart, setCart] = useState([]);
+  const { orderId } = useParams();
+
+  const [order, setOrder] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState("transfer");
   const [proofs, setProofs] = useState({ transfer: null, qris: null });
+  const [uploading, setUploading] = useState(false);
 
-  // Load cart dari localStorage
   useEffect(() => {
-    const stored =
-      typeof window !== "undefined" ? localStorage.getItem("cart") : null;
-    if (stored) {
+    const fetchOrder = async () => {
       try {
-        setCart(JSON.parse(stored));
-      } catch {
-        setCart([]);
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${API_URL}/orders/${orderId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setOrder(res.data);
+      } catch (error) {
+        console.error("Gagal mengambil data pesanan:", error);
+        toast.error("Gagal memuat data pesanan.");
       }
-    }
-  }, []);
+    };
+    fetchOrder();
+  }, [orderId]);
 
-  // Hitung subtotal & total
-  const subtotal = useMemo(() => {
-    return cart
-      .filter((item) => (item.qty || 0) > 0)
-      .reduce((sum, item) => sum + item.price * item.qty, 0);
-  }, [cart]);
-
-  const shipping = 5000;
-  const total = Math.max(0, subtotal + shipping);
-
-  // Upload bukti pembayaran
+  // 🔹 Upload bukti pembayaran (disable reupload)
   const handleUpload = (e, method) => {
     const file = e.target.files[0];
     if (file) {
@@ -42,35 +42,52 @@ export default function PaymentPage() {
     }
   };
 
-  // Konfirmasi pembayaran
-  const handleConfirmPayment = () => {
+  const handleRemoveProof = (method) => {
+    setProofs((prev) => ({ ...prev, [method]: null }));
+  };
+
+  // 🔹 Konfirmasi pembayaran
+  const handleConfirmPayment = async () => {
     if (!proofs[selectedMethod]) {
-      alert("Silakan upload bukti pembayaran terlebih dahulu.");
+      toast.error("Silakan upload bukti pembayaran terlebih dahulu.");
       return;
     }
 
-    // Ambil semua pesanan dari localStorage
-    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-    const orderId = window.location.pathname.split("/").pop(); // ambil ID dari URL
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("proof", proofs[selectedMethod]);
 
-    const updatedOrders = orders.map(order => {
-      if (String(order.id) === orderId) {
-        return {
-          ...order,
-          paymentProof: proofs[selectedMethod].name,
-          paymentMethod: selectedMethod,
-          status: "MENUNGGU_KONFIRMASI"
-        };
-      }
-      return order;
-    });
+    try {
+      setUploading(true);
+      await axios.post(`${API_URL}/payments/upload-proof/${orderId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    localStorage.setItem("orders", JSON.stringify(updatedOrders));
-
-    alert("Bukti pembayaran berhasil dikirim! Menunggu konfirmasi admin.");
-    navigate("/order-history");
+      toast.success("Bukti pembayaran berhasil dikirim!");
+      navigate("/order-history");
+    } catch (error) {
+      console.error("Gagal upload bukti pembayaran:", error);
+      toast.error(
+        error.response?.data?.message || "Gagal mengunggah bukti pembayaran."
+      );
+    } finally {
+      setUploading(false);
+    }
   };
 
+  const subtotal = useMemo(() => {
+    if (!order?.OrderItems) return 0;
+    return order.OrderItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+  }, [order]);
+
+  const shipping = 5000;
+  const total = subtotal + shipping;
 
   return (
     <div className="payment-page">
@@ -82,7 +99,6 @@ export default function PaymentPage() {
             type="button"
             className="payment-back-btn"
             onClick={() => navigate("/order")}
-            aria-label="Kembali ke Form Pemesanan"
           >
             ← Kembali ke Form Pemesanan
           </button>
@@ -95,7 +111,7 @@ export default function PaymentPage() {
 
       <main className="payment-main">
         <div className="container payment-grid">
-          {/* Kiri: Metode Pembayaran */}
+          {/* Kiri: Upload Bukti Pembayaran */}
           <section className="payment-methods">
             <div className="method">
               <label className="radio-row">
@@ -112,28 +128,45 @@ export default function PaymentPage() {
                   <strong>BNI</strong> - 1983714283 A/N RAMA AULIA
                 </p>
                 <div className="upload-box">
-                  <label className="upload-label">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleUpload(e, "transfer")}
-                    />
-                    <div className="upload-placeholder">
-                      <img
-                        src="/placeholder.svg?height=50&width=50"
-                        alt="upload"
+                  {!proofs.transfer ? (
+                    <label className="upload-label">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleUpload(e, "transfer")}
                       />
-                      <p>Upload Bukti Pembayaran</p>
-                      <small>JPG, JPEG, PNG (maks. 1MB)</small>
+                      <div className="upload-placeholder">
+                        <img
+                          src="/placeholder.svg?height=50&width=50"
+                          alt="upload"
+                        />
+                        <p>Upload Bukti Pembayaran</p>
+                        <small>JPG, JPEG, PNG (maks. 1MB)</small>
+                      </div>
+                    </label>
+                  ) : (
+                    <div className="preview-box">
+                      <img
+                        src={URL.createObjectURL(proofs.transfer)}
+                        alt="Bukti Pembayaran"
+                        className="preview-image"
+                      />
+                      <div className="preview-actions">
+                        <p>{proofs.transfer.name}</p>
+                        <button
+                          onClick={() => handleRemoveProof("transfer")}
+                          className="remove-btn"
+                        >
+                          Ganti File
+                        </button>
+                      </div>
                     </div>
-                  </label>
-                  {proofs.transfer && (
-                    <p className="file-name">{proofs.transfer.name}</p>
                   )}
                 </div>
               </div>
             </div>
 
+            {/* QRIS */}
             <div className="method">
               <label className="radio-row">
                 <input
@@ -151,23 +184,39 @@ export default function PaymentPage() {
                   className="qris-image"
                 />
                 <div className="upload-box">
-                  <label className="upload-label">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleUpload(e, "qris")}
-                    />
-                    <div className="upload-placeholder">
-                      <img
-                        src="/placeholder.svg?height=50&width=50"
-                        alt="upload"
+                  {!proofs.qris ? (
+                    <label className="upload-label">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleUpload(e, "qris")}
                       />
-                      <p>Upload Bukti Pembayaran</p>
-                      <small>JPG, JPEG, PNG (maks. 1MB)</small>
+                      <div className="upload-placeholder">
+                        <img
+                          src="/placeholder.svg?height=50&width=50"
+                          alt="upload"
+                        />
+                        <p>Upload Bukti Pembayaran</p>
+                        <small>JPG, JPEG, PNG (maks. 1MB)</small>
+                      </div>
+                    </label>
+                  ) : (
+                    <div className="preview-box">
+                      <img
+                        src={URL.createObjectURL(proofs.qris)}
+                        alt="Bukti Pembayaran"
+                        className="preview-image"
+                      />
+                      <div className="preview-actions">
+                        <p>{proofs.qris.name}</p>
+                        <button
+                          onClick={() => handleRemoveProof("qris")}
+                          className="remove-btn"
+                        >
+                          Ganti File
+                        </button>
+                      </div>
                     </div>
-                  </label>
-                  {proofs.qris && (
-                    <p className="file-name">{proofs.qris.name}</p>
                   )}
                 </div>
               </div>
@@ -177,62 +226,63 @@ export default function PaymentPage() {
               <button
                 type="button"
                 className="confirm-btn"
+                disabled={uploading}
                 onClick={handleConfirmPayment}
               >
-                Konfirmasi Pembayaran
+                {uploading ? "Mengunggah..." : "Konfirmasi Pembayaran"}
               </button>
             </div>
           </section>
 
-          {/* Kanan: Ringkasan Pesanan (sama seperti di OrderPage) */}
+          {/* Kanan: Ringkasan Pesanan */}
           <aside className="order-summary" aria-label="Tinjau Pemesanan">
             <h3>Tinjau Pemesanan</h3>
-            <ul className="summary-list">
-              {cart.length === 0 && (
-                <li className="empty">Keranjang Anda kosong.</li>
-              )}
-              {cart
-                .filter((item) => (item.qty || 0) > 0)
-                .map((item) => (
-                  <li key={item.id} className="summary-item">
-                    <div className="thumb">
-                      <img
-                        src={
-                          item.image ||
-                          "/placeholder.svg?height=48&width=48&query=produk"
-                        }
-                        alt={item.name}
-                        width={48}
-                        height={48}
-                      />
-                    </div>
-                    <div className="meta">
-                      <div className="name">{item.name}</div>
-                      <div className="desc">Berat: {item.weight || "—"}</div>
-                    </div>
-                    <div className="price">
-                      Rp {(item.price * (item.qty || 0)).toLocaleString("id-ID")}
-                    </div>
-                  </li>
-                ))}
-            </ul>
 
-            <div className="totals">
-              <div className="row">
-                <span>
-                  Subtotal ({cart.length} item{cart.length > 1 ? "s" : ""})
-                </span>
-                <span>Rp {subtotal.toLocaleString("id-ID")}</span>
-              </div>
-              <div className="row">
-                <span>Biaya Pengiriman</span>
-                <span>Rp {shipping.toLocaleString("id-ID")}</span>
-              </div>
-              <div className="row total">
-                <strong>Total</strong>
-                <strong>Rp {total.toLocaleString("id-ID")}</strong>
-              </div>
-            </div>
+            {!order ? (
+              <p className="loading">Memuat pesanan...</p>
+            ) : (
+              <>
+                <ul className="summary-list">
+                  {order?.OrderItems?.map((item) => (
+                    <li key={item.order_item_id} className="summary-item">
+                      <div className="thumb">
+                        <img
+                          src={
+                            item.Products?.image_url ||
+                            "/placeholder.svg?height=48&width=48&query=produk"
+                          }
+                          alt={item.Products?.product_name}
+                          width={48}
+                          height={48}
+                        />
+                      </div>
+                      <div className="meta">
+                        <div className="name">{item.Products?.product_name}</div>
+                        <div className="desc">Qty: {item.quantity}</div>
+                      </div>
+                      <div className="price">
+                        Rp {(item.price * item.quantity).toLocaleString("id-ID")}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="totals">
+                  <div className="row">
+                    <span>Subtotal</span>
+                    <span>Rp {subtotal.toLocaleString("id-ID")}</span>
+                  </div>
+                  <div className="row">
+                    <span>Biaya Pengiriman</span>
+                    <span>Rp {shipping.toLocaleString("id-ID")}</span>
+                  </div>
+                  <div className="row total">
+                    <strong>Total</strong>
+                    <strong>Rp {total.toLocaleString("id-ID")}</strong>
+                  </div>
+                </div>
+              </>
+            )}
           </aside>
         </div>
       </main>

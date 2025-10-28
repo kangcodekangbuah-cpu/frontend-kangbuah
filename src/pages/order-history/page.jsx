@@ -148,7 +148,7 @@ export default function OrderHistoryPage() {
                     <button
                       className="btn-primary"
                       style={{ marginTop: "1rem" }}
-                      onClick={() => navigate(`/payment/${selectedOrder.id}`)}
+                      onClick={() => navigate(`/payment/${selectedOrder.order_id}`)}
                     >
                       Bayar Sekarang
                     </button>
