@@ -290,3 +290,21 @@
     grid-template-columns: 1fr;
   }
 }
+
+.payment-proof-image {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.payment-proof-image:hover {
+  transform: scale(1.05);
+}
+.item-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  object-fit: cover;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
