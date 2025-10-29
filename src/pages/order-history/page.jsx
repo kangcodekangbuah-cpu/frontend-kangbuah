@@ -144,14 +144,57 @@ export default function OrderHistoryPage() {
                   </div>
 
                   {selectedOrder.status === "MENUNGGU_PEMBAYARAN" && (
-                    <button
-                      className="btn-primary"
-                      style={{ marginTop: "1rem" }}
-                      onClick={() => navigate(`/payment/${selectedOrder.order_id}`)}
-                    >
-                      Bayar Sekarang
-                    </button>
+                    <>
+                      {!selectedOrder.attachment_url ? (
+                        // kalau belum upload bukti
+                        <button
+                          className="btn-primary bayar-btn"
+                          style={{ marginTop: "0.9rem" }}
+                          onClick={() => navigate(`/payment/${selectedOrder.order_id}`)}
+                        >
+                          Bayar
+                        </button>
+                      ) : (
+                            // Sudah upload bukti
+                      <div
+                        className="bukti-section"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "1rem",
+                          marginTop: "2rem",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                          <img
+                            src={selectedOrder.attachment_url}
+                            alt="Bukti pembayaran"
+                            className="bukti-preview"
+                            onClick={() => window.open(selectedOrder.attachment_url, "_blank")}
+                          />
+                          <a
+                            href={selectedOrder.attachment_url}
+                            target="_blank"
+                            className="a"
+                            rel="noopener noreferrer"
+                            style={{ display: "block", marginTop: "6px", color: "#3498db" }}
+                          >
+                            Tinjau Bukti Pembayaran
+                          </a>
+                        </div>
+
+                        <button
+                          className="btn-upload-ulang"
+                          onClick={() => navigate(`/payment/${selectedOrder.order_id}`)}
+                        >
+                          Upload Ulang
+                        </button>
+                      </div>
+                      )}
+                    </>
                   )}
+
                 </div>
 
                 <div className="detail-section">

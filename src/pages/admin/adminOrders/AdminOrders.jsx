@@ -232,12 +232,39 @@ export default function AdminOrdersPage() {
                   <h3>Tanggal Pesanan</h3>
                   <p>{new Date(selectedOrder.created_at).toLocaleDateString("id-ID")}</p>
                 </div>
-              </>
-            ) : (
-              <div className="empty-details">
-                <p>Pilih pesanan untuk melihat detail dan ubah status</p>
-              </div>
-            )}
+
+                {selectedOrder.attachment_url && (
+                <div className="detail-section">
+                  <h3>Bukti Pembayaran</h3>
+                  <img
+                    src={selectedOrder.attachment_url}
+                    alt="Bukti Pembayaran"
+                    className="payment-proof-image"
+                    style={{
+                      width: "100%",
+                      maxWidth: "300px",
+                      borderRadius: "10px",
+                      marginTop: "8px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  <a
+                    href={selectedOrder.attachment_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: "block", marginTop: "6px", color: "#3498db" }}
+                  >
+                    Lihat Gambar Asli
+                  </a>
+                </div>
+              )}
+
+                </>
+              ) : (
+                <div className="empty-details">
+                  <p>Pilih pesanan untuk melihat detail dan ubah status</p>
+                </div>
+              )}
           </aside>
         </div>
       </main>
