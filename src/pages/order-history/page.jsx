@@ -52,8 +52,6 @@ export default function OrderHistoryPage() {
         const res = await axios.get(`${API_URL}/orders/history/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Fetched orders:", res.data);
-
         setOrders(res.data.data || res.data.orders || []);
       } catch (err) {
         console.error("Gagal mengambil data pesanan:", err);

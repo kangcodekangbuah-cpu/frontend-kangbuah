@@ -153,7 +153,6 @@ export default function AdminOrdersPage() {
                 <div className="detail-section">
                   <h3>Ubah Status Pesanan</h3>
                   <div className="status-selector">
-                    {console.log("Selected Order:", selectedOrder)}
                     {statusOrder.map((status) => (
                       <button
                         key={status}

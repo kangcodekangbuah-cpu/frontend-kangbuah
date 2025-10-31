@@ -38,9 +38,6 @@ export default function OrderPage() {
     }
   }
 
-  console.log("Nilai userId sebelum render:", userId);
-  console.log("Nilai token sebelum render:", token);
-
   // Cek status login saat halaman dimuat
   useEffect(() => {
     if (!token) {
@@ -51,7 +48,6 @@ export default function OrderPage() {
 
   // Load cart dari localStorage
   useEffect(() => {
-    console.log("EFEK B: load cart dari storage");
     if (typeof window === "undefined") return;
     const stored = localStorage.getItem("cart");
     if (stored) {
@@ -65,7 +61,6 @@ export default function OrderPage() {
 
   // untuk pre fill form dengan data user jika sudah ada
   useEffect(() => {
-    console.log("Menjalankan useEffect [userId, token]. Nilai userId:", userId);
     if (userId) {
       const fetchCheckoutDetails = async () => {
         setIsLoading(true);
@@ -168,7 +163,6 @@ export default function OrderPage() {
       );
 
       toast.success("Pesanan berhasil dibuat!");
-      console.log("test", res)
       const newOrderId = res.data.data.order?.order_id;
 
       if (newOrderId) {
