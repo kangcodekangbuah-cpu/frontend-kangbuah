@@ -118,7 +118,7 @@ export default function OrderHistoryPage() {
                       {new Date(order.created_at).toLocaleDateString("id-ID")}
                     </div>
                     <div className="order-item-total">
-                      Rp {order.total_price?.toLocaleString("id-ID")}
+                      Rp {Number(order.total_price)?.toLocaleString("id-ID")}
                     </div>
                   </li>
                 ))}
@@ -155,42 +155,42 @@ export default function OrderHistoryPage() {
                           Bayar
                         </button>
                       ) : (
-                            // Sudah upload bukti
-                      <div
-                        className="bukti-section"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                          marginTop: "2rem",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                          <img
-                            src={selectedOrder.attachment_url}
-                            alt="Bukti pembayaran"
-                            className="bukti-preview"
-                            onClick={() => window.open(selectedOrder.attachment_url, "_blank")}
-                          />
-                          <a
-                            href={selectedOrder.attachment_url}
-                            target="_blank"
-                            className="a"
-                            rel="noopener noreferrer"
-                            style={{ display: "block", marginTop: "6px", color: "#3498db" }}
-                          >
-                            Tinjau Bukti Pembayaran
-                          </a>
-                        </div>
-
-                        <button
-                          className="btn-upload-ulang"
-                          onClick={() => navigate(`/payment/${selectedOrder.order_id}`)}
+                        // Sudah upload bukti
+                        <div
+                          className="bukti-section"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "1rem",
+                            marginTop: "2rem",
+                            justifyContent: "space-between",
+                          }}
                         >
-                          Upload Ulang
-                        </button>
-                      </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                            <img
+                              src={selectedOrder.attachment_url}
+                              alt="Bukti pembayaran"
+                              className="bukti-preview"
+                              onClick={() => window.open(selectedOrder.attachment_url, "_blank")}
+                            />
+                            <a
+                              href={selectedOrder.attachment_url}
+                              target="_blank"
+                              className="a"
+                              rel="noopener noreferrer"
+                              style={{ display: "block", marginTop: "6px", color: "#3498db" }}
+                            >
+                              Tinjau Bukti Pembayaran
+                            </a>
+                          </div>
+
+                          <button
+                            className="btn-upload-ulang"
+                            onClick={() => navigate(`/payment/${selectedOrder.order_id}`)}
+                          >
+                            Upload Ulang
+                          </button>
+                        </div>
                       )}
                     </>
                   )}
@@ -214,10 +214,9 @@ export default function OrderHistoryPage() {
                     {selectedOrder.order_details?.map((detail, i) => (
                       <li key={i} className="item-row">
                         <div className="item-info">
-                          {/* 🧠 tampilkan gambar kalau ada */}
                           {detail.product?.image_url && (
                             <img
-                              src={detail.product.image_url}
+                              src={detail.product.image_url[0]}
                               alt={detail.product.name}
                               className="item-image"
                             />
@@ -240,7 +239,7 @@ export default function OrderHistoryPage() {
                     <div className="summary-row total">
                       <strong>Total</strong>
                       <strong>
-                        Rp {selectedOrder.total_price?.toLocaleString("id-ID")}
+                        Rp {parseFloat(selectedOrder.total_price)?.toLocaleString("id-ID")}
                       </strong>
                     </div>
                   </div>

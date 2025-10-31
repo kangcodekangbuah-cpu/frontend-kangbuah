@@ -86,3 +86,8 @@
 .confirm-btn:hover {
   background: #16a34a;
 }
+
+.desc {
+  font-size: small;
+  color:#8d8d8d;
+}

@@ -25,7 +25,7 @@ export default function PaymentPage() {
         const res = await axios.get(`${API_URL}/orders/${orderId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setOrder(res.data);
+        setOrder(res.data.data);
       } catch (error) {
         console.error("Gagal mengambil data pesanan:", error);
         toast.error("Gagal memuat data pesanan.");
@@ -79,15 +79,11 @@ export default function PaymentPage() {
   };
 
   const subtotal = useMemo(() => {
-    if (!order?.OrderItems) return 0;
-    return order.OrderItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
+    return order?.total_price || 0;
   }, [order]);
 
   const shipping = 5000;
-  const total = subtotal + shipping;
+  const total = parseFloat(subtotal) + shipping;
 
   return (
     <div className="payment-page">
@@ -95,13 +91,9 @@ export default function PaymentPage() {
 
       <header className="payment-header">
         <div className="container">
-          <button
-            type="button"
-            className="payment-back-btn"
-            onClick={() => navigate("/order")}
-          >
-            ← Kembali ke Form Pemesanan
-          </button>
+          <button onClick={() => navigate(-1)} className="header-btn back-btn">
+              <span>&#8592;</span> Kembali
+            </button>
           <h1>Pembayaran</h1>
           <p className="subtitle">
             Harap melakukan pembayaran ke nomor rekening berikut
@@ -243,25 +235,25 @@ export default function PaymentPage() {
             ) : (
               <>
                 <ul className="summary-list">
-                  {order?.OrderItems?.map((item) => (
-                    <li key={item.order_item_id} className="summary-item">
+                  {order?.order_details?.map((item) => (
+                    <li key={item.order_detail_id} className="summary-item">
                       <div className="thumb">
                         <img
                           src={
-                            item.Products?.image_url ||
+                            item.product?.image_url[0] ||
                             "/placeholder.svg?height=48&width=48&query=produk"
                           }
-                          alt={item.Products?.product_name}
+                          alt={item.product?.name}
                           width={48}
                           height={48}
                         />
                       </div>
                       <div className="meta">
-                        <div className="name">{item.Products?.product_name}</div>
-                        <div className="desc">Qty: {item.quantity}</div>
+                        <div className="name">{item.product?.name}</div>
+                        <div className="desc">Qty: {item.quantity} x {item.product.unit}</div>
                       </div>
                       <div className="price">
-                        Rp {(item.price * item.quantity).toLocaleString("id-ID")}
+                        Rp {(item.price_per_unit * item.quantity).toLocaleString("id-ID")}
                       </div>
                     </li>
                   ))}
@@ -270,7 +262,7 @@ export default function PaymentPage() {
                 <div className="totals">
                   <div className="row">
                     <span>Subtotal</span>
-                    <span>Rp {subtotal.toLocaleString("id-ID")}</span>
+                    <span>Rp {parseFloat(subtotal).toLocaleString("id-ID")}</span>
                   </div>
                   <div className="row">
                     <span>Biaya Pengiriman</span>

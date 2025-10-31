@@ -113,13 +113,13 @@
   height: 100%;
 
   background: rgba(255, 255, 255, 0.85);
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
 
   z-index: 1000;
-  
+
   opacity: 1;
   transition: opacity 0.2s ease-in-out;
 }
@@ -127,15 +127,19 @@
 .spinner {
   width: 50px;
   height: 50px;
-  border: 6px solid #f3f3f3; 
-  border-top: 6px solid #007bff; 
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #007bff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .order-page[aria-busy="true"] {
@@ -283,38 +287,43 @@
 .qty-control {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-top: 4px;
 }
 
+.qty-value {
+  width: 30px;
+  text-align: center;
+  font-weight: 600;
+  color: #000000;
+  font-size: 0.95rem;
+}
+
 .qty-btn {
-  width: 26px;
-  height: 26px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #f7f7f7;
-  color: #444;
-  font-size: 16px;
-  font-weight: bold;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 20%;
+  background-color: #4caf50;
+  color: #ffffff;
+  font-size: 18px;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .qty-btn:hover {
-  background-color: #eaeaea;
+  background-color: #348437;
+  color: #ffffff;
 }
 
-.qty-value {
-  width: 28px;
-  text-align: center;
-  font-weight: 500;
-  color: #333;
+/* Efek klik */
+.qty-btn:active {
+  transform: scale(0.95);
 }
-
 
 /* Responsive */
 @media (max-width: 900px) {

@@ -1,5 +1,5 @@
-import { formatPrice } from "../../../utils/formatPrice"; // Impor fungsi formatPrice
-import defaultImage from "../../../assets/kiwi.jpg";
+import { formatPrice } from "../../../utils/formatPrice";
+import defaultImage from "../../../assets/placeHolder.png";
 import "./ProductCard.css";
 
 const ProductCard = ({ product, onAddToCart, showAddtoCart = true }) => {

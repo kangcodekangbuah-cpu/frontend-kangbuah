@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -8,6 +6,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StepNavigation from "../../components/ui/StepNavigation/StepNavigation";
 import "./order.css";
+import defaultImage from "../../assets/placeHolder.png"
 
 const API_URL = "http://localhost:3000";
 
@@ -39,6 +38,9 @@ export default function OrderPage() {
     }
   }
 
+  console.log("Nilai userId sebelum render:", userId);
+  console.log("Nilai token sebelum render:", token);
+
   // Cek status login saat halaman dimuat
   useEffect(() => {
     if (!token) {
@@ -49,6 +51,7 @@ export default function OrderPage() {
 
   // Load cart dari localStorage
   useEffect(() => {
+    console.log("EFEK B: load cart dari storage");
     if (typeof window === "undefined") return;
     const stored = localStorage.getItem("cart");
     if (stored) {
@@ -62,6 +65,7 @@ export default function OrderPage() {
 
   // untuk pre fill form dengan data user jika sudah ada
   useEffect(() => {
+    console.log("Menjalankan useEffect [userId, token]. Nilai userId:", userId);
     if (userId) {
       const fetchCheckoutDetails = async () => {
         setIsLoading(true);
@@ -71,7 +75,7 @@ export default function OrderPage() {
             headers: { Authorization: `Bearer ${token}` },
           }
           );
-          const data = res.data;
+          const data = res.data.data;
 
           setFormData(prev => ({
             ...prev,
@@ -169,17 +173,8 @@ export default function OrderPage() {
 
       if (newOrderId) {
         localStorage.removeItem("cart");
-
-        navigate(`/payment/${newOrderId}`);
-      } else {
-        console.error("Order ID tidak ditemukan di respon server");
-        toast.warn("Gagal mendapat ID pesanan, mengarahkan ke riwayat.");
-        localStorage.removeItem("cart");
         navigate("/order-history");
       }
-
-      localStorage.removeItem("cart");
-      navigate("/order-history");
 
     } catch (err) {
       console.error("Error membuat pesanan:", err);
@@ -201,6 +196,10 @@ export default function OrderPage() {
     localStorage.setItem("cart", JSON.stringify(updated));
   };
 
+  const handleBack = () => {
+    navigate('/catalog');
+  };
+
 
   return (
     <>
@@ -216,6 +215,9 @@ export default function OrderPage() {
 
         <header className="order-header">
           <div className="container">
+            <button onClick={handleBack} className="header-btn back-btn">
+              <span>&#8592;</span> Kembali
+            </button>
             <h1>Pemesanan</h1>
             <p className="subtitle">Detail Pesanan</p>
           </div>
@@ -372,10 +374,10 @@ export default function OrderPage() {
                   <li className="empty">Keranjang Anda kosong.</li>
                 )}
                 {cart.map((item) => (
-                  <li key={item.id} className="summary-item">
+                  <li key={item.product_id} className="summary-item">
                     <div className="thumb">
                       <img
-                        src={item.image_url || "/placeholder.svg"}
+                        src={item.image_url[0] || defaultImage}
                         alt={item.name}
                         width={48}
                         height={48}
@@ -386,6 +388,7 @@ export default function OrderPage() {
                       <div className="qty-control">
                         <button
                           type="button"
+                          className="qty-btn"
                           onClick={() =>
                             updateQuantity(
                               item.id || item.product_id || item.uniqueId,
@@ -393,10 +396,12 @@ export default function OrderPage() {
                             )
                           }
                         >
+                          -
                         </button>
-                        <span>{item.qty || 0}</span>
+                        <span className="qty-value">{item.qty || 0}</span>
                         <button
                           type="button"
+                          className="qty-btn"
                           onClick={() =>
                             updateQuantity(
                               item.id || item.product_id || item.uniqueId,
