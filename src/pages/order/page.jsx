@@ -127,6 +127,11 @@ export default function OrderPage() {
       return;
     }
 
+    if (!paymentMethod) {
+      toast.error("Silakan pilih metode pembayaran terlebih dahulu.");
+      return;
+    }
+
     // payload untuk dikirim ke backend
     const products = cart
       .filter((item) => item.qty > 0)
@@ -197,8 +202,8 @@ export default function OrderPage() {
   };
 
   const removeFromCart = (product) => {
-        setCart((prev) => prev.filter((p) => p.uniqueId !== product.uniqueId));
-    };
+    setCart((prev) => prev.filter((p) => p.uniqueId !== product.uniqueId));
+  };
 
 
   return (
@@ -349,22 +354,21 @@ export default function OrderPage() {
                   <h3>Metode Pembayaran</h3>
 
                   <label className="radio-row">
-                    <input 
-                    type="radio" 
-                    name="pay" 
-                    value="BANK_TRANSFER"
-                    checked={paymentMethod === 'BANK_TRANSFER'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    defaultChecked />
+                    <input
+                      type="radio"
+                      name="pay"
+                      value="BANK_TRANSFER"
+                      checked={paymentMethod === 'BANK_TRANSFER'}
+                      onChange={(e) => setPaymentMethod(e.target.value)} />
                     <span>Transfer Bank</span>
                   </label>
                   <label className="radio-row">
-                    <input 
-                    type="radio" 
-                    name="pay" 
-                    value="QRIS"
-                    checked={paymentMethod === 'QRIS'}
-                    onChange={(e) => setPaymentMethod(e.target.value)} />
+                    <input
+                      type="radio"
+                      name="pay"
+                      value="QRIS"
+                      checked={paymentMethod === 'QRIS'}
+                      onChange={(e) => setPaymentMethod(e.target.value)} />
                     <span>QRIS</span>
                   </label>
                 </section>
