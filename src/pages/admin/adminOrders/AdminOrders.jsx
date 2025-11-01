@@ -10,7 +10,7 @@ import AdminHeader from "../../../components/features/Admin/AdminHeader"
 const API_URL = "http://localhost:3000";
 
 const statusLabels = {
-  MENUNGGU_PERSETUJUAN: "Menunggu Persetujuan",
+  MENUNGGU_VERIFIKASI: "Menunggu Verifikasi",
   MENUNGGU_PEMBAYARAN: "Menunggu Pembayaran",
   SEDANG_DIPROSES: "Sedang Diproses",
   DALAM_PENGIRIMAN: "Dalam Pengiriman",
@@ -19,18 +19,18 @@ const statusLabels = {
 }
 
 const statusColors = {
-  MENUNGGU_PERSETUJUAN: "#FFA500",
+  SEDANG_DIPROSES: "#FFA500",
   MENUNGGU_PEMBAYARAN: "#FF6B6B",
-  SEDANG_DIPROSES: "#4ECDC4",
+  MENUNGGU_VERIFIKASI: "#4ECDC4",
   DALAM_PENGIRIMAN: "#45B7D1",
   SELESAI: "#2ECC71",
   DIBATALKAN: "#95A5A6",
 }
 
 const statusOrder = [
-  "MENUNGGU_PERSETUJUAN",
-  "MENUNGGU_PEMBAYARAN",
   "SEDANG_DIPROSES",
+  "MENUNGGU_PEMBAYARAN",
+  "MENUNGGU_VERIFIKASI",
   "DALAM_PENGIRIMAN",
   "SELESAI",
   "DIBATALKAN",
