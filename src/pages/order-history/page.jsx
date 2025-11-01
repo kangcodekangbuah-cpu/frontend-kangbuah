@@ -94,7 +94,7 @@ export default function OrderHistoryPage() {
               <ul>
                 {orders.map((order) => (
                   <li
-                    key={order.order_id || order.id}
+                    key={order.order_id}
                     className={`order-item ${selectedOrder?.order_id === order.order_id ? "active" : ""
                       }`}
                     onClick={() => setSelectedOrder(order)}
@@ -199,8 +199,8 @@ export default function OrderHistoryPage() {
                   <h3>Informasi Pengiriman</h3>
                   <p>
                     <strong>
-                      {selectedOrder.delivery_address
-                        ? `${selectedOrder.delivery_address.street}, ${selectedOrder.delivery_address.city}`
+                      {selectedOrder
+                        ? `${selectedOrder.delivery_street}, ${selectedOrder.delivery_city}`
                         : "Alamat tidak ditemukan"}
                     </strong>
                   </p>

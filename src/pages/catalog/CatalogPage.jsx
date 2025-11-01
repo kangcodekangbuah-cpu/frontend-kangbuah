@@ -30,7 +30,7 @@ const CatalogPage = () => {
     const [cart, setCart] = useState([]);
 
     const navigate = useNavigate();
-    const itemsPerPage = 12;
+    const itemsPerPage = 10;
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     // Cek status login saat halaman dimuat
@@ -118,7 +118,6 @@ const CatalogPage = () => {
         setCart((prev) => prev.filter((p) => p.uniqueId !== product.uniqueId));
     };
 
-    // 🚀 Pindah ke halaman Order
     const goToOrderPage = () => {
         if (cart.length === 0) return alert("Keranjang masih kosong!");
         navigate("/order");
@@ -161,7 +160,10 @@ const CatalogPage = () => {
                                             type="text"
                                             placeholder="Cari produk di sini..."
                                             value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            onChange={(e) => {
+                                                setSearchQuery(e.target.value);
+                                                setCurrentPage(1);
+                                            }}
                                         />
                                         <button className="search-btn">🔍</button>
                                     </div>
@@ -169,7 +171,10 @@ const CatalogPage = () => {
                                     <div className="sort-controls">
                                         <select
                                             value={sortBy}
-                                            onChange={(e) => setSortBy(e.target.value)}
+                                            onChange={(e) => {
+                                                setSortBy(e.target.value);
+                                                setCurrentPage(1);
+                                            }}
                                             className="sort-select"
                                         >
                                             <option value="name-asc">Nama: A-Z</option>

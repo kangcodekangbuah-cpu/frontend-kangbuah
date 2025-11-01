@@ -173,16 +173,16 @@ export default function AdminOrdersPage() {
                   <h3>Informasi Pelanggan</h3>
                   <p>
                     <strong>
-                    {selectedOrder.delivery_address.pic_name} - {selectedOrder.user?.company_name}
+                    {selectedOrder.delivery_pic_name} - {selectedOrder.billing_company_name}
                     </strong>
                   </p>
-                  <p>{selectedOrder.delivery_address
-                        ? `${selectedOrder.delivery_address?.street}`
+                  <p>{selectedOrder
+                        ? `${selectedOrder.delivery_street}`
                         : "Alamat tidak ditemukan"}</p>
                   <p>
-                  {selectedOrder.delivery_address.city}, {selectedOrder.delivery_address.province} {selectedOrder.delivery_address.postal_code}
+                  {selectedOrder.delivery_city}, {selectedOrder.delivery_province} {selectedOrder.delivery_postal_code}
                   </p>
-                  <p>Telepon: {selectedOrder.user?.phone_number ? `${selectedOrder.user?.phone_number}` : "-"}</p>
+                  <p>Telepon: {selectedOrder.billing_phone_number ? `${selectedOrder.billing_phone_number}` : "-"}</p>
                 </div>
 
                 <div className="detail-section">
@@ -226,9 +226,6 @@ export default function AdminOrdersPage() {
 
                 <div className="detail-section">
                   <h3>Metode Pembayaran</h3>
-                  <>
-                  {console.log("PTOD",selectedOrder)}
-                  </>
                   <p>{selectedOrder.payment_method == "BANK_TRANSFER" ? "Transfer Bank" : "QRIS"}</p>
                 </div>
 
