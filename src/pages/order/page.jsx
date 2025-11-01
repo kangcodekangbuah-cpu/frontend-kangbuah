@@ -14,6 +14,7 @@ export default function OrderPage() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState(null);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -137,6 +138,7 @@ export default function OrderPage() {
     const orderPayload = {
       products,
       formData: {
+        payment_method: paymentMethod || "",
         company_name: formData.company_name || "",
         phone_number: formData.phone_number || "",
         delivery_address: {
@@ -347,11 +349,22 @@ export default function OrderPage() {
                   <h3>Metode Pembayaran</h3>
 
                   <label className="radio-row">
-                    <input type="radio" name="pay" value="transfer" defaultChecked />
+                    <input 
+                    type="radio" 
+                    name="pay" 
+                    value="BANK_TRANSFER"
+                    checked={paymentMethod === 'BANK_TRANSFER'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    defaultChecked />
                     <span>Transfer Bank</span>
                   </label>
                   <label className="radio-row">
-                    <input type="radio" name="pay" value="qris" />
+                    <input 
+                    type="radio" 
+                    name="pay" 
+                    value="QRIS"
+                    checked={paymentMethod === 'QRIS'}
+                    onChange={(e) => setPaymentMethod(e.target.value)} />
                     <span>QRIS</span>
                   </label>
                 </section>

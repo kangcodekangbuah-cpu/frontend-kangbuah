@@ -134,9 +134,9 @@ export default function AdminOrdersPage() {
                         </div>
                       </div>
                       <div className="order-item-customer">
-                        {order.user?.first_name} {order.user?.last_name}
+                        {order.user?.username} - {new Date(order.order_date).toLocaleDateString("id-ID")}
                       </div>
-                      <div className="order-item-total">Rp {order.total_price?.toLocaleString("id-ID")}</div>
+                      <div className="order-item-total">Rp {Number(order.total_price)?.toLocaleString("id-ID")}</div>
                     </li>
                   ))}
                 </ul>
@@ -173,14 +173,16 @@ export default function AdminOrdersPage() {
                   <h3>Informasi Pelanggan</h3>
                   <p>
                     <strong>
-                      {selectedOrder.user?.first_name} {selectedOrder.user?.last_name}
+                    {selectedOrder.delivery_address.pic_name} - {selectedOrder.user?.company_name}
                     </strong>
                   </p>
-                  <p>{selectedOrder.user?.address}</p>
+                  <p>{selectedOrder.delivery_address
+                        ? `${selectedOrder.delivery_address?.street}`
+                        : "Alamat tidak ditemukan"}</p>
                   <p>
-                    {selectedOrder.user?.city}, {selectedOrder.user?.province} {selectedOrder.user?.postalCode}
+                  {selectedOrder.delivery_address.city}, {selectedOrder.delivery_address.province} {selectedOrder.delivery_address.postal_code}
                   </p>
-                  <p>Telepon: {selectedOrder.user?.phone}</p>
+                  <p>Telepon: {selectedOrder.user?.phone_number ? `${selectedOrder.user?.phone_number}` : "-"}</p>
                 </div>
 
                 <div className="detail-section">
@@ -193,7 +195,7 @@ export default function AdminOrdersPage() {
                         <div className="item-qty">Qty: {item.quantity}</div>
                       </div>
                       <div className="item-price">
-                        Rp {(item.product?.price * item.quantity).toLocaleString("id-ID")}
+                        Rp {Number(item.product?.price * item.quantity).toLocaleString("id-ID")}
                       </div>
                     </li>
                   ))}
@@ -205,26 +207,29 @@ export default function AdminOrdersPage() {
                   <div className="payment-summary">
                     <div className="summary-row">
                       <span>Subtotal</span>
-                      <span>Rp {(selectedOrder.subtotal || 0).toLocaleString("id-ID")}</span>
+                      <span>Rp {Number(selectedOrder.subtotal || 0).toLocaleString("id-ID")}</span>
                     </div>
                     <div className="summary-row">
                       <span>Diskon</span>
-                      <span>- Rp {(selectedOrder.discount || 0).toLocaleString("id-ID")}</span>
+                      <span>- Rp {Number(selectedOrder.discount || 0).toLocaleString("id-ID")}</span>
                     </div>
                     <div className="summary-row">
                       <span>Biaya Pengiriman</span>
-                      <span>Rp {(selectedOrder.shipping || 0).toLocaleString("id-ID")}</span>
+                      <span>Rp {Number(selectedOrder.shipping || 0).toLocaleString("id-ID")}</span>
                     </div>
                     <div className="summary-row total">
                       <strong>Total</strong>
-                      <strong>Rp {(selectedOrder.total_price || 0).toLocaleString("id-ID")}</strong>
+                      <strong>Rp {Number(selectedOrder.total_price || 0).toLocaleString("id-ID")}</strong>
                     </div>
                   </div>
                 </div>
 
                 <div className="detail-section">
                   <h3>Metode Pembayaran</h3>
-                  <p>{selectedOrder.paymentMethod === "transfer" ? "Transfer Bank" : "QRIS"}</p>
+                  <>
+                  {console.log("PTOD",selectedOrder)}
+                  </>
+                  <p>{selectedOrder.payment_method == "BANK_TRANSFER" ? "Transfer Bank" : "QRIS"}</p>
                 </div>
 
                 <div className="detail-section">
