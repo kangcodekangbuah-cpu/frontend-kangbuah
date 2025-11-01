@@ -91,3 +91,26 @@
   font-size: small;
   color:#8d8d8d;
 }
+
+.preview-box {
+  padding: 1rem;
+}
+
+.preview-image {
+  display: block;
+  width: 25rem;  
+  height: 50rem;  
+  /* object-fit: cover; */
+  border-radius: 8px; 
+  margin: 0 auto 1rem; 
+}
+
+.preview-actions {
+  text-align: center; 
+}
+
+.preview-actions p {
+  margin: 0 0 0.5rem; 
+  font-size: 0.9rem;
+  word-break: break-all;
+}

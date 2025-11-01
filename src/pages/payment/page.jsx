@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -14,7 +12,6 @@ export default function PaymentPage() {
   const { orderId } = useParams();
 
   const [order, setOrder] = useState(null);
-  const [selectedMethod, setSelectedMethod] = useState("transfer");
   const [proofs, setProofs] = useState({ transfer: null, qris: null });
   const [uploading, setUploading] = useState(false);
 
@@ -27,14 +24,12 @@ export default function PaymentPage() {
         });
         setOrder(res.data.data);
       } catch (error) {
-        console.error("Gagal mengambil data pesanan:", error);
         toast.error("Gagal memuat data pesanan.");
       }
     };
     fetchOrder();
   }, [orderId]);
 
-  // 🔹 Upload bukti pembayaran (disable reupload)
   const handleUpload = (e, method) => {
     const file = e.target.files[0];
     if (file) {
@@ -46,16 +41,19 @@ export default function PaymentPage() {
     setProofs((prev) => ({ ...prev, [method]: null }));
   };
 
-  // 🔹 Konfirmasi pembayaran
+
   const handleConfirmPayment = async () => {
-    if (!proofs[selectedMethod]) {
-      toast.error("Silakan upload bukti pembayaran terlebih dahulu.");
+    const methodKey = order.payment_method === "BANK_TRANSFER" ? "transfer" : "qris";
+    const proofFile = proofs[methodKey];
+
+    if (!proofFile) {
+      toast.error("Silakan unggah bukti pembayaran terlebih dahulu.");
       return;
     }
 
     const token = localStorage.getItem("token");
     const formData = new FormData();
-    formData.append("proof", proofs[selectedMethod]);
+    formData.append("proof", proofFile);
 
     try {
       setUploading(true);
@@ -92,11 +90,11 @@ export default function PaymentPage() {
       <header className="payment-header">
         <div className="container">
           <button onClick={() => navigate(-1)} className="header-btn back-btn">
-              <span>&#8592;</span> Kembali
-            </button>
+            <span>&#8592;</span> Kembali
+          </button>
           <h1>Pembayaran</h1>
           <p className="subtitle">
-            Harap melakukan pembayaran ke nomor rekening berikut
+            Silahkan Unggah Bukti Pembayaran
           </p>
         </div>
       </header>
@@ -105,114 +103,105 @@ export default function PaymentPage() {
         <div className="container payment-grid">
           {/* Kiri: Upload Bukti Pembayaran */}
           <section className="payment-methods">
-            <div className="method">
-              <label className="radio-row">
-                <input
-                  type="radio"
-                  name="pay"
-                  checked={selectedMethod === "transfer"}
-                  onChange={() => setSelectedMethod("transfer")}
-                />
-                <span>TRANSFER BANK</span>
-              </label>
-              <div className="method-box">
-                <p>
-                  <strong>BNI</strong> - 1983714283 A/N RAMA AULIA
-                </p>
-                <div className="upload-box">
-                  {!proofs.transfer ? (
-                    <label className="upload-label">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleUpload(e, "transfer")}
-                      />
-                      <div className="upload-placeholder">
-                        <img
-                          src="/placeholder.svg?height=50&width=50"
-                          alt="upload"
-                        />
-                        <p>Upload Bukti Pembayaran</p>
-                        <small>JPG, JPEG, PNG (maks. 1MB)</small>
-                      </div>
-                    </label>
-                  ) : (
-                    <div className="preview-box">
-                      <img
-                        src={URL.createObjectURL(proofs.transfer)}
-                        alt="Bukti Pembayaran"
-                        className="preview-image"
-                      />
-                      <div className="preview-actions">
-                        <p>{proofs.transfer.name}</p>
-                        <button
-                          onClick={() => handleRemoveProof("transfer")}
-                          className="remove-btn"
-                        >
-                          Ganti File
-                        </button>
-                      </div>
+            <>
+              {order?.payment_method === 'BANK_TRANSFER' ? (
+                <div className="method">
+                  <label className="radio-row">
+                    <span>TRANSFER BANK</span>
+                  </label>
+                  <div className="method-box">
+                    <p>
+                      <strong>BNI</strong> - 1983714283 A/N RAMA AULIA
+                    </p>
+                    <div className="upload-box">
+                      {!proofs.transfer ? (
+                        <label className="upload-label">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleUpload(e, "transfer")}
+                          />
+                          <div className="upload-placeholder">
+                            <img
+                              src="/placeholder.svg?height=50&width=50"
+                              alt="upload"
+                            />
+                            <p>Upload Bukti Pembayaran</p>
+                            <small>JPG, JPEG, PNG (maks. 1MB)</small>
+                          </div>
+                        </label>
+                      ) : (
+                        <div className="preview-box">
+                          <img
+                            src={URL.createObjectURL(proofs.transfer)}
+                            alt="Bukti Pembayaran"
+                            className="preview-image"
+                          />
+                          <div className="preview-actions">
+                            <p>{proofs.transfer.name}</p>
+                            <button
+                              onClick={() => handleRemoveProof("transfer")}
+                              className="remove-btn"
+                            >
+                              Ganti File
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* QRIS */}
-            <div className="method">
-              <label className="radio-row">
-                <input
-                  type="radio"
-                  name="pay"
-                  checked={selectedMethod === "qris"}
-                  onChange={() => setSelectedMethod("qris")}
-                />
-                <span>QRIS</span>
-              </label>
-              <div className="method-box">
-                <img
-                  src="/qris-example.png"
-                  alt="QRIS QR Code"
-                  className="qris-image"
-                />
-                <div className="upload-box">
-                  {!proofs.qris ? (
-                    <label className="upload-label">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleUpload(e, "qris")}
-                      />
-                      <div className="upload-placeholder">
-                        <img
-                          src="/placeholder.svg?height=50&width=50"
-                          alt="upload"
-                        />
-                        <p>Upload Bukti Pembayaran</p>
-                        <small>JPG, JPEG, PNG (maks. 1MB)</small>
-                      </div>
-                    </label>
-                  ) : (
-                    <div className="preview-box">
-                      <img
-                        src={URL.createObjectURL(proofs.qris)}
-                        alt="Bukti Pembayaran"
-                        className="preview-image"
-                      />
-                      <div className="preview-actions">
-                        <p>{proofs.qris.name}</p>
-                        <button
-                          onClick={() => handleRemoveProof("qris")}
-                          className="remove-btn"
-                        >
-                          Ganti File
-                        </button>
-                      </div>
+              ) : (
+                <div className="method">
+                  <label className="radio-row">
+                    <span>QRIS</span>
+                  </label>
+                  <div className="method-box">
+                    <img
+                      src="/qris-example.png"
+                      alt="QRIS QR Code"
+                      className="qris-image"
+                    />
+                    <div className="upload-box">
+                      {!proofs.qris ? (
+                        <label className="upload-label">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleUpload(e, "qris")}
+                          />
+                          <div className="upload-placeholder">
+                            <img
+                              src="/placeholder.svg?height=50&width=50"
+                              alt="upload"
+                            />
+                            <p>Upload Bukti Pembayaran</p>
+                            <small>JPG, JPEG, PNG (maks. 1MB)</small>
+                          </div>
+                        </label>
+                      ) : (
+                        <div className="preview-box">
+                          <img
+                            src={URL.createObjectURL(proofs.qris)}
+                            alt="Bukti Pembayaran"
+                            className="preview-image"
+                          />
+                          <div className="preview-actions">
+                            <p>{proofs.qris.name}</p>
+                            <button
+                              onClick={() => handleRemoveProof("qris")}
+                              className="remove-btn"
+                            >
+                              Ganti File
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
 
             <div className="confirm-row">
               <button

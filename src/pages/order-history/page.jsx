@@ -11,7 +11,7 @@ import "./order-history.css";
 const API_URL = "http://localhost:3000";
 
 const statusLabels = {
-  MENUNGGU_PERSETUJUAN: "Menunggu Persetujuan",
+  MENUNGGU_VERIFIKASI: "Menunggu Verifikasi",
   MENUNGGU_PEMBAYARAN: "Menunggu Pembayaran",
   SEDANG_DIPROSES: "Sedang Diproses",
   DALAM_PENGIRIMAN: "Dalam Pengiriman",
