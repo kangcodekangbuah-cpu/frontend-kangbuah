@@ -102,7 +102,6 @@ const CatalogPage = () => {
         return () => clearTimeout(delay);
     }, [currentPage, activeCategory, sortBy, searchQuery]);
 
-    // ➕ Add to Cart — pakai uniqueId biar tidak bentrok antar kategori
     const addToCart = (product) => {
         setCart((prev) => {
             const idx = prev.findIndex((p) => p.uniqueId === product.uniqueId);
@@ -113,6 +112,10 @@ const CatalogPage = () => {
             }
             return [...prev, { ...product, qty: 1 }];
         });
+    };
+
+    const removeFromCart = (product) => {
+        setCart((prev) => prev.filter((p) => p.uniqueId !== product.uniqueId));
     };
 
     // 🚀 Pindah ke halaman Order
@@ -198,7 +201,11 @@ const CatalogPage = () => {
                             {isLoading ? (
                                 <div>Loading...</div>
                             ) : (
-                                <ProductGrid products={products} onAddToCart={addToCart} />
+                                <ProductGrid
+                                    products={products}
+                                    onAddToCart={addToCart}
+                                    onRemoveFromCart={removeFromCart}
+                                    cart={cart} />
                             )}
 
                             <Pagination

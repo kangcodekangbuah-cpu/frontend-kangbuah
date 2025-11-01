@@ -250,7 +250,7 @@ export default function PaymentPage() {
                       </div>
                       <div className="meta">
                         <div className="name">{item.product?.name}</div>
-                        <div className="desc">Qty: {item.quantity} x {item.product.unit}</div>
+                        <div className="desc-qty">Qty: {item.quantity} x {item.product.unit}</div>
                       </div>
                       <div className="price">
                         Rp {(item.price_per_unit * item.quantity).toLocaleString("id-ID")}

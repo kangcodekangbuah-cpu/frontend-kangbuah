@@ -325,6 +325,32 @@
   transform: scale(0.95);
 }
 
+.del-btn {
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 20%;
+  background-color: #af4c4c;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.del-btn:hover {
+  background-color: #843434;
+  color: #ffffff;
+}
+
+/* Efek klik */
+.del-btn:active {
+  transform: scale(0.95);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .order-grid {

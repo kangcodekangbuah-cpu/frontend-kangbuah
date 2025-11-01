@@ -2,7 +2,7 @@ import { formatPrice } from "../../../utils/formatPrice";
 import defaultImage from "../../../assets/placeHolder.png";
 import "./ProductCard.css";
 
-const ProductCard = ({ product, onAddToCart, showAddtoCart = true }) => {
+const ProductCard = ({ product, onAddToCart, showAddtoCart = true, onRemoveFromCart, isInCart }) => {
   const imageUrl =
     product.image_url &&
       Array.isArray(product.image_url) &&
@@ -34,14 +34,25 @@ const ProductCard = ({ product, onAddToCart, showAddtoCart = true }) => {
 
         <button className="product-detail-btn">Detail</button>
 
-        { showAddtoCart && (
-        <button
-          className="add-to-cart-btn"
-          onClick={() => onAddToCart && onAddToCart(product)}
-          disabled={!hasStock}
-        >
-          Tambah ke Keranjang
-        </button>
+        {showAddtoCart && (
+          <>
+            {isInCart ? (<button
+              className="remove-from-cart-btn"
+              onClick={() => onRemoveFromCart && onRemoveFromCart(product)}
+              disabled={!hasStock}
+            >
+              Hapus Dari Keranjang
+            </button>
+            ) : (
+              <button
+                className="add-to-cart-btn"
+                onClick={() => onAddToCart && onAddToCart(product)}
+                disabled={!hasStock}
+              >
+                Tambah ke Keranjang
+              </button>)}
+          </>
+
         )}
       </div>
     </div>

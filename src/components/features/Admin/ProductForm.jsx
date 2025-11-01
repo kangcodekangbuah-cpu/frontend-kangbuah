@@ -41,13 +41,13 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
         </label>
 
         <label>
-          {editingId && (
             <>
               Status
               <select
                 name="status"
                 value={formState.status}
                 onChange={handleInputChange}
+                disabled={!editingId}
               >
                 <option value="TERSEDIA">TERSEDIA</option>
                 <option value="STOK_MENIPIS">STOK_MENIPIS</option>
@@ -55,12 +55,12 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
                 <option value="TIDAK_AKTIF">TIDAK_AKTIF</option>
               </select>
             </>
-          )}
         </label>
 
         <label>
           Deskripsi
           <textarea
+          className="desc"
             name="description"
             value={formState.description}
             onChange={handleInputChange}

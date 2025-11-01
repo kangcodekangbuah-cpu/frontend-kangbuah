@@ -135,10 +135,10 @@ export default function AdminCatalogPage() {
 
         if (form.image_url && form.image_url.length > 0) {
           form.image_url.forEach(url => {
-            formData.append("existing_image_url", url);
+            formData.append("existing_image_url[]", url);
           });
         } else {
-          formData.append("existing_image_url", "");
+          formData.append("existing_image_url[]", "");
         }
 
         res = await axios.patch(`http://localhost:3000/products/${editingId}`, formData, {
