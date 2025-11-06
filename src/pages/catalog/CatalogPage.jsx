@@ -117,6 +117,20 @@ const CatalogPage = () => {
     const removeFromCart = (product) => {
         setCart((prev) => prev.filter((p) => p.uniqueId !== product.uniqueId));
     };
+    
+const updateQuantity = (uniqueId, change) => {
+  setCart((prev) =>
+    prev
+      .map((item) =>
+        item.uniqueId === uniqueId
+          ? { ...item, qty: Math.max(1, (item.qty || 1) + change) }
+          : item
+      )
+      .filter((item) => item.qty > 0)
+  );
+};
+
+
 
     const goToOrderPage = () => {
         if (cart.length === 0) return alert("Keranjang masih kosong!");
@@ -210,6 +224,7 @@ const CatalogPage = () => {
                                     products={products}
                                     onAddToCart={addToCart}
                                     onRemoveFromCart={removeFromCart}
+                                    onUpdateQuantity={updateQuantity}
                                     cart={cart} />
                             )}
 
