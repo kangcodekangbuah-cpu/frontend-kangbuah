@@ -89,7 +89,6 @@ export default function OrderPage() {
     }
   }, [userId]);
 
-  // Hitung subtotal dan total
   const subtotal = useMemo(() => {
     return cart
       .filter((item) => (item.qty || 0) > 0)
@@ -105,7 +104,6 @@ export default function OrderPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Konfirmasi pesanan
   const handleConfirm = async (e) => {
     e.preventDefault();
 
@@ -160,15 +158,15 @@ export default function OrderPage() {
       }
 
     } catch (err) {
-      console.error("Error membuat pesanan:", err);
-      toast.error("Gagal membuat pesanan ke server. : ", err);
+      console.error("Error membuat pesanan:", err.response || err);
+      toast.error(err.response?.data?.message);
     }
   };
 
 
   const updateQuantity = (id, delta) => {
     const updated = cart.map((item) => {
-      const itemId = item.id || item.product_id || item.uniqueId;
+      const itemId = item.uniqueId || item.product_id;
       if (itemId === id) {
         const newQty = Math.max(0, (item.qty || 0) + delta);
         return { ...item, qty: newQty };
@@ -184,13 +182,18 @@ export default function OrderPage() {
   };
 
   const removeFromCart = (product) => {
-    setCart((prev) => prev.filter((p) => p.uniqueId !== product.uniqueId));
-  };
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const updatedCart = cart.filter((p) => p.uniqueId !== product.uniqueId);
+
+  localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+  setCart(updatedCart);
+};
 
   if (authStatus === 'loading' || isLoading) {
     return (
       <div className="admin-chat-page">
-       <LoadingSpinner text="Memuat..." />
+        <LoadingSpinner text="Memuat..." />
       </div>
     );
   }
@@ -304,7 +307,7 @@ export default function OrderPage() {
                     placeholder="Kode pos"
                   />
                 </div>
-                
+
 
                 <div className="save-info">
                   <input type="checkbox" id="saveInfo" />
@@ -373,7 +376,7 @@ export default function OrderPage() {
                   <li className="empty">Keranjang Anda kosong.</li>
                 )}
                 {cart.map((item) => (
-                  <li key={item.product_id} className="summary-item">
+                  <li key={item.uniqueId || item.product_id} className="summary-item">
                     <div className="thumb">
                       <img
                         src={item.image_url[0] || defaultImage}
@@ -390,7 +393,7 @@ export default function OrderPage() {
                           className="qty-btn"
                           onClick={() =>
                             updateQuantity(
-                              item.id || item.product_id || item.uniqueId,
+                              item.uniqueId || item.product_id,
                               -1
                             )
                           }
@@ -403,7 +406,7 @@ export default function OrderPage() {
                           className="qty-btn"
                           onClick={() =>
                             updateQuantity(
-                              item.id || item.product_id || item.uniqueId,
+                              item.uniqueId || item.product_id,
                               1
                             )
                           }

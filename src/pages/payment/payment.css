@@ -82,6 +82,7 @@
   padding: 0.9rem;
   border-radius: 10px;
   cursor: pointer;
+  margin-bottom: 2rem;
 }
 
 .confirm-btn:hover {
