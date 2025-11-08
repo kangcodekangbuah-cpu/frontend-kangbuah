@@ -77,7 +77,6 @@ const CatalogPage = () => {
                 setProducts(dataWithUniqueId);
                 setPagination({ page, max_page: maxPage });
             } catch (error) {
-                console.error("Gagal mengambil data produk:", error);
                 toast.error("Gagal memuat produk. Coba muat ulang halaman.");
             } finally {
                 setIsLoading(false);

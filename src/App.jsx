@@ -40,12 +40,10 @@ function App() {
 
         if (res.data.data.accessToken) {
           setToken(res.data.data.accessToken);
-          console.log("Silent refresh berhasil.");
         } else {
           throw new Error("Invalid refresh response");
         }
       } catch (error) {
-        console.error("Refresh GAGAL, ini errornya:", error.response?.data || error.message);
         clearAuth();
       } finally {
         setIsInitialized(true);

@@ -16,7 +16,6 @@ const FeaturedProducts = () => {
         
         setFeaturedItems(response.data.data.data);
       } catch (err) {
-        console.error("Gagal mengambil produk unggulan:", err);
         setError("Tidak dapat memuat produk saat ini.");
       } finally {
         setLoading(false);

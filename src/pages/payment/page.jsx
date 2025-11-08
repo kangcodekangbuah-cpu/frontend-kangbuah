@@ -61,7 +61,6 @@ export default function PaymentPage() {
       toast.success("Bukti pembayaran berhasil dikirim!");
       navigate("/order-history");
     } catch (error) {
-      console.error("Gagal upload bukti pembayaran:", error);
       toast.error(
         error.response?.data?.message || "Gagal mengunggah bukti pembayaran."
       );

@@ -119,7 +119,6 @@ export default function AdminChat() {
                 message: msg
             });
         } catch (error) {
-            console.error("Gagal mengirim pesan:", error);
             toast.error("Gagal mengirim pesan")
         }
     };

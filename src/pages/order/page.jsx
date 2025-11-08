@@ -159,7 +159,6 @@ export default function OrderPage() {
       }
 
     } catch (err) {
-      console.error("Error membuat pesanan:", err.response || err);
       toast.error(err.response?.data?.message);
     }
   };
@@ -183,13 +182,13 @@ export default function OrderPage() {
   };
 
   const removeFromCart = (product) => {
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const updatedCart = cart.filter((p) => p.uniqueId !== product.uniqueId);
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const updatedCart = cart.filter((p) => p.uniqueId !== product.uniqueId);
 
-  localStorage.setItem("cart", JSON.stringify(updatedCart));
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
 
-  setCart(updatedCart);
-};
+    setCart(updatedCart);
+  };
 
   if (authStatus === 'loading' || isLoading) {
     return (

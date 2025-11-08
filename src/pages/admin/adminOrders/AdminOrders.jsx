@@ -47,7 +47,6 @@ export default function AdminOrdersPage() {
         const res = await apiClient.get(`/orders/list`);
         setOrders(res.data.data || res.data.orders || []);
       } catch (err) {
-        console.error("Gagal ambil data dari backend:", err);
         toast.error("Gagal mengambil data dari backend!");
       } finally {
         setLoading(false);
@@ -74,7 +73,6 @@ export default function AdminOrdersPage() {
 
       toast.success(`Status pesanan #${orderId} diubah ke ${statusLabels[newStatus]}`);
     } catch (error) {
-      console.error("Gagal update status:", error);
       toast.error("Gagal menyinkronkan ke backend!");
     }
   };

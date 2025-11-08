@@ -51,7 +51,6 @@ export default function OrderHistoryPage() {
         const res = await apiClient.get(`/orders/history/${userId}`);
         setOrders(res.data.data || res.data.orders || []);
       } catch (err) {
-        console.error("Gagal mengambil data pesanan:", err);
         toast.error("Gagal memuat riwayat pesanan.");
         setOrders([]);
       } finally {

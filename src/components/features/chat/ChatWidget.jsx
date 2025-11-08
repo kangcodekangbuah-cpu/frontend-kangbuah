@@ -45,7 +45,6 @@ export default function ChatWidget() {
                 setMessages(formattedMessages);
 
             } catch (error) {
-                console.error("Gagal memulai chat:", error);
                 if (error.response && (error.response.status === 401 || error.response.status === 403)) {
                    setIsOpen(false);
                 }

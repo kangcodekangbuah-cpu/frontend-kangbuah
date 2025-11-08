@@ -10,8 +10,6 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-   console.log('📤 Request:', config.method.toUpperCase(), config.url);
-    console.log('🍪 WithCredentials:', config.withCredentials);
     
     const token = useAuthStore.getState().accessToken;
     if (token) {
@@ -77,7 +75,6 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
 
       } catch (refreshError) {
-        console.error("Session kedaluwarsa, silahkan logout dan login ulang.");
         
         processQueue(refreshError, null);
         toast.error('NAH KAN SI BABI')

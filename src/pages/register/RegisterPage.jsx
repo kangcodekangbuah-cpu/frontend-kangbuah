@@ -57,7 +57,6 @@ export default function RegisterPage() {
         navigate("/login");
       }, 1500);
     } catch (err) {
-      console.error("Signup error:", err)
       toast.error(err.response?.data?.message || "Signup gagal")
     }
   }
