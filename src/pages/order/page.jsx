@@ -8,6 +8,7 @@ import defaultImage from "../../assets/placeHolder.png"
 import apiClient from "../../services/api";
 import { useAuthStore } from "../../store/authStore";
 import LoadingSpinner from "../../components/ui/Layout/LoadingSpinner";
+import ChatWidget from "../../components/features/chat/ChatWidget";
 
 export default function OrderPage() {
   const navigate = useNavigate();
@@ -448,6 +449,8 @@ export default function OrderPage() {
             </aside>
           </div>
         </main>
+
+        <ChatWidget />
       </div>
     </>
   );

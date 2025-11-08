@@ -7,6 +7,7 @@ import CustomerHeader from "../CustomerHeader";
 import "./order-history.css";
 import apiClient from "../../services/api";
 import { useAuthStore } from "../../store/authStore";
+import ChatWidget from "../../components/features/chat/ChatWidget";
 
 const statusLabels = {
   MENUNGGU_VERIFIKASI: "Menunggu Verifikasi",
@@ -254,6 +255,8 @@ export default function OrderHistoryPage() {
           </aside>
         </div>
       </main>
+
+      <ChatWidget />
     </div>
   );
 }
