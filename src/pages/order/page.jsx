@@ -236,13 +236,13 @@ export default function OrderPage() {
                   />
                 </div>
                 <div className="field-group">
-                  <label>Kelurahan*</label>
+                  <label>No. Telepon*</label>
                   <input
                     required
-                    name="ward"
-                    value={formData.ward}
+                    name="phone_number"
+                    value={formData.phone_number}
                     onChange={handleChange}
-                    placeholder="Kelurahan"
+                    placeholder="No. telepon"
                   />
                 </div>
                 <div className="field-group">
@@ -262,6 +262,16 @@ export default function OrderPage() {
                     value={formData.street}
                     onChange={handleChange}
                     placeholder="Alamat lengkap"
+                  />
+                </div>
+                <div className="field-group">
+                  <label>Kecamatan*</label>
+                  <input
+                    required
+                    name="ward"
+                    value={formData.ward}
+                    onChange={handleChange}
+                    placeholder="Kelurahan"
                   />
                 </div>
                 <div className="field-group">
@@ -294,16 +304,7 @@ export default function OrderPage() {
                     placeholder="Kode pos"
                   />
                 </div>
-                <div className="field-group">
-                  <label>No. Telepon*</label>
-                  <input
-                    required
-                    name="phone_number"
-                    value={formData.phone_number}
-                    onChange={handleChange}
-                    placeholder="No. telepon"
-                  />
-                </div>
+                
 
                 <div className="save-info">
                   <input type="checkbox" id="saveInfo" />

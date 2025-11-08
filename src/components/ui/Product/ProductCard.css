@@ -188,3 +188,43 @@
   cursor: not-allowed;
   transform: none;
 }
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; 
+  gap: 8px;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.product-detail-btn,
+.qty-control {
+  height: 47px; /* sesuaikan tinggi tombol Detail */
+  box-sizing: border-box;
+}
+
+.qty-control button {
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  min-width: 24px;
+  text-align: center;
+}
+
+.product-detail-btn {
+  margin-bottom: 0;
+}

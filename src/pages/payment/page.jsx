@@ -43,7 +43,7 @@ export default function PaymentPage() {
 
 
   const handleConfirmPayment = async () => {
-    const methodKey = order.payment_method === "BANK_TRANSFER" ? "transfer" : "qris";
+    const methodKey = order?.payment_method === "BANK_TRANSFER" ? "transfer" : "qris";
     const proofFile = proofs[methodKey];
 
     if (!proofFile) {

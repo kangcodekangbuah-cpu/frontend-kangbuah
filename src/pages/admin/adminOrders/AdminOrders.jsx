@@ -27,9 +27,9 @@ const statusColors = {
 }
 
 const statusOrder = [
-  "SEDANG_DIPROSES",
-  "MENUNGGU_PEMBAYARAN",
   "MENUNGGU_VERIFIKASI",
+  "MENUNGGU_PEMBAYARAN",
+  "SEDANG_DIPROSES",
   "DALAM_PENGIRIMAN",
   "SELESAI",
   "DIBATALKAN",
