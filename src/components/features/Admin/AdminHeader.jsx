@@ -1,15 +1,15 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAuthStore } from "../../../store/authStore";
 
 
-const AdminHeader = ({ setIsLoggedIn }) => {
+const AdminHeader = () => {
     const navigate = useNavigate();
+    const logout = useAuthStore((state) => state.logout);
 
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role')
-        setIsLoggedIn(false);
+    const handleLogout = async () => {
+        await logout();
         toast.success("Logout berhasil");
         navigate("/", { replace: true });
     };

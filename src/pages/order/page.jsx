@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import StepNavigation from "../../components/ui/StepNavigation/StepNavigation";
 import "./order.css";
 import defaultImage from "../../assets/placeHolder.png"
-
-const API_URL = "http://localhost:3000";
+import apiClient from "../../services/api";
+import { useAuthStore } from "../../store/authStore";
+import LoadingSpinner from "../../components/ui/Layout/LoadingSpinner";
 
 export default function OrderPage() {
   const navigate = useNavigate();
@@ -27,27 +26,26 @@ export default function OrderPage() {
     phone_number: "",
   });
 
-  const token = localStorage.getItem("token");
-  let userId = null;
+  const userId = useAuthStore((state) => state.user?.sub);
+  const authStatus = useAuthStore((state) => state.authStatus);
 
-  if (token) {
-    try {
-      const decoded = jwtDecode(token);
-      userId = decoded.sub;
-    } catch (err) {
-      console.error("Gagal decode token:", err);
-    }
-  }
 
-  // Cek status login saat halaman dimuat
   useEffect(() => {
-    if (!token) {
-      toast.error("Silakan login terlebih dahulu!");
-      navigate("/login");
+    if (authStatus === 'loading') {
+      return;
     }
-  }, [navigate, token]);
 
-  // Load cart dari localStorage
+    if (authStatus === 'unauthenticated') {
+      toast.warning("Silahkan login terlebih dahulu!");
+
+      const timer = setTimeout(() => {
+        navigate("/");
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [authStatus, navigate]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const stored = localStorage.getItem("cart");
@@ -60,17 +58,13 @@ export default function OrderPage() {
     }
   }, []);
 
-  // untuk pre fill form dengan data user jika sudah ada
   useEffect(() => {
     if (userId) {
       const fetchCheckoutDetails = async () => {
         setIsLoading(true);
         try {
 
-          const res = await axios.get(`${API_URL}/orders/form/${userId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-          );
+          const res = await apiClient.get(`/orders/form/${userId}`);
           const data = res.data.data;
 
           setFormData(prev => ({
@@ -92,10 +86,8 @@ export default function OrderPage() {
         }
       };
       fetchCheckoutDetails();
-    } else if (token) {
-      setIsLoading(false);
     }
-  }, [userId, token]);
+  }, [userId]);
 
   // Hitung subtotal dan total
   const subtotal = useMemo(() => {
@@ -105,7 +97,7 @@ export default function OrderPage() {
   }, [cart]);
 
   const shipping = 5000;
-  const discount = 0; // Tambahkan variabel diskon (bisa dikembangkan nanti)
+  const discount = 0;
   const total = Math.max(0, subtotal + shipping - discount);
 
   const handleChange = (e) => {
@@ -132,11 +124,10 @@ export default function OrderPage() {
       return;
     }
 
-    // payload untuk dikirim ke backend
     const products = cart
       .filter((item) => item.qty > 0)
       .map((item) => ({
-        product_id: item.product_id || item.id,
+        product_id: item.product_id,
         quantity: item.qty,
       }));
 
@@ -158,16 +149,7 @@ export default function OrderPage() {
     };
 
     try {
-      const res = await axios.post(
-        `${API_URL}/orders/create/${userId}`,
-        orderPayload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await apiClient.post(`/orders/create/${userId}`, orderPayload);
 
       toast.success("Pesanan berhasil dibuat!");
       const newOrderId = res.data.data.order?.order_id;
@@ -205,22 +187,23 @@ export default function OrderPage() {
     setCart((prev) => prev.filter((p) => p.uniqueId !== product.uniqueId));
   };
 
+  if (authStatus === 'loading' || isLoading) {
+    return (
+      <div className="admin-chat-page">
+       <LoadingSpinner text="Memuat..." />
+      </div>
+    );
+  }
 
   return (
     <>
-      {isLoading && (
-        <div className="loading-overlay">
-          <div className="spinner"></div>
-        </div>
-      )}
-
       <div className="order-page">
 
         <StepNavigation currentStep={2} />
 
         <header className="order-header">
           <div className="container">
-            <button onClick={handleBack} className="header-btn back-btn">
+            <button onClick={handleBack} className="order-back-btn">
               <span>&#8592;</span> Kembali
             </button>
             <h1>Pemesanan</h1>

@@ -1,34 +1,34 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import apiClient from "../../services/api";
+import { useAuthStore } from "../../store/authStore";
 import { toast } from "react-toastify";
 import StepNavigation from "../../components/ui/StepNavigation/StepNavigation";
 import "./payment.css";
 
-const API_URL = "http://localhost:3000";
-
 export default function PaymentPage() {
   const navigate = useNavigate();
   const { orderId } = useParams();
-
   const [order, setOrder] = useState(null);
   const [proofs, setProofs] = useState({ transfer: null, qris: null });
   const [uploading, setUploading] = useState(false);
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${API_URL}/orders/${orderId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await apiClient.get(`/orders/${orderId}`);
         setOrder(res.data.data);
       } catch (error) {
-        toast.error("Gagal memuat data pesanan.");
+        if (error.response?.status !== 401 && error.response?.status !== 403) {
+          toast.error("Gagal memuat data pesanan.");
+        }
       }
     };
-    fetchOrder();
-  }, [orderId]);
+    if (user) {
+      fetchOrder();
+    }
+  }, [orderId, user]);
 
   const handleUpload = (e, method) => {
     const file = e.target.files[0];
@@ -51,18 +51,12 @@ export default function PaymentPage() {
       return;
     }
 
-    const token = localStorage.getItem("token");
     const formData = new FormData();
     formData.append("proof", proofFile);
 
     try {
       setUploading(true);
-      await axios.post(`${API_URL}/payments/upload-proof/${orderId}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await apiClient.post(`/payments/upload-proof/${orderId}`, formData);
 
       toast.success("Bukti pembayaran berhasil dikirim!");
       navigate("/order-history");
@@ -89,7 +83,7 @@ export default function PaymentPage() {
 
       <header className="payment-header">
         <div className="container">
-          <button onClick={() => navigate(-1)} className="header-btn back-btn">
+          <button onClick={() => navigate(-1)} className="payment-back-btn">
             <span>&#8592;</span> Kembali
           </button>
           <h1>Pembayaran</h1>

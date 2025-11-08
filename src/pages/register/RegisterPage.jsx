@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import axios from "axios"
 import { auth, googleProvider } from "../../services/firebase"
 import { signInWithPopup } from "firebase/auth"
 import AuthLayout from "../../components/features/Auth/AuthLayout";
@@ -10,9 +9,12 @@ import GoogleAuthButton from "../../components/features/Auth/GoogleAuthButton";
 import { toast } from 'react-toastify';
 import { jwtDecode } from "jwt-decode";
 import "./RegisterPage.css"
+import apiClient from "../../services/api"
+import { useAuthStore } from "../../store/authStore";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const setToken = useAuthStore((state) => state.setToken);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,8 +23,6 @@ export default function RegisterPage() {
     confirmPassword: "",
     agreeToTerms: false,
   })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -42,7 +42,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const res = await axios.post("http://localhost:3000/auth/register", {
+      const res = await apiClient.post("/auth/register", {
         email: formData.email,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
@@ -54,8 +54,8 @@ export default function RegisterPage() {
 
       toast.success("Registrasi berhasil! Silakan cek email untuk verifikasi lalu login.")
       setTimeout(() => {
-          navigate("/login");
-        }, 1500);
+        navigate("/login");
+      }, 1500);
     } catch (err) {
       console.error("Signup error:", err)
       toast.error(err.response?.data?.message || "Signup gagal")
@@ -68,19 +68,18 @@ export default function RegisterPage() {
       const result = await signInWithPopup(auth, googleProvider)
       const token = await result.user.getIdToken()
 
-      const res = await axios.post("http://localhost:3000/auth/google/login", { token })
+      const res = await apiClient.post("/auth/google/login", { token })
 
-      const accessToken = res.data?.data?.accessToken;
+      const accessToken = res.data.data?.accessToken;
       if (!accessToken) {
         throw new Error("Token tidak diterima dari server.");
       }
 
-      localStorage.setItem("token", res.data.data.accessToken)
-      const decodeToken = jwtDecode(res.data.data.accessToken)
-      localStorage.setItem("role", decodeToken.role)
+      setToken(accessToken);
+      const role = useAuthStore.getState().user.role;
       toast.success('Login berhasil! Mengalihkan...');
 
-      if (decodeToken.role == "ADMIN") {
+      if (role == "ADMIN") {
         setTimeout(() => {
           navigate("/admin/catalog");
         }, 1500);

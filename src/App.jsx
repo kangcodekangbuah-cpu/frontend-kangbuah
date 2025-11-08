@@ -1,6 +1,9 @@
 // App.jsx
 import { Routes, Route } from "react-router-dom"
-import { ToastContainer } from 'react-toastify';
+import { useState, useEffect, useRef } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import { useAuthStore } from './store/authStore';
+import apiClient from './services/api';
 import 'react-toastify/dist/ReactToastify.css';
 import HomePage from "../src/pages/home/HomePage"
 import LoginPage from "../src/pages/login/LoginPage"
@@ -12,8 +15,50 @@ import PaymentPage from "../src/pages/payment/page"
 import AdminCatalogPage from "./pages/admin/adminCatalog/AdminCatalogPage";
 import AdminChat from "./pages/admin/adminChat/AdminChat";
 import AdminOrders from "./pages/admin/adminOrders/AdminOrders";
+import LoadingSpinner from "./components/ui/Layout/LoadingSpinner";
 
-export default function App() {
+function App() {
+
+  const [isInitialized, setIsInitialized] = useState(false);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const setToken = useAuthStore((state) => state.setToken);
+
+  const isInitializing = useRef(false);
+
+  useEffect(() => {
+
+    if (isInitializing.current) {
+      return;
+    }
+
+    isInitializing.current = true;
+    const initializeApp = async () => {
+
+      try {
+
+        const res = await apiClient.get('/auth/refresh');
+
+        if (res.data.data.accessToken) {
+          setToken(res.data.data.accessToken);
+          console.log("Silent refresh berhasil.");
+        } else {
+          throw new Error("Invalid refresh response");
+        }
+      } catch (error) {
+        console.error("Refresh GAGAL, ini errornya:", error.response?.data || error.message);
+        clearAuth();
+      } finally {
+        setIsInitialized(true);
+      }
+    };
+
+    initializeApp();
+  }, [setToken, clearAuth]);
+
+  if (!isInitialized) {
+    return <LoadingSpinner text="Memuat..." />;
+  }
+
   return (
     <>
       <Routes>
@@ -33,8 +78,8 @@ export default function App() {
       </Routes>
 
       <ToastContainer
-        position="top-right"
-        autoClose={5000}
+        position="top-center"
+        autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -45,5 +90,7 @@ export default function App() {
         theme="light"
       />
     </>
-  )
+  );
 }
+
+export default App;

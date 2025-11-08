@@ -10,45 +10,21 @@ import ClientExperience from "../../components/features/HomePage/ClientExperienc
 import Advantages from "../../components/features/HomePage/Advantages"
 import MarketSegments from "../../components/features/HomePage/MarketSegments"
 import ChatWidget from "../../components/features/chat/ChatWidget"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { toast } from "react-toastify"
+import { useAuthStore } from "../../store/authStore"
 
 export default function HomePage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState(null);
-
-  // Cek status login saat komponen pertama kali dimuat
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role')
-    if (token) {
-      try {
-        setIsLoggedIn(true);
-        setUserRole(role);
-      } catch (error) {
-        console.error("Token tidak valid, melakukan logout:", error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        setIsLoggedIn(false);
-        setUserRole(null);
-      }
-    } else {
-      setIsLoggedIn(false);
-      setUserRole(null);
-    }
-  }, []);
-
-  // --- Fungsi logout dipindahkan ke sini ---
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    setIsLoggedIn(false);
-    toast.success("Logout berhasil");
-  };
+  const isLoggedIn = useAuthStore((state) => !!state.user);
+  const userRole = useAuthStore((state) => state.user?.role);
+  const handleLogout = useAuthStore((state) => state.logout);
 
   return (
     <div className="app">
-      <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      <Navbar isLoggedIn={isLoggedIn} onLogout={() => {
+        handleLogout();
+        toast.success("Logout berhasil");
+      }} />
       <Hero />
       <About />
       <VisionMission />
@@ -58,7 +34,7 @@ export default function HomePage() {
       <ClientExperience />
       <Advantages />
       <MarketSegments />
-      {isLoggedIn && userRole !== 'ADMIN' && <ChatWidget isLoggedIn={isLoggedIn} />}
+      {isLoggedIn && userRole !== 'ADMIN' && <ChatWidget />}
     </div>
   )
 }

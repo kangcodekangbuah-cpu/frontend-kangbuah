@@ -1,19 +1,19 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
-import axios from "axios"
+import { Link, useNavigate } from "react-router-dom"
+import apiClient from "../../services/api";
 import { auth, googleProvider } from "../../services/firebase"
 import { signInWithPopup } from "firebase/auth"
 import AuthLayout from "../../components/features/Auth/AuthLayout";
 import AuthInput from "../../components/features/Auth/AuthInput";
 import PasswordInput from "../../components/features/Auth/PasswordInput";
 import GoogleAuthButton from "../../components/features/Auth/GoogleAuthButton";
-import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
-import { jwtDecode } from "jwt-decode";
+import { useAuthStore } from "../../store/authStore";
 import "../register/RegisterPage.css"
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const setToken = useAuthStore((state) => state.setToken);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -31,19 +31,17 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.post("http://localhost:3000/auth/login", {
+      const res = await apiClient.post("/auth/login", {
         email: formData.email,
         password: formData.password,
       })
 
-      // Simpan token dari response backend
-      localStorage.setItem("token", res.data.data.accessToken)
-      const decodeToken = jwtDecode(res.data.data.accessToken)
-      localStorage.setItem("role", decodeToken.role)
+      setToken(res.data.data.accessToken);
+      const role = useAuthStore.getState().user.role;
       toast.success('Login berhasil! Mengalihkan...');
 
 
-      if (decodeToken.role == "ADMIN") {
+      if (role == "ADMIN") {
         setTimeout(() => {
           navigate("/admin/catalog");
         }, 1500);
@@ -67,19 +65,19 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, googleProvider)
       const token = await result.user.getIdToken()
 
-      const res = await axios.post("http://localhost:3000/auth/google/login", { token })
+      const res = await apiClient.post("/auth/google/login", { token });
 
-      const accessToken = res.data?.data?.accessToken;
+      const accessToken = res.data.data?.accessToken;
       if (!accessToken) {
         throw new Error("Token tidak diterima dari server.");
       }
 
-      localStorage.setItem("token", res.data.data.accessToken)
-      const decodeToken = jwtDecode(res.data.data.accessToken)
-      localStorage.setItem("role", decodeToken.role)
+      setToken(accessToken);
+      const role = useAuthStore.getState().user.role;
+
       toast.success('Login berhasil! Mengalihkan...');
 
-      if (decodeToken.role == "ADMIN") {
+      if (role == "ADMIN") {
         setTimeout(() => {
           navigate("/admin/catalog");
         }, 1500);
@@ -102,7 +100,6 @@ export default function LoginPage() {
   }
 
   return (
-    // 3. Bungkus semuanya dengan AuthLayout
     <AuthLayout>
       <div className="auth-header">
         <h1>Selamat Datang</h1>

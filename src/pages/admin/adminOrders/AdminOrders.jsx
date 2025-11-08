@@ -1,13 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import axios from "axios";
+import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify";
 import "./AdminOrders.css"
 import AdminHeader from "../../../components/features/Admin/AdminHeader"
-
-const API_URL = "http://localhost:3000";
+import apiClient from "../../../services/api";
+import LoadingSpinner from "../../../components/ui/Layout/LoadingSpinner";
 
 const statusLabels = {
   MENUNGGU_VERIFIKASI: "Menunggu Verifikasi",
@@ -37,19 +36,15 @@ const statusOrder = [
 ]
 
 export default function AdminOrdersPage() {
-  const navigate = useNavigate()
   const [orders, setOrders] = useState([])
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [filterStatus, setFilterStatus] = useState("all")
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`${API_URL}/orders/list`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        const res = await apiClient.get(`/orders/list`);
         setOrders(res.data.data || res.data.orders || []);
       } catch (err) {
         console.error("Gagal ambil data dari backend:", err);
@@ -62,17 +57,9 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, []);
 
-  if (loading) {
-    return <div className="loading">Memuat data pesanan...</div>;
-  }
-
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.patch(
-        `${API_URL}/orders/status/${orderId}`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
+      await apiClient.patch(`/orders/status/${orderId}`, { status: newStatus });
 
       const updatedOrders = orders.map((order) =>
         order.order_id === orderId ? { ...order, status: newStatus } : order
@@ -94,9 +81,18 @@ export default function AdminOrdersPage() {
 
   const filteredOrders = filterStatus === "all" ? orders : orders.filter((o) => o.status === filterStatus)
 
+  if (loading) {
+    return (
+      <div className="admin-chat-page">
+        <AdminHeader />
+        <LoadingSpinner text="Memuat Data Pesanan..."/>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-orders-page">
-      <AdminHeader setIsLoggedIn={setIsLoggedIn} />
+      <AdminHeader />
 
       <main className="admin-orders-main">
         <div className="container admin-orders-grid">
@@ -173,14 +169,14 @@ export default function AdminOrdersPage() {
                   <h3>Informasi Pelanggan</h3>
                   <p>
                     <strong>
-                    {selectedOrder.delivery_pic_name} - {selectedOrder.billing_company_name}
+                      {selectedOrder.delivery_pic_name} - {selectedOrder.billing_company_name}
                     </strong>
                   </p>
                   <p>{selectedOrder
-                        ? `${selectedOrder.delivery_street}`
-                        : "Alamat tidak ditemukan"}</p>
+                    ? `${selectedOrder.delivery_street}`
+                    : "Alamat tidak ditemukan"}</p>
                   <p>
-                  {selectedOrder.delivery_city}, {selectedOrder.delivery_province} {selectedOrder.delivery_postal_code}
+                    {selectedOrder.delivery_city}, {selectedOrder.delivery_province} {selectedOrder.delivery_postal_code}
                   </p>
                   <p>Telepon: {selectedOrder.billing_phone_number ? `${selectedOrder.billing_phone_number}` : "-"}</p>
                 </div>
@@ -188,17 +184,17 @@ export default function AdminOrdersPage() {
                 <div className="detail-section">
                   <h3>Item Pesanan</h3>
                   <ul className="items-list">
-                  {selectedOrder.order_details?.map((item) => (
-                    <li key={item.id} className="item-row">
-                      <div className="item-info">
-                        <div className="item-name">{item.product?.name}</div>
-                        <div className="item-qty">Qty: {item.quantity}</div>
-                      </div>
-                      <div className="item-price">
-                        Rp {Number(item.product?.price * item.quantity).toLocaleString("id-ID")}
-                      </div>
-                    </li>
-                  ))}
+                    {selectedOrder.order_details?.map((item) => (
+                      <li key={item.id} className="item-row">
+                        <div className="item-info">
+                          <div className="item-name">{item.product?.name}</div>
+                          <div className="item-qty">Qty: {item.quantity}</div>
+                        </div>
+                        <div className="item-price">
+                          Rp {Number(item.product?.price * item.quantity).toLocaleString("id-ID")}
+                        </div>
+                      </li>
+                    ))}
                   </ul>
                 </div>
 
@@ -235,37 +231,37 @@ export default function AdminOrdersPage() {
                 </div>
 
                 {selectedOrder.attachment_url && (
-                <div className="detail-section">
-                  <h3>Bukti Pembayaran</h3>
-                  <img
-                    src={selectedOrder.attachment_url}
-                    alt="Bukti Pembayaran"
-                    className="payment-proof-image"
-                    style={{
-                      width: "100%",
-                      maxWidth: "300px",
-                      borderRadius: "10px",
-                      marginTop: "8px",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                    }}
-                  />
-                  <a
-                    href={selectedOrder.attachment_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ display: "block", marginTop: "6px", color: "#3498db" }}
-                  >
-                    Lihat Gambar Asli
-                  </a>
-                </div>
-              )}
+                  <div className="detail-section">
+                    <h3>Bukti Pembayaran</h3>
+                    <img
+                      src={selectedOrder.attachment_url}
+                      alt="Bukti Pembayaran"
+                      className="payment-proof-image"
+                      style={{
+                        width: "100%",
+                        maxWidth: "300px",
+                        borderRadius: "10px",
+                        marginTop: "8px",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                    <a
+                      href={selectedOrder.attachment_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: "block", marginTop: "6px", color: "#3498db" }}
+                    >
+                      Lihat Gambar Asli
+                    </a>
+                  </div>
+                )}
 
-                </>
-              ) : (
-                <div className="empty-details">
-                  <p>Pilih pesanan untuk melihat detail dan ubah status</p>
-                </div>
-              )}
+              </>
+            ) : (
+              <div className="empty-details">
+                <p>Pilih pesanan untuk melihat detail dan ubah status</p>
+              </div>
+            )}
           </aside>
         </div>
       </main>

@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-import axios from "axios";
 import { toast } from "react-toastify";
 import CustomerHeader from "../CustomerHeader";
 import "./order-history.css";
-
-const API_URL = "http://localhost:3000";
+import apiClient from "../../services/api";
+import { useAuthStore } from "../../store/authStore";
 
 const statusLabels = {
   MENUNGGU_VERIFIKASI: "Menunggu Verifikasi",
@@ -32,26 +30,24 @@ export default function OrderHistoryPage() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [loading, setLoading] = useState(true);
+  const userId = useAuthStore((state) => state.user?.sub);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    let userId;
 
-    if (token) {
-      const decoded = jwtDecode(token);
-      userId = decoded?.sub || decoded?.id || decoded?.userId;
-    } else {
-      navigate("/login");
-      return;
+    if (!userId) {
+      toast.warning("Silahkan login terlebih dahulu!");
+
+      const timer = setTimeout(() => {
+        navigate("/");
+      }, 1500);
+
+      return () => clearTimeout(timer);
     }
 
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`${API_URL}/orders/history/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await apiClient.get(`/orders/history/${userId}`);
         setOrders(res.data.data || res.data.orders || []);
       } catch (err) {
         console.error("Gagal mengambil data pesanan:", err);
@@ -63,15 +59,22 @@ export default function OrderHistoryPage() {
     };
 
     fetchOrders();
-  }, [navigate]);
+  }, [navigate, userId]);
 
   if (loading) {
-    return <div className="loading">Memuat data pesanan...</div>;
+    return (
+      <div>
+        <main className="chat-main loading-container">
+          <div className="spinner"></div>
+          <p>Memuat Data...</p>
+        </main>
+      </div>
+    );
   }
 
   return (
     <div className="order-history-page">
-      <CustomerHeader isLoggedIn={isLoggedIn} />
+      <CustomerHeader />
 
       <header className="order-history-header">
         <div className="container">

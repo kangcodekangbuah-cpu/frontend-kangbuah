@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAuthStore } from "../store/authStore";
 
-const CustomerHeader = ({ isLoggedIn }) => {
+const CustomerHeader = () => {
   const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
+  const isLoggedIn = useAuthStore((state) => !!state.user);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("isLoggedIn");
+  const handleLogout = async () => {
+    await logout();
     toast.success("Logout berhasil");
     setTimeout(() => {
       navigate("/");

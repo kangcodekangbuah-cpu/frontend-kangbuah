@@ -1,8 +1,6 @@
 // CatalogPage.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import Header from "../../components/ui/Layout/Header";
 import CustomerHeader from "../CustomerHeader";
 import Footer from "../../components/ui/Layout/Footer";
 import CategorySidebar from "../../components/features/Catalog/CategorySidebar";
@@ -11,6 +9,10 @@ import Pagination from "../../components/features/Catalog/Pagination";
 import StepNavigation from "../../components/ui/StepNavigation/StepNavigation";
 import ChatWidget from "../../components/features/chat/ChatWidget";
 import "./CatalogPage.css";
+import apiClient from "../../services/api";
+import { useAuthStore } from "../../store/authStore";
+import { toast } from "react-toastify";
+import LoadingSpinner from "../../components/ui/Layout/LoadingSpinner";
 
 const categories = [
     { id: "ALL", name: "Semua Kategori" },
@@ -28,22 +30,10 @@ const CatalogPage = () => {
     const [pagination, setPagination] = useState({ page: 1, max_page: 1 });
     const [isLoading, setIsLoading] = useState(true);
     const [cart, setCart] = useState([]);
-
     const navigate = useNavigate();
     const itemsPerPage = 10;
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { isLoggedIn } = useAuthStore((state) => !!state.user);
 
-    // Cek status login saat halaman dimuat
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            setIsLoggedIn(true);
-        } else {
-            setIsLoggedIn(false);
-        }
-    }, []);
-
-    // 🛒 Load cart dari localStorage
     useEffect(() => {
         const stored = localStorage.getItem("cart");
         if (stored) {
@@ -55,12 +45,10 @@ const CatalogPage = () => {
         }
     }, []);
 
-    // 💾 Simpan cart ke localStorage
     useEffect(() => {
         localStorage.setItem("cart", JSON.stringify(cart));
     }, [cart]);
 
-    // 🔄 Fetch produk dari backend
     useEffect(() => {
         const fetchProducts = async () => {
             setIsLoading(true);
@@ -76,10 +64,7 @@ const CatalogPage = () => {
                 if (activeCategory !== "ALL") params.append("type", activeCategory);
                 if (searchQuery) params.append("search", searchQuery);
 
-                const token = localStorage.getItem("token");
-                const res = await axios.get(`http://localhost:3000/products?${params.toString()}`, {
-                    headers: token ? { Authorization: `Bearer ${token}` } : {},
-                });
+                const res = await apiClient.get(`/products?${params.toString()}`);
 
                 const productData = res.data?.data?.data || [];
                 const page = res.data?.data?.page || 1;
@@ -93,6 +78,7 @@ const CatalogPage = () => {
                 setPagination({ page, max_page: maxPage });
             } catch (error) {
                 console.error("Gagal mengambil data produk:", error);
+                toast.error("Gagal memuat produk. Coba muat ulang halaman.");
             } finally {
                 setIsLoading(false);
             }
@@ -119,7 +105,7 @@ const CatalogPage = () => {
     };
 
     const goToOrderPage = () => {
-        if (cart.length === 0) return alert("Keranjang masih kosong!");
+        if (cart.length === 0) return toast.error("Keranjang masih kosong!");
         navigate("/order");
     };
 
@@ -128,9 +114,20 @@ const CatalogPage = () => {
         return category ? category.name : "Produk";
     };
 
+    if (isLoading && products.length === 0) {
+        return (
+            <>
+                <CustomerHeader />
+                <StepNavigation currentStep={1} />
+                <LoadingSpinner text="Memuat Data..." />
+
+            </>
+        )
+    }
+
     return (
         <div className="catalog-page">
-            <CustomerHeader isLoggedIn={isLoggedIn} />
+            <CustomerHeader />
             <StepNavigation currentStep={1} />
 
             <main className="catalog-main">
@@ -203,15 +200,12 @@ const CatalogPage = () => {
                                 </div>
                             </div>
 
-                            {isLoading ? (
-                                <div>Loading...</div>
-                            ) : (
-                                <ProductGrid
-                                    products={products}
-                                    onAddToCart={addToCart}
-                                    onRemoveFromCart={removeFromCart}
-                                    cart={cart} />
-                            )}
+                            <ProductGrid
+                                products={products}
+                                onAddToCart={addToCart}
+                                onRemoveFromCart={removeFromCart}
+                                cart={cart} />
+
 
                             <Pagination
                                 currentPage={pagination.page}
@@ -224,7 +218,7 @@ const CatalogPage = () => {
             </main>
 
             <Footer />
-            <ChatWidget isLoggedIn={isLoggedIn} />
+            <ChatWidget />
         </div>
     );
 };

@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import AdminHeader from "../../../components/features/Admin/AdminHeader";
 import ProductForm from "../../../components/features/Admin/ProductForm";
 import ProductTable from "../../../components/features/Admin/ProductTable";
-import axios from "axios"
+import apiClient from "../../../services/api";
+import { useAuthStore } from "../../../store/authStore";
 import { toast } from 'react-toastify';
 import "./AdminCatalog.css";
 
 export default function AdminCatalogPage() {
   const router = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [products, setProducts] = useState([]);
   const [query, setQuery] = useState("");
@@ -21,18 +23,12 @@ export default function AdminCatalogPage() {
     total: 0,
   });
   const [form, setForm] = useState({ name: "", category: "BUAH", price: "", description: "", unit: "", stock: "", image_url: [], status: "TERSEDIA" });
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [newImagePreviews, setNewImagePreviews] = useState([]);
 
   const fetchProducts = async (page = 1) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:3000/products?page=${page}&limit=10`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await apiClient.get(`/products?page=${page}&limit=10`);
 
       setProducts(res.data.data.data);
       setPagination({
@@ -55,28 +51,24 @@ export default function AdminCatalogPage() {
   }, [newImagePreviews]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
 
-    if (!token) {
-      setIsLoggedIn(false);
-      router("/")
-    } else if (role !== "ADMIN") {
-      setIsLoggedIn(true);
-      router("/catalog")
-    } else {
-      setIsLoggedIn(true);
+    if (user) {
+      if (user.role !== "ADMIN") {
+        toast.error("Anda tidak memiliki hak akses admin.");
+        router("/catalog");
+      }
     }
-  })
+    
+    else if (!user && useAuthStore.getState().accessToken === null) {
+       router("/");
+    }
+  }, [user, router]);
 
   useEffect(() => {
-    fetchProducts(pagination.page);
-  }, [pagination.page]);
-
-  const saveProducts = (next) => {
-    setProducts(next);
-    localStorage.setItem("adminProducts", JSON.stringify(next));
-  };
+    if (user && user.role === "ADMIN") {
+      fetchProducts(pagination.page);
+    }
+  }, [pagination.page, user]);
 
   const resetForm = () => {
     setEditingId(null);
@@ -119,7 +111,6 @@ export default function AdminCatalogPage() {
     }
 
     try {
-      const token = localStorage.getItem("token");
       let res;
 
       if (editingId) {
@@ -141,9 +132,7 @@ export default function AdminCatalogPage() {
           formData.append("existing_image_url[]", "");
         }
 
-        res = await axios.patch(`http://localhost:3000/products/${editingId}`, formData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        res = await apiClient.patch(`/products/${editingId}`, formData);
         toast.success("Produk berhasil diperbarui!");
       } else {
         if (!selectedFiles || selectedFiles.length === 0) {
@@ -151,9 +140,7 @@ export default function AdminCatalogPage() {
           return;
         }
 
-        res = await axios.post("http://localhost:3000/products", formData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        res = await apiClient.post("/products", formData);
         toast.success("Produk baru berhasil ditambahkan!");
       }
 
@@ -188,14 +175,10 @@ export default function AdminCatalogPage() {
     if (!confirm("Anda yakin ingin menghapus produk ini?")) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:3000/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await apiClient.delete(`/products/${id}`);
       toast.success("Produk berhasil dihapus!");
-      fetchProducts(pagination.page); // Muat ulang data
+      fetchProducts(pagination.page);
     } catch (err) {
-
       toast.error(err.response?.data?.message || "Gagal menghapus produk.");
     }
   };
@@ -233,15 +216,9 @@ export default function AdminCatalogPage() {
 
   const formatPrice = (price) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(price);
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    router("/", { replace: true });
-  };
-
   return (
     <div className="admin-cat-page">
-      <AdminHeader setIsLoggedIn={setIsLoggedIn} />
+      <AdminHeader />
       <main className="admin-cat-main">
         <div className="maxw">
           <div className="toolbar">

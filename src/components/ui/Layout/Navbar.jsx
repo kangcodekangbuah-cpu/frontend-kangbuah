@@ -1,28 +1,17 @@
-import { useState, useEffect } from "react"; // 1. Impor useState
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from 'react-toastify';
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Navbar.css";
+import { useAuthStore } from "../../../store/authStore"
 
 export default function Navbar({isLoggedIn, onLogout}) {
-  // 2. Buat state untuk mengontrol menu mobile
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // const navigate = useNavigate();
-  const role = localStorage.getItem("role");
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem('token');
-  //   if (token) {
-  //     setIsLoggedIn(true);
-  //   }
-  // }, []);
+  const role = useAuthStore((state) => state.user?.role) || localStorage.getItem('role');
 
   const handleLogoutClick = () => {
     onLogout();
     handleLinkClick();
   };
 
-  // Fungsi untuk menutup menu saat link diklik
   const handleLinkClick = () => {
     setIsMenuOpen(false);
   };

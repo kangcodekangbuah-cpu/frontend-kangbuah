@@ -1,31 +1,24 @@
-import { useState, useEffect } from "react"; // 1. Impor useState dan useEffect
+import { useState, useEffect } from "react"; 
 import { Link } from "react-router-dom";
-import axios from "axios"; // 2. Impor axios untuk request API
+import apiClient from "../../../services/api";
 import ProductCard from "../../ui/Product/ProductCard";
 import "./FeaturedProducts.css";
 
 const FeaturedProducts = () => {
-  // 3. Buat state untuk menampung data, status loading, dan error
   const [featuredItems, setFeaturedItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 4. Gunakan useEffect untuk mengambil data dari API saat komponen dimuat
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
-        // Panggil endpoint produk Anda.
-        // Menambahkan `?limit=8` adalah cara efisien untuk hanya mengambil 8 produk.
-        const response = await axios.get("http://localhost:3000/products?limit=8");
+        const response = await apiClient.get("/products?limit=8");
         
-        // Simpan data produk dari API ke dalam state
         setFeaturedItems(response.data.data.data);
       } catch (err) {
-        // Jika terjadi error, simpan pesan error di state
         console.error("Gagal mengambil produk unggulan:", err);
         setError("Tidak dapat memuat produk saat ini.");
       } finally {
-        // Hentikan status loading, baik berhasil maupun gagal
         setLoading(false);
       }
     };
@@ -46,7 +39,6 @@ const FeaturedProducts = () => {
     );
   }
 
-  // Tampilan jika terjadi error
   if (error) {
     return (
       <section className="featured-products-section">
@@ -60,7 +52,6 @@ const FeaturedProducts = () => {
     );
   }
 
-  // Tampilan jika data berhasil dimuat
   return (
     <section className="featured-products-section">
       <div className="container">

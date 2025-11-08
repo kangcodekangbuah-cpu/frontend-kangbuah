@@ -1,81 +1,76 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AdminHeader from "../../../components/features/Admin/AdminHeader"
-import { jwtDecode } from "jwt-decode";
 import "./AdminChat.css";
 import { toast } from "react-toastify";
-import axios from "axios";
-
-const getUserInfoFromToken = () => {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-    try {
-        const decoded = jwtDecode(token);
-        return {
-            id: decoded.sub,
-            name: decoded.username,
-            role: decoded.role
-        }
-    } catch (error) {
-        console.error("Token decode error:", error);
-        return error;
-    }
-};
+import apiClient from "../../../services/api";
+import { useAuthStore } from "../../../store/authStore";
+import LoadingSpinner from "../../../components/ui/Layout/LoadingSpinner";
 
 export default function AdminChat() {
     const router = useNavigate();
     const [contacts, setContacts] = useState([]);
-    const [activeId, setActiveId] = useState(null); // Mulai dari null karena belum ada kontak yang dipilih
-    const [store, setStore] = useState({}); // { [contactId]: Message[] }
+    const [activeId, setActiveId] = useState(null);
+    const [store, setStore] = useState({});
     const [text, setText] = useState("");
     const endRef = useRef(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
-    const currentUser = getUserInfoFromToken();
-    const currentUserId = currentUser?.id;
+    const currentUserId = useAuthStore((state) => state.user?.sub);
+    const username = useAuthStore((state) => state.user?.username);
+    const role = useAuthStore((state) => state.user?.role);
+    const authStatus = useAuthStore((state) => state.authStatus);
+    const [isLoading, setIsLoading] = useState(true);
 
 
     useEffect(() => {
-        if (!currentUser) {
-            router("/", { replace: true });
-        } else if (currentUser.role !== 'ADMIN') {
-            router("/catalog", { replace: true });
+        if (authStatus === 'loading') {
+            return;
         }
-    }, [router, currentUser]);
+
+        if (authStatus === 'unauthenticated') {
+            toast.warn("Anda harus login untuk mengakses halaman ini.");
+
+            const timer = setTimeout(() => {
+                router("/", { replace: true });
+            }, 1500);
+            return () => clearTimeout(timer);
+
+        } else if (authStatus === 'authenticated' && role !== "ADMIN") {
+            toast.error("Anda tidak memiliki hak akses admin.");
+            router("/", { replace: true });
+        }
+    }, [router, role, authStatus]);
 
 
     useEffect(() => {
-        if (!currentUserId) return;
+        if (authStatus !== 'authenticated' || !currentUserId || role !== 'ADMIN') {
+            return;
+        }
 
         const fetchContacts = async () => {
+            setIsLoading(true);
             try {
-                const token = localStorage.getItem("token");
-                const res = await axios.get(`http://localhost:3000/chat/list/${currentUserId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await apiClient.get(`/chat/list/${currentUserId}`);
 
-                // PERBAIKAN: Hapus .data kedua. res.data sudah merupakan array.
                 setContacts(res.data.data);
-                if (res.data.length > 0) {
-                    setActiveId(res.data.data[0].id);
+                if (res.data.data.length > 0) {
+                    setActiveId(res.data.data[0].room_id);
                 }
             } catch (error) {
                 console.error("Gagal mengambil daftar chat:", error);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchContacts();
-    }, [currentUserId]);
+    }, [currentUserId, role, authStatus]);
 
     useEffect(() => {
         if (!activeId) return;
 
         const fetchMessages = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const res = await axios.get(`http://localhost:3000/chat/messages/${activeId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await apiClient.get(`/chat/messages/${activeId}`);
 
-                // PERBAIKAN: Hapus .data kedua. res.data sudah merupakan array.
                 const formattedMessages = res.data.data.map(msg => ({
                     text: msg.message_content,
                     at: msg.timestamp,
@@ -101,16 +96,16 @@ export default function AdminChat() {
     // --- Functions ---
     const send = async () => {
         const msg = text.trim();
-        if (!msg || !activeId || !currentUser) return;
+        if (!msg || !activeId || !currentUserId || !username) return;
 
         const newMessage = {
             text: msg,
             at: new Date().toISOString(),
-            senderId: currentUser.id,
-            senderName: currentUser.username,
+            senderId: currentUserId,
+            senderName: username,
             senderRole: 'ADMIN'
         };
-        // Optimistic UI update: langsung tampilkan pesan di layar
+
         setStore(prevStore => ({
             ...prevStore,
             [activeId]: [...(prevStore[activeId] || []), newMessage]
@@ -118,13 +113,10 @@ export default function AdminChat() {
         setText("");
 
         try {
-            const token = localStorage.getItem("token");
-            await axios.post(`http://localhost:3000/chat/send`, {
+            await apiClient.post(`/chat/send`, {
                 roomId: activeId,
                 senderId: currentUserId,
                 message: msg
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
         } catch (error) {
             console.error("Gagal mengirim pesan:", error);
@@ -132,15 +124,41 @@ export default function AdminChat() {
         }
     };
 
-    // Dapatkan detail kontak yang sedang aktif
     const activeContact = useMemo(() => {
+        if (!Array.isArray(contacts)) return null;
         return contacts.find((c) => c.id === activeId);
     }, [contacts, activeId]);
 
+    if (authStatus === 'loading') {
+        return (
+            <>
+                <AdminHeader />
+                <LoadingSpinner text="Mengecek autentikasi..." />
+            </>
+        );
+    }
+
+    if (role !== 'ADMIN') {
+        return (
+            <>
+                <AdminHeader />
+                <LoadingSpinner text="Memverifikasi hak akses..." />
+            </>
+        );
+    }
+
+    if (isLoading) {
+        return (
+            <>
+                <AdminHeader />
+                <LoadingSpinner text="Memuat percakapan..." />
+            </>
+        );
+    }
+
     return (
         <div className="admin-chat-pagel">
-            {/* 1. Menggunakan komponen AdminHeader */}
-            <AdminHeader setIsLoggedIn={setIsLoggedIn} />
+            <AdminHeader />
 
             <main className="chat-main">
                 <div className="maxw chat-layout">
@@ -169,17 +187,16 @@ export default function AdminChat() {
                         <section className="thread">
                             <div className="thread-head">
                                 <div className="contact-title">
-                                    <div className="avatar lg">{activeContact.name.slice(0, 1)}</div>
+                                    <div className="avatar lg">{activeContact?.name?.slice(0, 1)}</div>
                                     <div>
-                                        <div className="name">{activeContact.name}</div>
-                                        <div className="status">online</div>
+                                        <div className="name">{activeContact?.name}</div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="messages">
                                 {messages.map((m, idx) => {
-                                    const isMe = m.senderId === currentUser.id;
+                                    const isMe = m.senderId === currentUserId;
                                     const isAdminSender = m.senderRole === 'ADMIN';
 
                                     const bubbleClass = isMe ? 'sent' : isAdminSender ? 'recv-admin' : 'recv-user'
@@ -213,7 +230,7 @@ export default function AdminChat() {
                         </section>
                     ) : (
                         // Tampilkan placeholder jika belum ada chat yang dipilih
-                        <section className="thread placeholder">
+                        <section className="thread-placeholder">
                             <p>Pilih percakapan untuk memulai.</p>
                         </section>
                     )}
