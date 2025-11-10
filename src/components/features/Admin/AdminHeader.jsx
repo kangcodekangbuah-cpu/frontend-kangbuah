@@ -31,6 +31,9 @@ const AdminHeader = () => {
                         <NavLink to="/admin/orders" className="nav-item">
                             Pemesanan
                         </NavLink>
+                        <NavLink to="/admin/analytics" className="nav-item">
+                            Analytics
+                        </NavLink>
                     </nav>
                     <div className="right">
                         <button className="logout" onClick={handleLogout}>

@@ -15,7 +15,9 @@ import PaymentPage from "../src/pages/payment/page"
 import AdminCatalogPage from "./pages/admin/adminCatalog/AdminCatalogPage";
 import AdminChat from "./pages/admin/adminChat/AdminChat";
 import AdminOrders from "./pages/admin/adminOrders/AdminOrders";
+import AdminAnalytics from "./pages/admin/adminAnalytics/AdminAnalyticsPage";
 import LoadingSpinner from "./components/ui/Layout/LoadingSpinner";
+import AdminAnalyticsPage from "./pages/admin/adminAnalytics/AdminAnalyticsPage";
 
 function App() {
 
@@ -73,6 +75,7 @@ function App() {
         <Route path="/admin/catalog" element={<AdminCatalogPage />} />
         <Route path="/admin/chat" element={<AdminChat />} />
         <Route path="/admin/orders" element={<AdminOrders />} />
+        <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
       </Routes>
 
       <ToastContainer
