@@ -119,3 +119,27 @@
     grid-template-columns: 1fr;
   }
 }
+.small-card h3 {
+  margin-bottom: 12px;
+  color: #065f46;
+}
+
+.recharts-legend-wrapper {
+  overflow-y: auto !important;
+  max-height: 200px !important;
+}
+
+.recharts-default-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 6px;
+}
+
+.recharts-tooltip-label {
+  font-weight: 600;
+  color: #059669;
+}
+.recharts-tooltip-item-name {
+  color: #065f46;
+}
