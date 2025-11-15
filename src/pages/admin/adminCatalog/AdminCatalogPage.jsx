@@ -7,6 +7,7 @@ import apiClient from "../../../services/api";
 import { useAuthStore } from "../../../store/authStore";
 import { toast } from 'react-toastify';
 import "./AdminCatalog.css";
+import Pagination from "../../../components/features/Catalog/Pagination";
 
 export default function AdminCatalogPage() {
   const router = useNavigate();
@@ -28,7 +29,22 @@ export default function AdminCatalogPage() {
   const fetchProducts = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await apiClient.get(`/products?page=${page}&limit=10`);
+      const params = new URLSearchParams({
+        page: page,
+        limit: 10,
+        sortBy: 'status_priority',
+        order: 'ASC'
+      });
+
+      if (filter !== "all") {
+        params.append("type", filter);
+      }
+
+      if (query) {
+        params.append("search", query);
+      }
+
+      const res = await apiClient.get(`/products?${params.toString()}`);
 
       setProducts(res.data.data.data);
       setPagination({
@@ -58,17 +74,26 @@ export default function AdminCatalogPage() {
         router("/catalog");
       }
     }
-    
+
     else if (!user && useAuthStore.getState().accessToken === null) {
-       router("/");
+      router("/");
     }
   }, [user, router]);
 
   useEffect(() => {
     if (user && user.role === "ADMIN") {
-      fetchProducts(pagination.page);
+
+      const delay = setTimeout(() => {
+        fetchProducts(pagination.page);
+      }, 300);
+
+      return () => clearTimeout(delay);
     }
-  }, [pagination.page, user]);
+  }, [pagination.page, query, filter, user]);
+
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
+  };
 
   const resetForm = () => {
     setEditingId(null);
@@ -183,37 +208,6 @@ export default function AdminCatalogPage() {
     }
   };
 
-  const getStatusPriority = (status) => {
-    switch (status) {
-      case 'STOK_MENIPIS':
-        return 1;
-      case 'STOK_HABIS':
-        return 2;
-      case 'TIDAK_AKTIF':
-        return 3;
-      default:
-        return 4;
-    }
-  };
-
-  const filtered = useMemo(() => {
-    if (!Array.isArray(products)) return [];
-
-    return products
-      .filter((p) => (filter === "all" ? true : p.type === filter))
-      .filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
-      .sort((a, b) => {
-        const priorityA = getStatusPriority(a.status);
-        const priorityB = getStatusPriority(b.status);
-
-        if (priorityA !== priorityB) {
-          return priorityA - priorityB;
-        }
-
-        return a.name.localeCompare(b.name)
-      });
-  }, [products, query, filter]);
-
   const formatPrice = (price) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(price);
 
   return (
@@ -226,12 +220,18 @@ export default function AdminCatalogPage() {
               className="search"
               placeholder="Cari produk..."
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                handlePageChange(1);
+              }}
             />
             <select
               className="filter"
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              onChange={(e) => {
+                setFilter(e.target.value);
+                handlePageChange(1);
+              }}
             >
               <option value="all">Semua Kategori</option>
               <option value="BUAH">Buah-buahan</option>
@@ -250,7 +250,7 @@ export default function AdminCatalogPage() {
               newImagePreviews={newImagePreviews}
             />
             <ProductTable
-              products={filtered}
+              products={products}
               onEdit={onEdit}
               onDelete={onDelete}
               formatPrice={formatPrice}
@@ -258,6 +258,12 @@ export default function AdminCatalogPage() {
           </div>
         </div>
       </main>
+      <Pagination
+        currentPage={pagination.page}
+        totalPages={pagination.max_page}
+        onPageChange={handlePageChange}
+      />
+      <br></br>
     </div>
   );
 }

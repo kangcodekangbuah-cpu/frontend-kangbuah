@@ -31,7 +31,7 @@ const CatalogPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [cart, setCart] = useState([]);
     const navigate = useNavigate();
-    const itemsPerPage = 10;
+    const itemsPerPage = 12;
     const { isLoggedIn } = useAuthStore((state) => !!state.user);
 
     useEffect(() => {

@@ -379,7 +379,7 @@ export default function OrderPage() {
                   <li key={item.uniqueId || item.product_id} className="summary-item">
                     <div className="thumb">
                       <img
-                        src={item.image_url[0] || defaultImage}
+                        src={item.image_url?.[0] || defaultImage}
                         alt={item.name}
                         width={48}
                         height={48}
