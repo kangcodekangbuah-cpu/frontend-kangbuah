@@ -591,6 +591,13 @@
   padding: 0 1rem;
 }
 
+.products-area .loading-container {
+  height: auto;
+  width: 100%;
+  background-color: transparent;
+  padding: 5rem 0; 
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .catalog-content {
