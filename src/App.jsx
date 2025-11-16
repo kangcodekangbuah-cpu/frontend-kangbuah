@@ -32,6 +32,7 @@ function App() {
     title,
     message,
     confirmText,
+    cancelText,
     confirmVariant,
     isLoading,
     onConfirm,
@@ -103,6 +104,7 @@ function App() {
         title={title}
         message={message}
         confirmText={confirmText}
+        cancelText={cancelText}
         confirmVariant={confirmVariant}
         isLoading={isLoading}
       />

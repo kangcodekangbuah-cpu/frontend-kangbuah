@@ -5,6 +5,7 @@ const initialState = {
   title: '',
   message: '',
   confirmText: 'Konfirmasi',
+  cancelText: 'Batal',
   confirmVariant: 'danger',
   isLoading: false,
   onConfirm: () => {},

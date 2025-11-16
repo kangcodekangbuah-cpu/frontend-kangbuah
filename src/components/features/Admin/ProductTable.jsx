@@ -1,4 +1,4 @@
-const ProductTable = ({ products, onEdit, onDelete, formatPrice }) => {
+const ProductTable = ({ products, onEdit, onArchive, formatPrice }) => {
 
     const getStatusClass = (status) => {
         switch (status) {
@@ -54,8 +54,8 @@ const ProductTable = ({ products, onEdit, onDelete, formatPrice }) => {
                                     <button className="edit" onClick={() => onEdit(p)}>
                                         Ubah
                                     </button>
-                                    <button className="del" onClick={() => onDelete(p.product_id)}>
-                                        Hapus
+                                    <button className="del" onClick={() => onArchive(p)}>
+                                        Arsip
                                     </button>
                                 </td>
                             </tr>

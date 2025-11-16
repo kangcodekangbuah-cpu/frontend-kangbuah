@@ -7,6 +7,7 @@ import "./AdminOrders.css"
 import AdminHeader from "../../../components/features/Admin/AdminHeader"
 import apiClient from "../../../services/api";
 import LoadingSpinner from "../../../components/ui/Layout/LoadingSpinner";
+import { useModalStore } from "../../../store/useModalStore";
 
 const statusLabels = {
   MENUNGGU_VERIFIKASI: "Menunggu Verifikasi",
@@ -40,6 +41,7 @@ export default function AdminOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [filterStatus, setFilterStatus] = useState("all")
   const [loading, setLoading] = useState(true);
+  const { openModal, closeModal, setLoading: setModalLoading } = useModalStore.getState();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -57,23 +59,58 @@ export default function AdminOrdersPage() {
   }, []);
 
   const updateOrderStatus = async (orderId, newStatus) => {
-    try {
-      await apiClient.patch(`/orders/status/${orderId}`, { status: newStatus });
+    if (newStatus === "DIBATALKAN") {
+      const confirmAction = async () => {
+        setModalLoading(true);
+        try {
+          await apiClient.patch(`/orders/status/${orderId}`, { status: newStatus });
 
-      const updatedOrders = orders.map((order) =>
-        order.order_id === orderId ? { ...order, status: newStatus } : order
-      );
-      setOrders(updatedOrders);
+          const updatedOrders = orders.map((order) =>
+            order.order_id === orderId ? { ...order, status: newStatus } : order
+          );
+          setOrders(updatedOrders);
 
-      setSelectedOrder((prev) =>
-        prev && prev.order_id === orderId
-          ? { ...prev, status: newStatus }
-          : prev
-      );
+          setSelectedOrder((prev) =>
+            prev && prev.order_id === orderId
+              ? { ...prev, status: newStatus }
+              : prev
+          );
 
-      toast.success(`Status pesanan #${orderId} diubah ke ${statusLabels[newStatus]}`);
-    } catch (error) {
-      toast.error("Gagal menyinkronkan ke backend!");
+          toast.success(`Status pesanan #${orderId} diubah ke ${statusLabels[newStatus]}`);
+          closeModal();
+        } catch (error) {
+          toast.error("Gagal mengubah status");
+          setModalLoading(false);
+        }
+      };
+
+      openModal({
+        title: "Konfirmasi Batalkan Pemesanan",
+        message: `Anda yakin ingin batalkan pemesanan ini?`,
+        onConfirm: confirmAction,
+        confirmText: "Ya",
+        cancelText: "Tidak",
+        confirmVariant: "danger",
+      })
+    } else {
+      try {
+        await apiClient.patch(`/orders/status/${orderId}`, { status: newStatus });
+
+        const updatedOrders = orders.map((order) =>
+          order.order_id === orderId ? { ...order, status: newStatus } : order
+        );
+        setOrders(updatedOrders);
+
+        setSelectedOrder((prev) =>
+          prev && prev.order_id === orderId
+            ? { ...prev, status: newStatus }
+            : prev
+        );
+
+        toast.success(`Status pesanan #${orderId} diubah ke ${statusLabels[newStatus]}`);
+      } catch (error) {
+        toast.error("Gagal mengubah status");
+      }
     }
   };
 
@@ -83,7 +120,7 @@ export default function AdminOrdersPage() {
     return (
       <div className="admin-chat-page">
         <AdminHeader />
-        <LoadingSpinner text="Memuat Data Pesanan..."/>
+        <LoadingSpinner text="Memuat Data Pesanan..." />
       </div>
     );
   }

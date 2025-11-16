@@ -8,6 +8,7 @@ import { useAuthStore } from "../../../store/authStore";
 import { toast } from 'react-toastify';
 import "./AdminCatalog.css";
 import Pagination from "../../../components/features/Catalog/Pagination";
+import { useModalStore } from "../../../store/useModalStore";
 
 export default function AdminCatalogPage() {
   const router = useNavigate();
@@ -25,6 +26,7 @@ export default function AdminCatalogPage() {
   });
   const [form, setForm] = useState({ name: "", category: "BUAH", price: "", description: "", unit: "", stock: "", image_url: [], status: "TERSEDIA" });
   const [newImagePreviews, setNewImagePreviews] = useState([]);
+  const { openModal, closeModal, setLoading: setModalLoading } = useModalStore.getState()
 
   const fetchProducts = async (page = 1) => {
     setLoading(true);
@@ -196,16 +198,29 @@ export default function AdminCatalogPage() {
     document.getElementById('image-upload').value = null;
   };
 
-  const onDelete = async (id) => {
-    if (!confirm("Anda yakin ingin menghapus produk ini?")) return;
+  const onArchive = async (product) => {
+    const confirmAction = async () => {
+      setModalLoading(true);
+      try {
+        await apiClient.patch(`/products/${product.product_id}`, {
+          status: 'TIDAK_AKTIF'
+        });
+        toast.success("Produk berhasil diarsipkan!");
+        fetchProducts(pagination.page);
+        closeModal();
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Gagal menghapus produk.");
+        setModalLoading(false);
+      }
+    };
 
-    try {
-      await apiClient.delete(`/products/${id}`);
-      toast.success("Produk berhasil dihapus!");
-      fetchProducts(pagination.page);
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Gagal menghapus produk.");
-    }
+    openModal({
+      title: "Konfirmasi Arsipkan Produk",
+      message: `Anda yakin ingin arsip "${product.name}"?`,
+      onConfirm: confirmAction,
+      confirmText: "Ya",
+      confirmVariant: "danger",
+    })
   };
 
   const formatPrice = (price) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(price);
@@ -252,7 +267,7 @@ export default function AdminCatalogPage() {
             <ProductTable
               products={products}
               onEdit={onEdit}
-              onDelete={onDelete}
+              onArchive={onArchive}
               formatPrice={formatPrice}
             />
           </div>
