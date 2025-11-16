@@ -2,13 +2,34 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { useAuthStore } from "../../../store/authStore"
+import { useModalStore } from "../../../store/useModalStore";
 
-export default function Navbar({isLoggedIn, onLogout}) {
+export default function Navbar({ isLoggedIn, onLogout }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const role = useAuthStore((state) => state.user?.role) || localStorage.getItem('role');
 
+  const { openModal, setLoading } = useModalStore.getState();
+
   const handleLogoutClick = () => {
-    onLogout();
+    const confirmAction = async () => {
+      setLoading(true);
+      try {
+        await onLogout();
+        useModalStore.getState().closeModal()
+      } catch (error) {
+        console.error("Gagal logout:", error);
+        setLoading(false);
+      }
+    };
+
+    openModal({
+      title: "Konfirmasi Logout",
+      message: "Anda yakin ingin keluar dari akun ini?",
+      onConfirm: confirmAction,
+      confirmText: "Ya, Logout",
+      confirmVariant: "danger",
+    });
+
     handleLinkClick();
   };
 

@@ -1,17 +1,36 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuthStore } from "../../../store/authStore";
+import { useModalStore } from "../../../store/useModalStore";
 
 
 const AdminHeader = () => {
     const navigate = useNavigate();
     const logout = useAuthStore((state) => state.logout);
+    const { openModal, setLoading } = useModalStore.getState();
 
 
     const handleLogout = async () => {
-        await logout();
-        toast.success("Logout berhasil");
-        navigate("/", { replace: true });
+        const confirmAction = async () => {
+            setLoading(true);
+            try {
+                await logout();
+                toast.success("Logout berhasil");
+                useModalStore.getState().closeModal()
+                navigate("/", { replace: true });
+            } catch (error) {
+                console.error("Gagal logout:", error);
+                setLoading(false);
+            }
+        };
+
+        openModal({
+            title: "Konfirmasi Logout",
+            message: "Keluar dari Akun ini?",
+            onConfirm: confirmAction,
+            confirmText: "Ya, Keluar",
+            confirmVariant: "danger"
+        })
     };
 
     return (

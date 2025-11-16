@@ -64,7 +64,7 @@ apiClient.interceptors.response.use(
       try {
         
         const res = await apiClient.get('/auth/refresh');
-        const newAccessToken = res.data.accessToken;
+        const newAccessToken = res.data.data.accessToken;
 
         useAuthStore.getState().setToken(newAccessToken);
         
@@ -77,10 +77,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         
         processQueue(refreshError, null);
-        toast.error('NAH KAN SI BABI')
         useAuthStore.getState().logout();
-        
-        // window.location.href = '/login'; 
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
