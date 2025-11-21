@@ -64,6 +64,7 @@ export default function OrderHistoryPage() {
   if (loading) {
     return (
       <div>
+        <CustomerHeader />
         <main className="chat-main loading-container">
           <div className="spinner"></div>
           <p>Memuat Data...</p>
@@ -196,6 +197,15 @@ export default function OrderHistoryPage() {
                     </>
                   )}
 
+                </div>
+
+                <div className="detail-note">
+                  <h3>Catatan</h3>
+                  {selectedOrder.notes ? (
+                    <p className="note-content">{selectedOrder.notes}</p>
+                  ) : (
+                    <p className="note-empty">-</p>
+                  )}
                 </div>
 
                 <div className="detail-section">
