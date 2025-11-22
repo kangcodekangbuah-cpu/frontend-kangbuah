@@ -5,7 +5,7 @@
 }
 
 .maxw {
-  max-width: 1200px;
+  max-width: 100rem;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -99,13 +99,13 @@
 }
 
 .filter {
-  min-width: 200px;
+  min-width: 3rem;
 }
 
 /* --- Layout Grid (Form & Table) --- */
 .grid {
   display: grid;
-  grid-template-columns: 350px 1fr;
+  grid-template-columns: 22rem 1fr;
   gap: 2rem;
   align-items: flex-start;
 }

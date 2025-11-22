@@ -1,38 +1,87 @@
+"use client"
+import { Sprout, Zap, Handshake, Globe, Leaf } from "lucide-react"
 import "./VisionMission.css"
 
 export default function VisionMission() {
-  return (
-    <section className="vision-mission" id="vision">
-      <div className="vm-container">
-        <h2 className="vm-title">VISI & MISI</h2>
+  const missionData = [
+    {
+      id: 1,
+      title: "Produk Berkualitas",
+      description: "Menyediakan produk segar dan berkualitas secara konsisten",
+      icon: Sprout,
+      position: "top-left",
+    },
+    {
+      id: 2,
+      title: "Pelayanan Responsif",
+      description: "Memberikan pelayanan cepat, responsive, dan professional",
+      icon: Zap,
+      position: "top-right",
+    },
+    {
+      id: 3,
+      title: "Jangkauan Luas",
+      description: "Memperluas jangkauan distribusi melalui teknologi dan media sosial",
+      icon: Globe,
+      position: "bottom-left",
+    },
+    {
+      id: 4,
+      title: "Kemitraan Strategis",
+      description: "Menjalin kemitraan jangka panjang yang saling menguntungkan",
+      icon: Handshake,
+      position: "bottom-right",
+    },
+  ]
 
+  return (
+    <section className="vision-mission-section">
+      <div className="vision-mission-decorative">
+        <div className="vision-mission-decorative-top"></div>
+        <div className="vision-mission-decorative-bottom"></div>
+      </div>
+
+      <div className="vision-mission-wrapper">
+        {/* Vision Section */}
         <div className="vision-section">
-          <h3 className="vision-title">Visi:</h3>
-          <p className="vision-text">
+          <h3 className="vision-section-title">Visi Kami</h3>
+          <p className="vision-section-text">
             Menjadi mitra terpercaya dalam rantai pasok buah dan sayur segar bagi industri kuliner dan layanan publik di
             Jabodetabek
           </p>
         </div>
 
-        <div className="mission-section">
-          <h3 className="mission-title">Misi:</h3>
-          <div className="mission-grid">
-            <div className="mission-card">
-              <div className="mission-icon">🎯</div>
-              <p>Menyediakan produk segar dan berkualitas secara konsisten</p>
-            </div>
-            <div className="mission-card">
-              <div className="mission-icon">⚡</div>
-              <p>Memberikan pelayanan cepat, responsive, dan professional</p>
-            </div>
-            <div className="mission-card">
-              <div className="mission-icon">🤝</div>
-              <p>Menjalin kemitraan jangka panjang yang saling menguntungkan</p>
-            </div>
-            <div className="mission-card">
-              <div className="mission-icon">📱</div>
-              <p>Memperluas jangkauan distribusi melalui teknologi dan media sosial</p>
-            </div>
+        {/* Large background text with cards overlay */}
+        <div className="vision-mission-container">
+          {/* Large "Visi & Misi" text in background */}
+          <div className="vision-mission-background-text">
+            <h2>Visi & Misi</h2>
+          </div>
+
+          {/* Mission cards grid */}
+          <div className="vision-mission-grid">
+            {missionData.map((item) => {
+              const IconComponent = item.icon
+              return (
+                <div key={item.id} className={`vision-mission-card-wrapper ${item.position}`}>
+                  <div className="mission-card-inner">
+                    {/* Icon container */}
+                    <div className="mission-icon-container">
+                      <IconComponent className="mission-icon" />
+                    </div>
+
+                    {/* Title */}
+                    <h4 className="mission-title">{item.title}</h4>
+
+                    {/* Description */}
+                    <p className="mission-description">{item.description}</p>
+
+                    {/* Read More link */}
+                    <button className="mission-button">READ MORE</button>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>

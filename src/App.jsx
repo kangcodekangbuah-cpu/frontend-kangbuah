@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom"
 import { useState, useEffect, useRef } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { useAuthStore } from './store/authStore';
+import { useModalStore } from "./store/useModalStore";
 import apiClient from './services/api';
 import 'react-toastify/dist/ReactToastify.css';
 import HomePage from "../src/pages/home/HomePage"
@@ -18,26 +19,29 @@ import AdminOrders from "./pages/admin/adminOrders/AdminOrders";
 import AdminAnalytics from "./pages/admin/adminAnalytics/AdminAnalyticsPage";
 import LoadingSpinner from "./components/ui/Layout/LoadingSpinner";
 import AdminAnalyticsPage from "./pages/admin/adminAnalytics/AdminAnalyticsPage";
+import ConfirmationModal from "./components/ui/Layout/ConfirmationModal";
 
 function App() {
 
-  const [isInitialized, setIsInitialized] = useState(false);
+  const authStatus = useAuthStore((state) => state.authStatus);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const setToken = useAuthStore((state) => state.setToken);
 
-  const isInitializing = useRef(false);
+  const {
+    isOpen,
+    title,
+    message,
+    confirmText,
+    cancelText,
+    confirmVariant,
+    isLoading,
+    onConfirm,
+    closeModal,
+  } = useModalStore();
 
   useEffect(() => {
-
-    if (isInitializing.current) {
-      return;
-    }
-
-    isInitializing.current = true;
     const initializeApp = async () => {
-
       try {
-
         const res = await apiClient.get('/auth/refresh');
 
         if (res.data.data.accessToken) {
@@ -47,15 +51,17 @@ function App() {
         }
       } catch (error) {
         clearAuth();
-      } finally {
-        setIsInitialized(true);
       }
     };
 
-    initializeApp();
-  }, [setToken, clearAuth]);
+    if (authStatus === 'loading') {
+      initializeApp();
+    }
 
-  if (!isInitialized) {
+  }, [authStatus, setToken, clearAuth]);
+
+
+  if (authStatus === 'loading') {
     return <LoadingSpinner text="Memuat..." />;
   }
 
@@ -89,6 +95,18 @@ function App() {
         draggable
         pauseOnHover
         theme="light"
+      />
+
+      <ConfirmationModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        onConfirm={onConfirm}
+        title={title}
+        message={message}
+        confirmText={confirmText}
+        cancelText={cancelText}
+        confirmVariant={confirmVariant}
+        isLoading={isLoading}
       />
     </>
   );

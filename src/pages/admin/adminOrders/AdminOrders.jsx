@@ -7,6 +7,8 @@ import "./AdminOrders.css"
 import AdminHeader from "../../../components/features/Admin/AdminHeader"
 import apiClient from "../../../services/api";
 import LoadingSpinner from "../../../components/ui/Layout/LoadingSpinner";
+import { useModalStore } from "../../../store/useModalStore";
+import NoteModal from "../../../components/ui/Layout/NoteModal";
 
 const statusLabels = {
   MENUNGGU_VERIFIKASI: "Menunggu Verifikasi",
@@ -40,6 +42,10 @@ export default function AdminOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [filterStatus, setFilterStatus] = useState("all")
   const [loading, setLoading] = useState(true);
+  const { openModal, closeModal, setLoading: setModalLoading } = useModalStore.getState();
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+  const [pendingStatusUpdate, setPendingStatusUpdate] = useState(null);
+  const [isEditingNoteOnly, setIsEditingNoteOnly] = useState(false);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -56,24 +62,110 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, []);
 
-  const updateOrderStatus = async (orderId, newStatus) => {
+  const handleStatusClick = (status) => {
+    if (status === "MENUNGGU_PEMBAYARAN") {
+      setPendingStatusUpdate(status);
+      setIsEditingNoteOnly(false);
+      setIsNoteModalOpen(true);
+    }
+    else {
+      updateOrderStatus(selectedOrder.order_id, status);
+    }
+  };
+
+  const handleConfirmNote = async (noteContent) => {
+    setModalLoading(true);
     try {
-      await apiClient.patch(`/orders/status/${orderId}`, { status: newStatus });
+      const orderId = selectedOrder.order_id;
 
-      const updatedOrders = orders.map((order) =>
-        order.order_id === orderId ? { ...order, status: newStatus } : order
-      );
-      setOrders(updatedOrders);
+      if (isEditingNoteOnly) {
+        await apiClient.patch(`/orders/${orderId}/note`, { note: noteContent });
+        toast.success("Catatan berhasil diperbarui");
 
-      setSelectedOrder((prev) =>
-        prev && prev.order_id === orderId
-          ? { ...prev, status: newStatus }
-          : prev
-      );
+        const updatedOrders = orders.map((o) =>
+          o.order_id === orderId ? { ...o, notes: noteContent } : o
+        );
+        setOrders(updatedOrders);
+        setSelectedOrder(prev => ({ ...prev, notes: noteContent }));
+      }
+      else {
+        await apiClient.patch(`/orders/status/${orderId}`, {
+          status: pendingStatusUpdate,
+          note: noteContent
+        });
 
-      toast.success(`Status pesanan #${orderId} diubah ke ${statusLabels[newStatus]}`);
+        toast.success(`Status diubah ke ${statusLabels[pendingStatusUpdate]}`);
+
+        const updatedOrders = orders.map((o) =>
+          o.order_id === orderId ? { ...o, status: pendingStatusUpdate, notes: noteContent } : o
+        );
+        setOrders(updatedOrders);
+        setSelectedOrder(prev => ({ ...prev, status: pendingStatusUpdate, notes: noteContent }));
+      }
+
+      setIsNoteModalOpen(false);
     } catch (error) {
-      toast.error("Gagal menyinkronkan ke backend!");
+      console.error(error);
+      toast.error("Gagal memproses permintaan");
+    } finally {
+      setModalLoading(false);
+      setPendingStatusUpdate(null);
+    }
+  };
+
+  const updateOrderStatus = async (orderId, newStatus, note = null) => {
+    if (newStatus === "DIBATALKAN") {
+      const confirmAction = async () => {
+        setModalLoading(true);
+        try {
+          await apiClient.patch(`/orders/status/${orderId}`, { status: newStatus });
+
+          const updatedOrders = orders.map((order) =>
+            order.order_id === orderId ? { ...order, status: newStatus } : order
+          );
+          setOrders(updatedOrders);
+
+          setSelectedOrder((prev) =>
+            prev && prev.order_id === orderId
+              ? { ...prev, status: newStatus }
+              : prev
+          );
+
+          toast.success(`Status pesanan #${orderId} diubah ke ${statusLabels[newStatus]}`);
+          closeModal();
+        } catch (error) {
+          toast.error("Gagal mengubah status");
+          setModalLoading(false);
+        }
+      };
+
+      openModal({
+        title: "Konfirmasi Batalkan Pemesanan",
+        message: `Anda yakin ingin batalkan pemesanan ini?`,
+        onConfirm: confirmAction,
+        confirmText: "Ya",
+        cancelText: "Tidak",
+        confirmVariant: "danger",
+      })
+    } else {
+      try {
+        await apiClient.patch(`/orders/status/${orderId}`, { status: newStatus, note: note });
+
+        const updatedOrders = orders.map((order) =>
+          order.order_id === orderId ? { ...order, status: newStatus } : order
+        );
+        setOrders(updatedOrders);
+
+        setSelectedOrder((prev) =>
+          prev && prev.order_id === orderId
+            ? { ...prev, status: newStatus }
+            : prev
+        );
+
+        toast.success(`Status pesanan #${orderId} diubah ke ${statusLabels[newStatus]}`);
+      } catch (error) {
+        toast.error("Gagal mengubah status");
+      }
     }
   };
 
@@ -83,7 +175,7 @@ export default function AdminOrdersPage() {
     return (
       <div className="admin-chat-page">
         <AdminHeader />
-        <LoadingSpinner text="Memuat Data Pesanan..."/>
+        <LoadingSpinner text="Memuat Data Pesanan..." />
       </div>
     );
   }
@@ -155,12 +247,34 @@ export default function AdminOrdersPage() {
                           backgroundColor: selectedOrder.status === status ? statusColors[status] : "#e0e0e0",
                           color: selectedOrder.status === status ? "#fff" : "#666",
                         }}
-                        onClick={() => updateOrderStatus(selectedOrder.order_id, status)}
+                        onClick={() => handleStatusClick(status)}
                       >
                         {statusLabels[status]}
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div className="detail-note-section">
+                  <div className="detail-note-header">
+                    <h3>Catatan Admin</h3>
+                    {selectedOrder.status === "MENUNGGU_PEMBAYARAN" && (
+                      <button
+                        className="btn-edit-note"
+                        onClick={() => {
+                          setIsEditingNoteOnly(true);
+                          setIsNoteModalOpen(true);
+                        }}
+                      >
+                        Ubah Catatan
+                      </button>
+                    )}
+                  </div>
+                  {selectedOrder.notes ? (
+                    <p className="note-content">{selectedOrder.notes}</p>
+                  ) : (
+                    <p className="note-empty">Tidak ada catatan.</p>
+                  )}
                 </div>
 
                 <div className="detail-section">
@@ -200,16 +314,8 @@ export default function AdminOrdersPage() {
                   <h3>Ringkasan Pembayaran</h3>
                   <div className="payment-summary">
                     <div className="summary-row">
-                      <span>Subtotal</span>
-                      <span>Rp {Number(selectedOrder.subtotal || 0).toLocaleString("id-ID")}</span>
-                    </div>
-                    <div className="summary-row">
                       <span>Diskon</span>
                       <span>- Rp {Number(selectedOrder.discount || 0).toLocaleString("id-ID")}</span>
-                    </div>
-                    <div className="summary-row">
-                      <span>Biaya Pengiriman</span>
-                      <span>Rp {Number(selectedOrder.shipping || 0).toLocaleString("id-ID")}</span>
                     </div>
                     <div className="summary-row total">
                       <strong>Total</strong>
@@ -261,6 +367,14 @@ export default function AdminOrdersPage() {
               </div>
             )}
           </aside>
+          <NoteModal
+            isOpen={isNoteModalOpen}
+            onClose={() => setIsNoteModalOpen(false)}
+            onConfirm={handleConfirmNote}
+            title={isEditingNoteOnly ? "Edit Catatan Pesanan" : "Catatan Untuk Pelanggan"}
+            initialNote={selectedOrder?.notes}
+            isLoading={loading}
+          />
         </div>
       </main>
     </div>

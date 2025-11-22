@@ -41,26 +41,26 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
         </label>
 
         <label>
-            <>
-              Status
-              <select
-                name="status"
-                value={formState.status}
-                onChange={handleInputChange}
-                disabled={!editingId}
-              >
-                <option value="TERSEDIA">TERSEDIA</option>
-                <option value="STOK_MENIPIS">STOK_MENIPIS</option>
-                <option value="STOK_HABIS">STOK_HABIS</option>
-                <option value="TIDAK_AKTIF">TIDAK_AKTIF</option>
-              </select>
-            </>
+          <>
+            Status
+            <select
+              name="status"
+              value={formState.status}
+              onChange={handleInputChange}
+              disabled={!editingId}
+            >
+              <option value="TERSEDIA">TERSEDIA</option>
+              <option value="STOK_MENIPIS">STOK_MENIPIS</option>
+              <option value="STOK_HABIS">STOK_HABIS</option>
+              <option value="TIDAK_AKTIF">TIDAK_AKTIF</option>
+            </select>
+          </>
         </label>
 
         <label>
           Deskripsi
           <textarea
-          className="desc"
+            className="desc"
             name="description"
             value={formState.description}
             onChange={handleInputChange}
@@ -83,6 +83,7 @@ const ProductForm = ({ editingId, formState, setFormState, onFilesChange, onSubm
           <input
             name="stock"
             type="number"
+            min="0"
             value={formState.stock}
             onChange={handleInputChange}
             required

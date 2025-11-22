@@ -1,131 +1,186 @@
 .company-values {
-  padding: 6rem 0;
-  background: linear-gradient(135deg, #f5f3f0 0%, #ebe8e3 100%);
   position: relative;
+  padding: 80px 20px;
+  padding-bottom: 0px;
+  background: rgb(255, 255, 255);
+  min-height: 1000px;
   overflow: hidden;
 }
 
-.company-values::before {
-  content: "";
+/* Added background text styling */
+.company-values-background-text {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 20% 80%, rgba(124, 179, 66, 0.06) 0%, transparent 50%);
-  z-index: 1;
-}
-
-.values-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  position: relative;
-  z-index: 2;
-}
-
-.values-title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #5a6c57;
-  text-align: center;
-  margin-bottom: 3rem;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.values-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2.5rem;
-  margin-bottom: 4rem;
-}
-
-.value-card {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 2.5rem;
-  border-radius: 25px;
-  text-align: center;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-top: 5px solid #7cb342;
-  position: relative;
-}
-
-.value-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-}
-
-.value-card:nth-child(1) {
-  border-top-color: #ff6b35;
-}
-
-.value-card:nth-child(2) {
-  border-top-color: #ffd23f;
-}
-
-.value-card:nth-child(3) {
-  border-top-color: #7cb342;
-}
-
-.value-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, #f8f6f3, #e8e6e1);
-  border-radius: 50%;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+  z-index: 1;
 }
 
-.icon-chat,
-.icon-quality,
-.icon-partnership {
-  font-size: 2.5rem;
+.company-values-background-text h2 {
+  font-size: clamp(5rem, 15vw, 12rem);
+  font-weight: 900;
+  color: rgb(245, 245, 245);
+  text-align: center;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-top: -200px;
 }
 
-.value-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #4a5647;
-  margin-bottom: 1rem;
+.values-background {
+  position: absolute;
+  top: 0;
+  padding-bottom: 200px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.dashed-lines {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.5;
+}
+
+.values-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.values-grid {
+  position: relative;
+  height: 1300px;
+}
+
+/* Scattered positioning for each card */
+.value-card {
+  position: absolute;
+  width: 280px;
+  padding: 30px 25px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.value-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Card positioning using CSS Grid positioning */
+.card-1 {
+  top: -40px;
+  left: -100px;
+  transform: rotate(-5deg);
+}
+
+.card-2 {
+  top: 90px;
+  right: -100px;
+  transform: rotate(3deg);
+}
+
+.card-3 {
+  top: 350px;
+  left: -70px;
+  transform: rotate(-8deg);
+}
+
+.card-4 {
+  top: 400px;
+  right: -100px;
+  transform: rotate(4deg);
+}
+
+.card-5 {
+  top: 700px;
+  left: -40px;
+  transform: rotate(-3deg);
+}
+
+.card-6 {
+  top: 800px;
+  right: -60px;
+  transform: rotate(5deg);
+}
+
+/* Colored sphere with icon on top of card */
+.value-sphere {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.value-number {
+  font-size: 24px;
+  font-weight: 300;
+  color: #999;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.value-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+  line-height: 1.3;
 }
 
 .value-description {
-  font-size: 1rem;
+  font-size: 14px;
+  color: #666;
   line-height: 1.6;
-  color: #5a6c57;
   margin: 0;
-}
-
-.company-footer {
-  text-align: center;
-  padding-top: 2rem;
-  border-top: 2px solid rgba(124, 179, 66, 0.2);
-}
-
-.company-footer p {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #5a6c57;
-  margin: 0;
-  letter-spacing: 1px;
 }
 
 @media (max-width: 768px) {
-  .values-title {
-    font-size: 2rem;
+  .company-values {
+    min-height: auto;
+    padding: 40px 20px;
+  }
+
+  .company-values-background-text h2 {
+    font-size: clamp(2rem, 10vw, 4rem);
   }
 
   .values-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    height: auto;
   }
 
   .value-card {
-    padding: 2rem;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100%;
+    margin-bottom: 30px;
+    transform: none !important;
+  }
+
+  .value-card:hover {
+    transform: translateY(-4px) scale(1.01) !important;
+  }
+
+  .dashed-lines {
+    display: none;
   }
 }

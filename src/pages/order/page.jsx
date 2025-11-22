@@ -96,9 +96,8 @@ export default function OrderPage() {
       .reduce((sum, item) => sum + item.price * item.qty, 0);
   }, [cart]);
 
-  const shipping = 5000;
   const discount = 0;
-  const total = Math.max(0, subtotal + shipping - discount);
+  const total = Math.max(0, subtotal - discount);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -318,24 +317,6 @@ export default function OrderPage() {
 
                 <hr className="section-sep" />
 
-                {/* Pengiriman */}
-                <section className="shipping">
-                  <h3>Metode Pengiriman</h3>
-                  <div className="shipping-card">
-                    <div>
-                      <strong>Tiba pada 7 Juni 2025</strong>
-                      <p className="muted">
-                        Biaya pengiriman dapat berubah, syarat & ketentuan berlaku
-                      </p>
-                    </div>
-                    <div className="ship-fee">
-                      Rp {shipping.toLocaleString("id-ID")}
-                    </div>
-                  </div>
-                </section>
-
-                <hr className="section-sep" />
-
                 {/* Pembayaran */}
                 <section className="payment">
                   <h3>Metode Pembayaran</h3>
@@ -379,7 +360,7 @@ export default function OrderPage() {
                   <li key={item.uniqueId || item.product_id} className="summary-item">
                     <div className="thumb">
                       <img
-                        src={item.image_url[0] || defaultImage}
+                        src={item.image_url?.[0] || defaultImage}
                         alt={item.name}
                         width={48}
                         height={48}
@@ -432,14 +413,6 @@ export default function OrderPage() {
               </ul>
 
               <div className="totals">
-                <div className="row">
-                  <span>Subtotal</span>
-                  <span>Rp {subtotal.toLocaleString("id-ID")}</span>
-                </div>
-                <div className="row">
-                  <span>Biaya Pengiriman</span>
-                  <span>Rp {shipping.toLocaleString("id-ID")}</span>
-                </div>
                 <div className="row total">
                   <strong>Total</strong>
                   <strong>Rp {total.toLocaleString("id-ID")}</strong>

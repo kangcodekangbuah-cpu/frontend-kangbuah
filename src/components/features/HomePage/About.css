@@ -1,99 +1,332 @@
+/* Modern layout with left text and right cards section */
 .about {
-  padding: 6rem 0;
-  background: linear-gradient(135deg, #f8f6f3 0%, #f0ede8 100%);
+  padding-bottom: 2rem;
+  background: white;
   position: relative;
   overflow: hidden;
 }
 
-.about::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
+.about-container {
+  max-width: 1400px;
   width: 100%;
-  height: 100%;
-  background-image: radial-gradient(circle at 20% 80%, rgba(124, 179, 66, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.05) 0%, transparent 50%);
-  z-index: 1;
+  margin: 0 auto;
+  position: relative;
 }
 
-.about-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  position: relative;
-  z-index: 2;
+/* Header section */
+.about-header {
+  text-align: left;
+  margin-bottom: 3rem;
 }
 
 .about-title {
   font-size: 2.5rem;
-  font-weight: bold;
-  color: #5a6c57;
-  text-align: center;
-  margin-bottom: 3rem;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  font-weight: 800;
+  color: #2d3d2d;
+  letter-spacing: -0.5px;
+  margin-bottom: -50px;
 }
 
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  align-items: center;
-}
-
-.about-images {
+/* Main layout - flexbox with text on left, cards on right */
+.about-main {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  gap: 4rem;
+  align-items: flex-start;
 }
 
-.image-card {
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+.about-text-section {
+  flex: 0 0 40%;
+  padding-right: 2rem;
 }
 
-.image-card:hover {
-  transform: translateY(-5px);
-}
-
-.image-card img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.about-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.about-description {
-  font-size: 1.1rem;
-  line-height: 1.7;
-  color: #4a5647;
+/* Single continuous paragraph styling */
+.company-description {
+  font-size: 1rem;
+  color: #5a6b5a;
+  line-height: 1.8;
   text-align: justify;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 1.5rem;
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  border-left: 4px solid #7cb342;
+}
+
+/* Cards section on the right */
+.about-cards-section {
+  flex: 1;
+  position: relative;
+  height: 550px;
+  min-width: 300px;
+}
+
+/* Changed from grid layout to absolute positioning for abstract/scattered layout */
+.benefits-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.benefit-card {
+  position: absolute;
+  padding: 2rem 1.5rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  min-height: 140px;
+  min-width: 140px;
+}
+
+.benefit-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Abstract positioning for each card with different rotations */
+.benefit-card:nth-child(1) {
+  top: 0;
+  left: 20%;
+  width: 140px;
+  transform: rotate(-5deg);
+}
+
+.benefit-card:nth-child(2) {
+  top: 80px;
+  left: 0;
+  width: 200px;
+  transform: rotate(3deg);
+}
+
+.benefit-card:nth-child(3) {
+  top: 280px;
+  left: 10%;
+  width: 160px;
+  transform: rotate(-8deg);
+}
+
+.benefit-card:nth-child(4) {
+  top: 0;
+  right: 0;
+  width: 180px;
+  transform: rotate(2deg);
+}
+
+.benefit-card:nth-child(5) {
+  bottom: 0;
+  right: 10%;
+  width: 200px;
+  transform: rotate(-3deg);
+}
+
+.card-large {
+  grid-column: unset;
+  min-height: 160px;
+  font-size: 1.3rem;
+}
+
+/* Card colors */
+.card-green {
+  background: linear-gradient(135deg, #7de07a 0%, #5bc956 100%);
+  color: white;
+}
+
+.card-orange {
+  background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+  color: white;
+}
+
+.card-pink {
+  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+  color: white;
+}
+
+.card-lime {
+  background: linear-gradient(135deg, #cddc39 0%, #9ccc65 100%);
+  color: white;
+  font-weight: 700;
+}
+
+.card-dark-green {
+  background: linear-gradient(135deg, #2d5016 0%, #1b7e20 100%);
+  color: white;
+}
+
+.card-text {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Decorative pills */
+.pills-container {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  width: 200px;
+  z-index: 10;
+}
+
+.pill {
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.pill:hover {
+  transform: scale(1.05);
+}
+
+.pill-blue {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 2px solid #1976d2;
+}
+
+.pill-green {
+  background: #e8f5e9;
+  color: #27ae60;
+  border: 2px solid #27ae60;
+}
+
+.pill-pink {
+  background: #fce4ec;
+  color: #c2185b;
+  border: 2px solid #c2185b;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .about-cards-section {
+    height: 500px;
+  }
+
+  .benefit-card:nth-child(1) {
+    width: 120px;
+    min-height: 120px;
+  }
+
+  .benefit-card:nth-child(2) {
+    width: 160px;
+  }
+
+  .benefit-card:nth-child(4) {
+    width: 150px;
+  }
+
+  .benefit-card:nth-child(5) {
+    width: 160px;
+  }
 }
 
 @media (max-width: 768px) {
-  .about-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  .about {
+    padding: 4rem 1.5rem;
   }
 
   .about-title {
     font-size: 2rem;
   }
 
-  .about-description {
-    font-size: 1rem;
-    padding: 1rem;
+  .about-main {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .about-text-section {
+    flex: 1;
+    padding-right: 0;
+  }
+
+  .company-title {
+    font-size: 1.5rem;
+  }
+
+  .company-description {
+    font-size: 0.95rem;
+  }
+
+  .about-cards-section {
+    height: 450px;
+  }
+
+  .benefit-card {
+    min-height: 120px;
+    padding: 1.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .pills-container {
+    top: -15px;
+    width: 180px;
+  }
+
+  .pill {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-title {
+    font-size: 1.5rem;
+  }
+
+  .company-title {
+    font-size: 1.2rem;
+  }
+
+  .company-description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .about-cards-section {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .benefits-grid {
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .benefit-card {
+    position: relative;
+    top: unset !important;
+    left: unset !important;
+    right: unset !important;
+    bottom: unset !important;
+    transform: none !important;
+    width: auto !important;
+    flex: 1 1 calc(50% - 0.5rem);
+    min-height: 100px;
+    font-size: 0.85rem;
+    padding: 1.2rem;
+  }
+
+  .pills-container {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .pill {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
   }
 }

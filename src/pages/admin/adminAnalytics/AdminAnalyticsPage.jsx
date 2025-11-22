@@ -15,137 +15,89 @@ import {
   Cell,
   Legend,
   Brush,
+  BarChart, Bar
 } from "recharts";
-import { format, parseISO, getDate, getMonth, getYear } from "date-fns";
 import "./AdminAnalyticsPage.css";
 import AdminHeader from "../../../components/features/Admin/AdminHeader";
+import apiClient from "../../../services/api";
 
 const GREEN = "#2ecc71";
-const CATEGORY_COLORS = ["#10B981", "#F59E0B", "#EF4444", "#6366F1", "#FBBF24"];
+const CATEGORY_COLORS = [
+  "#60A5FA", // biru muda
+  "#34D399", // hijau toska
+  "#FBBF24", // kuning lembut
+  "#F87171", // merah salmon
+  "#A78BFA", // ungu lembut
+  "#38BDF8", // cyan
+  "#F472B6"  // pink lembut
+];
 
 function currencyIDR(v) {
   if (v == null) return "Rp 0";
   return "Rp " + Number(v).toLocaleString("id-ID", { maximumFractionDigits: 0 });
 }
 
-export default function AdminAnalyticsPage({ fetchOrdersFromApi }) {
-  const [orders, setOrders] = useState([]);
+export default function AdminAnalyticsPage() {
+  const [summary, setSummary] = useState({});
+  const [trendData, setTrendData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [topCustomers, setTopCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [yearFilter, setYearFilter] = useState(new Date().getFullYear());
-  const [monthFilter, setMonthFilter] = useState(new Date().getMonth() + 1);
+  const [topProducts, setTopProducts] = useState([]);
+  const [statusDist, setStatusDist] = useState([]);
+  const [customerDistribution, setCustomerDistribution] = useState([]);
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
+    const loadData = async () => {
       try {
-        let data = [];
-        if (typeof fetchOrdersFromApi === "function") {
-          const res = await fetchOrdersFromApi();
-          data = Array.isArray(res) ? res : res?.data || [];
-        } else {
-          const stored = localStorage.getItem("orders");
-          data = stored ? JSON.parse(stored) : [];
+        setLoading(true);
+
+        const [summaryRes, trendRes, categoryRes, topCustRes, topProdRes, statusDistRes, ordersRes] = await Promise.all([
+          apiClient.get("/reports/summary"),
+          apiClient.get("/reports/trend"),
+          apiClient.get("/reports/category-distribution"),
+          apiClient.get("/reports/top-customers"),
+          apiClient.get("/reports/top-products"),
+          apiClient.get("/reports/status-distribution"),
+          apiClient.get("/reports/orders"),
+        ]);
+
+        // Pastikan semua ambil dari field .data.data
+        setSummary(summaryRes.data.data || {});
+        setTrendData(trendRes.data.data || []);
+        setCategoryData(categoryRes.data.data || []);
+        setTopCustomers(topCustRes.data.data || []);
+        setTopProducts(topProdRes.data.data || []);
+        setStatusDist(statusDistRes.data.data || []);
+        // hitung total order per kota
+        const orders = ordersRes.data.data || [];
+        const cityCount = {};
+        for (const order of orders) {
+          const city = order.delivery_city || "Tidak diketahui";
+          cityCount[city] = (cityCount[city] || 0) + 1;
         }
-        const normalized = data.map((o) => ({
-          ...o,
-          createdAt: o.createdAt || o.order_date || o.created_at || new Date().toISOString(),
-          total: Number(o.total || o.total_price || o.amount || 0),
+
+        const formatted = Object.entries(cityCount).map(([city, total_orders]) => ({
+          city,
+          total_orders,
         }));
-        setOrders(normalized);
+
+        setCustomerDistribution(formatted);
+
+        // Ambil jumlah total produk dari panjang array categoryData
+        const totalProducts = (categoryRes.data.data || []).length;
+
+        // Masukkan ke summary agar bisa ditampilkan di card
+        setSummary(prev => ({ ...prev, total_products: totalProducts }));
       } catch (err) {
-        console.error("Gagal load orders", err);
-        setOrders([]);
+        console.error("Gagal memuat data analytics:", err);
       } finally {
         setLoading(false);
       }
     };
-    load();
-  }, [fetchOrdersFromApi]);
 
-  const yearOptions = useMemo(() => {
-    const years = new Set(orders.map((o) => getYear(parseISO(o.createdAt))));
-    return Array.from(years).sort((a, b) => b - a);
-  }, [orders]);
-
-  const dailySeries = useMemo(() => {
-    const daysMap = {};
-    orders.forEach((o) => {
-      const d = parseISO(o.createdAt);
-      const y = getYear(d);
-      const m = getMonth(d) + 1;
-      if (y === Number(yearFilter) && m === Number(monthFilter)) {
-        const day = getDate(d);
-        daysMap[day] = (daysMap[day] || 0) + Number(o.total || 0);
-      }
-    });
-    const lastDay = new Date(yearFilter, monthFilter, 0).getDate();
-    return Array.from({ length: lastDay }, (_, i) => ({
-      date: String(i + 1),
-      revenue: daysMap[i + 1] || 0,
-    }));
-  }, [orders, yearFilter, monthFilter]);
-
-  const summary = useMemo(() => {
-    const totalRevenueAll = orders.reduce((s, o) => s + Number(o.total || 0), 0);
-    const todayStr = format(new Date(), "yyyy-MM-dd");
-    const revenueToday = orders
-      .filter((o) => format(parseISO(o.createdAt), "yyyy-MM-dd") === todayStr)
-      .reduce((s, o) => s + Number(o.total || 0), 0);
-
-    const productSet = new Set();
-    orders.forEach((o) => {
-      (o.order_details || o.items || []).forEach((it) => {
-        const pid = it.product?.id || it.id || it.product_id || `${it.name}`;
-        productSet.add(String(pid));
-      });
-    });
-
-    const custSet = new Set();
-    orders.forEach((o) => {
-      const u =
-        o.user?.username ||
-        o.user?.email ||
-        o.billing_email ||
-        o.delivery_pic_name;
-      if (u) custSet.add(String(u));
-    });
-
-    return {
-      totalRevenueAll,
-      revenueToday,
-      totalProducts: productSet.size,
-      totalCustomers: custSet.size,
-    };
-  }, [orders]);
-
-  const pieData = useMemo(() => {
-    const counts = {};
-    orders.forEach((o) => {
-      (o.order_details || o.items || []).forEach((it) => {
-        const cat = it.product?.category || it.category || "Lainnya";
-        const qty = Number(it.quantity || it.qty || 1);
-        counts[cat] = (counts[cat] || 0) + qty;
-      });
-    });
-    const total = Object.values(counts).reduce((s, v) => s + v, 0);
-    return Object.entries(counts).map(([k, v]) => ({
-      name: k,
-      value: v,
-      percent: total ? (v / total) * 100 : 0,
-    }));
-  }, [orders]);
-
-  const topCustomers = useMemo(() => {
-    const map = {};
-    orders.forEach((o) => {
-      const key =
-        o.user?.username || o.user?.email || o.billing_email || "Unknown";
-      map[key] = map[key] || { name: key, orders: 0, total: 0 };
-      map[key].orders += 1;
-      map[key].total += Number(o.total || 0);
-    });
-    return Object.values(map).sort((a, b) => b.orders - a.orders).slice(0, 5);
-  }, [orders]);
+    loadData();
+  }, []);
 
   if (loading) {
     return (
@@ -176,148 +128,201 @@ export default function AdminAnalyticsPage({ fetchOrdersFromApi }) {
           {/* Ringkasan angka */}
           <div className="summary-cards">
             <div className="card">
+              <small>Total Pesanan</small>
+              <h3>{summary.total_orders}</h3>
+              <div className="muted">Pesanan</div>
+            </div>
+
+            <div className="card">
               <small>Total Pemasukan</small>
-              <h3>{currencyIDR(summary.totalRevenueAll)}</h3>
-              <div className="muted">{orders.length} Pesanan</div>
+              <h3 style={{ color: "#27ae60" }}>{currencyIDR(summary.total_revenue)}</h3>
+              <div className="muted">Seluruh transaksi</div>
             </div>
 
             <div className="card">
-              <small>Revenue Hari ini</small>
-              <h3 style={{ color: "#27ae60" }}>
-                {currencyIDR(summary.revenueToday)}
-              </h3>
-              <div className="muted">
-                {
-                  orders.filter(
-                    (o) =>
-                      format(parseISO(o.createdAt), "yyyy-MM-dd") ===
-                      format(new Date(), "yyyy-MM-dd")
-                  ).length
-                }{" "}
-                Pesanan
-              </div>
+                <small>Jenis Produk</small>
+                <h3>{summary.total_products ?? 0}</h3>
+                <div className="muted">Dari semua kategori</div>
             </div>
-
-            <div className="card">
-              <small>Total Produk</small>
-              <h3>{summary.totalProducts}</h3>
-              <div className="muted">Dari semua kategori</div>
-            </div>
-
+            
             <div className="card">
               <small>Total Customer</small>
-              <h3>{summary.totalCustomers}</h3>
-              <div className="muted">customers</div>
+              <h3>{summary.total_customers}</h3>
+              <div className="muted">Customers</div>
             </div>
           </div>
 
-          {/* Chart */}
+          {/* Chart penjualan */}
           <div className="charts-grid">
             <div className="large-card">
-              <div className="card-header">
-                <h3>Total Pemasukan</h3>
-                <div className="filters">
-                  <select
-                    value={yearFilter}
-                    onChange={(e) => setYearFilter(Number(e.target.value))}
-                  >
-                    {yearOptions.length === 0 ? (
-                      <option value={new Date().getFullYear()}>
-                        {new Date().getFullYear()}
-                      </option>
-                    ) : (
-                      yearOptions.map((y) => (
-                        <option key={y} value={y}>
-                          {y}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                  <select
-                    value={monthFilter}
-                    onChange={(e) => setMonthFilter(Number(e.target.value))}
-                  >
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                      <option key={m} value={m}>
-                        {format(new Date(2000, m - 1, 1), "LLLL")}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="chart-area">
-                <ResponsiveContainer width="100%" height={260}>
-                  <AreaChart data={dailySeries}>
-                    <defs>
-                      <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                        <stop
-                          offset="5%"
-                          stopColor={GREEN}
-                          stopOpacity={0.2}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor={GREEN}
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis
-                      tickFormatter={(v) =>
-                        v ? `${(v / 1000).toFixed(0)}k` : "0"
-                      }
-                    />
-                    <Tooltip formatter={(value) => currencyIDR(value)} />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke={GREEN}
-                      fill="url(#colorRev)"
-                      strokeWidth={2}
-                    />
-                    <Brush
-                      dataKey="date"
-                      height={30}
-                      stroke={GREEN}
-                      travellerWidth={10}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+              <h3>Tren Penjualan</h3>
+              <ResponsiveContainer width="100%" height={260}>
+                <AreaChart data={trendData}>
+                  <defs>
+                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={GREEN} stopOpacity={0.2} />
+                      <stop offset="95%" stopColor={GREEN} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis
+                    tickFormatter={(v) => (v ? `${(v / 1000).toFixed(0)}k` : "0")}
+                  />
+                  <Tooltip formatter={(v) => currencyIDR(v)} />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke={GREEN}
+                    fill="url(#colorRev)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
 
+            {/* <div className="small-card">
+              <h3>Distribusi Kategori</h3>
+              <div style={{ width: "100%", height: 300 }}>
+                {Array.isArray(categoryData) && categoryData.length > 0 ? (
+                  <ResponsiveContainer>
+                    <PieChart>
+                      {(() => {
+                        // Urutkan dari total_sold terbesar
+                        const sortedData = [...categoryData].sort(
+                          (a, b) => b.total_sold - a.total_sold
+                        );
+
+                        // 5 kategori teratas
+                        const top5 = sortedData.slice(0, 5);
+
+                        // sisanya jadi "Lainnya"
+                        const othersTotal = sortedData
+                          .slice(5)
+                          .reduce((acc, curr) => acc + curr.total_sold, 0);
+
+                        const finalData =
+                          othersTotal > 0
+                            ? [...top5, { category: "Lainnya", total_sold: othersTotal }]
+                            : top5;
+
+                        return (
+                          <Pie
+                            data={finalData.map((c) => ({
+                              name: c.category,
+                              value: c.total_sold,
+                            }))}
+                            dataKey="value"
+                            nameKey="name"
+                            innerRadius={60}
+                            outerRadius={90}
+                            paddingAngle={2}
+                          >
+                            {finalData.map((_, i) => (
+                              <Cell
+                                key={i}
+                                fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                        );
+                      })()}
+                      <Tooltip
+                        formatter={(value, name) => [`${value} produk`, name]}
+                        contentStyle={{ fontSize: "13px" }}
+                      />
+                      <Legend
+                        layout="vertical"
+                        verticalAlign="middle"
+                        align="right"
+                        wrapperStyle={{
+                          fontSize: "13px",
+                          lineHeight: "20px",
+                          maxHeight: "230px",
+                          overflowY: "auto",
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="muted">Belum ada data kategori</p>
+                )}
+              </div>
+            </div> */}
             <div className="small-card">
-              <h3>Pembelian Per Kategori</h3>
-              <div style={{ width: "100%", height: 260 }}>
-                <ResponsiveContainer>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={2}
-                      label={(entry) =>
-                        `${entry.name}: ${entry.percent.toFixed(1)}%`
-                      }
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Legend verticalAlign="bottom" height={36} />
-                  </PieChart>
-                </ResponsiveContainer>
+              <h3>Top Products</h3>
+              <div style={{ width: "100%", height: 300 }}>
+                {topProducts.length > 0 ? (
+                  <ResponsiveContainer>
+                    <BarChart data={topProducts}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="product_name" />
+                      <YAxis />
+                      <Tooltip formatter={(v) => `${v} terjual`} />
+                      <Bar dataKey="total_sold" radius={[6, 6, 0, 0]}>
+                        {topProducts.map((_, i) => (
+                          <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="muted">Belum ada data produk</p>
+                )}
               </div>
             </div>
           </div>
+
+          <div className="charts-grid">
+            <div className="large-card">
+              <h3>Distribusi Pesanan per Kota</h3>
+              {customerDistribution.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={customerDistribution}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="city" />
+                    <YAxis />
+                    <Tooltip formatter={(v) => `${v} pesanan`} />
+                    <Bar dataKey="total_orders" fill="#88d8ecff" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="muted">Belum ada data pesanan per kota</p>
+              )}
+            </div>
+            
+            <div className="small-card">
+              <h3>Status Pesanan</h3>
+              <ResponsiveContainer width="100%" height={260}>
+                <PieChart>
+                  <Pie
+                    data={statusDist.map((s) => ({ name: s.status, value: s.count }))}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={30}
+                    outerRadius={90}
+                    label={false} 
+                  >
+                    {statusDist.map((_, i) => (
+                      <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v) => `${v} pesanan`} />
+                  <Legend
+                    layout="vertical"
+                    verticalAlign="middle"
+                    align="right"
+                    wrapperStyle={{
+                      fontSize: "10px",
+                      lineHeight: "17px",
+                      paddingLeft: "10px",
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
 
           {/* Top Customers */}
           <div className="card full-width top-customers">
@@ -326,18 +331,17 @@ export default function AdminAnalyticsPage({ fetchOrdersFromApi }) {
               <thead>
                 <tr>
                   <th>Customer</th>
-                  <th>Jumlah Pesanan</th>
                   <th>Total Pembelian</th>
                 </tr>
               </thead>
               <tbody>
                 {topCustomers.length === 0 ? (
                   <tr>
-                    <td colSpan="3">Belum ada data</td>
+                    <td colSpan="2">Belum ada data</td>
                   </tr>
                 ) : (
                   topCustomers.map((c, i) => (
-                    <tr key={c.name}>
+                    <tr key={i}>
                       <td className="cust-name">
                         <span
                           className="dot"
@@ -346,10 +350,9 @@ export default function AdminAnalyticsPage({ fetchOrdersFromApi }) {
                               CATEGORY_COLORS[i % CATEGORY_COLORS.length],
                           }}
                         />
-                        {c.name}
+                        {c.customer}
                       </td>
-                      <td>{c.orders}</td>
-                      <td>{currencyIDR(c.total)}</td>
+                      <td>{currencyIDR(c.total_spent)}</td>
                     </tr>
                   ))
                 )}
