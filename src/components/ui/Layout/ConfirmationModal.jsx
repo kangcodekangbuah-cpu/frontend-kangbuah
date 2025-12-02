@@ -15,9 +15,8 @@ const ConfirmationModal = ({
     return null;
   }
 
-  const confirmButtonClass = `btn ${
-    confirmVariant === 'danger' ? 'btn-danger' : 'btn-primary'
-  }`;
+  const confirmButtonClass = `btn ${confirmVariant === 'danger' ? 'btn-danger' : 'btn-primary'
+    }`;
 
   const handleContentClick = (e) => {
     e.stopPropagation();
@@ -33,7 +32,8 @@ const ConfirmationModal = ({
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -43,14 +43,19 @@ const ConfirmationModal = ({
           }
 
           .modal-content-confirm {
-            background: #ffffff;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15); 
+            border-radius: 16px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             width: 90%;
             max-width: 450px;
             overflow: hidden;
             transform: scale(0.9);
             animation: modalZoomIn 0.3s forwards;
+            color: #333;
           }
 
           .modal-header-confirm {
@@ -58,7 +63,6 @@ const ConfirmationModal = ({
             justify-content: space-between;
             align-items: center;
             padding: 16px 24px;
-            border-bottom: 1px solid #e9ecef;
           }
 
           .modal-header-confirm h3 {
@@ -94,8 +98,6 @@ const ConfirmationModal = ({
             justify-content: flex-end;
             gap: 12px;
             padding: 16px 24px;
-            background-color: #f8f9fa;
-            border-top: 1px solid #e9ecef;
           }
 
           /* Animations */
@@ -141,27 +143,27 @@ const ConfirmationModal = ({
           }
 
           .modal-footer-confirm .btn-danger {
-            background-color: #dc3545;
+            background-color: #ffa733;
             color: white;
           }
           .modal-footer-confirm .btn-danger:hover:not(:disabled) {
-            background-color: #c82333;
+            background-color: #ff8c00;
           }
 
           .modal-footer-confirm .btn-primary {
-            background-color: #007bff;
+            background-color: #7de07a
             color: white;
           }
           .modal-footer-confirm .btn-primary:hover:not(:disabled) {
-            background-color: #0069d9;
+            background-color: #27ae60;
           }
         `}
       </style>
 
       <div className="modal-overlay" onClick={onClose}>
-        
+
         <div className="modal-content-confirm" onClick={handleContentClick}>
-          
+
           <div className="modal-header-confirm">
             <h3>{title}</h3>
             <button onClick={onClose} className="modal-close-btn-confirm" disabled={isLoading}>

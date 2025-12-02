@@ -25,7 +25,7 @@ export default function Services() {
   ]
 
   return (
-    <section className="services">
+    <section className="services" id="service">
       <div className="services-background">
         <div className="organic-shape shape-1"></div>
         <div className="organic-shape shape-2"></div>

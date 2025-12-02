@@ -205,128 +205,140 @@
 
 /* Responsive design */
 @media (max-width: 1024px) {
-  .about-cards-section {
-    height: 500px;
-  }
-
-  .benefit-card:nth-child(1) {
-    width: 120px;
-    min-height: 120px;
-  }
-
-  .benefit-card:nth-child(2) {
-    width: 160px;
-  }
-
-  .benefit-card:nth-child(4) {
-    width: 150px;
-  }
-
-  .benefit-card:nth-child(5) {
-    width: 160px;
-  }
-}
-
-@media (max-width: 768px) {
   .about {
-    padding: 4rem 1.5rem;
+    padding: 4rem 2rem;
+  }
+
+  .about-header {
+    text-align: center;
+    margin-bottom: 2rem;
   }
 
   .about-title {
-    font-size: 2rem;
+    margin-bottom: 0;
   }
 
+  /* Ubah layout utama jadi vertikal (Teks Atas, Kartu Bawah) */
   .about-main {
     flex-direction: column;
-    gap: 2rem;
+    align-items: center;
+    gap: 3rem;
   }
 
   .about-text-section {
-    flex: 1;
+    flex: none;
+    width: 100%;
     padding-right: 0;
-  }
-
-  .company-title {
-    font-size: 1.5rem;
+    text-align: center;
   }
 
   .company-description {
-    font-size: 0.95rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center; /* Opsional: justify atau center */
   }
 
+  /* Reset container kartu agar tingginya otomatis mengikuti isi */
   .about-cards-section {
-    height: 450px;
+    width: 100%;
+    height: auto; /* Hapus height fix 550px */
+    min-height: auto;
+    margin-top: 1rem;
   }
 
-  .benefit-card {
-    min-height: 120px;
-    padding: 1.5rem 1rem;
-    font-size: 0.9rem;
+  /* Ubah Grid Kartu jadi Flexbox Rapi */
+  .benefits-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    position: relative;
+    width: 100%;
+    height: auto;
   }
 
+  /* Matikan posisi absolute (scattered) dan rotasi */
+  .benefit-card, 
+  .benefit-card:nth-child(n) { /* nth-child(n) untuk override spesifitas CSS sebelumnya */
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    
+    /* Ukuran kartu di tablet */
+    width: auto !important;
+    min-width: 160px;
+    flex: 0 1 calc(33.333% - 1.5rem); /* 3 Kolom */
+    margin: 0;
+    min-height: 140px;
+  }
+
+  /* Efek hover tetap ada tapi vertikal saja */
+  .benefit-card:hover {
+    transform: translateY(-8px) !important;
+  }
+
+  /* Reset Pills (Kapsul) ke posisi tengah atas */
   .pills-container {
-    top: -15px;
-    width: 180px;
-  }
-
-  .pill {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.85rem;
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 3rem; /* Jarak antara pills dan kartu */
   }
 }
 
+/* Mobile Besar (Max 768px) */
+@media (max-width: 768px) {
+  .about {
+    padding: 3rem 1.5rem;
+  }
+
+  .benefit-card, 
+  .benefit-card:nth-child(n) {
+    /* Ubah jadi 2 Kolom */
+    flex: 0 1 calc(50% - 1rem); 
+    min-height: 120px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Mobile Kecil (Max 480px) */
 @media (max-width: 480px) {
-  .about-title {
-    font-size: 1.5rem;
-  }
-
   .company-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
-
+  
   .company-description {
     font-size: 0.9rem;
-    line-height: 1.6;
-  }
-
-  .about-cards-section {
-    height: auto;
-    display: flex;
-    flex-direction: column;
+    text-align: justify; /* Lebih rapi di layar kecil */
   }
 
   .benefits-grid {
-    position: relative;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
     gap: 1rem;
   }
 
-  .benefit-card {
-    position: relative;
-    top: unset !important;
-    left: unset !important;
-    right: unset !important;
-    bottom: unset !important;
-    transform: none !important;
-    width: auto !important;
-    flex: 1 1 calc(50% - 0.5rem);
-    min-height: 100px;
+  .benefit-card, 
+  .benefit-card:nth-child(n) {
+    /* Tetap 2 kolom tapi lebih rapat, atau bisa 1 kolom jika mau */
+    flex: 1 1 calc(50% - 0.5rem); 
+    padding: 1rem;
     font-size: 0.85rem;
-    padding: 1.2rem;
   }
 
   .pills-container {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
   }
-
+  
   .pill {
     padding: 0.5rem 1rem;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
 }

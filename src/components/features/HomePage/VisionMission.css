@@ -22,7 +22,11 @@
   right: 5rem;
   width: 16rem;
   height: 16rem;
-  background: linear-gradient(to bottom right, rgb(236, 241, 235) 0%, transparent 100%);
+  background: linear-gradient(
+    to bottom right,
+    rgb(236, 241, 235) 0%,
+    transparent 100%
+  );
   border-radius: 9999px;
   filter: blur(96px);
 }
@@ -33,7 +37,11 @@
   left: 5rem;
   width: 18rem;
   height: 18rem;
-  background: linear-gradient(to top left, rgb(253, 232, 207) 0%, transparent 100%);
+  background: linear-gradient(
+    to top left,
+    rgb(253, 232, 207) 0%,
+    transparent 100%
+  );
   border-radius: 9999px;
   filter: blur(96px);
 }
@@ -180,7 +188,11 @@
   display: flex;
   justify-content: center;
   margin-bottom: 1rem;
-  background: linear-gradient(to bottom right, rgb(236, 241, 235) 0%, rgb(240, 253, 244) 100%);
+  background: linear-gradient(
+    to bottom right,
+    rgb(236, 241, 235) 0%,
+    rgb(240, 253, 244) 100%
+  );
   border-radius: 9999px;
   padding: 1rem;
   width: fit-content;
@@ -238,89 +250,85 @@
 /* Responsive: Tablet */
 @media (max-width: 1024px) {
   .vision-mission-section {
-    padding: 4rem 1rem;
+    padding: 4rem 2rem;
   }
 
+  /* Reset margin negatif pada judul agar tidak nabrak */
   .vision-section {
     margin-bottom: 3rem;
   }
 
-  .vision-mission-background-text h2 {
-    font-size: clamp(3rem, 12vw, 7rem);
+  .vision-mission-container {
+    min-height: auto;
+    display: block; /* Ubah layout */
   }
 
+  .vision-mission-background-text h2 {
+    font-size: 5rem;
+    opacity: 0.5;
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  /* UBAH GRID MENJADI 2 KOLOM YANG RAPI */
   .vision-mission-grid {
-    grid-template-columns: repeat(3, 1fr);
-    min-height: 450px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 Kolom */
+    grid-template-rows: auto; /* Tinggi otomatis */
+    gap: 5rem;
+    min-height: auto;
+  }
+
+  /* PENTING: RESET POSISI ABSOLUT DARI DESKTOP */
+  .vision-mission-card-wrapper,
+  .vision-mission-card-wrapper.top-left,
+  .vision-mission-card-wrapper.top-right,
+  .vision-mission-card-wrapper.bottom-left,
+  .vision-mission-card-wrapper.bottom-center,
+  .vision-mission-card-wrapper.bottom-right {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    align-self: stretch !important;
+    justify-self: center !important;
+    width: 100%;
   }
 
   .mission-card-inner {
-    max-width: 200px;
-    padding: 1.25rem;
+    max-width: 100%; /* Kartu memenuhi kolom */
+    height: 100%;
+    padding: 1.5rem 1rem 0rem 1rem;
   }
 }
 
-/* Responsive: Mobile */
+/* MOBILE (Max 768px) */
 @media (max-width: 768px) {
   .vision-mission-section {
-    padding: 3rem 1rem;
+    padding: 3rem 1.5rem;
   }
 
   .vision-section-text {
-    font-size: 1.25rem;
-  }
-
-  .vision-mission-container {
-    min-height: 500px;
+    font-size: 1rem;
   }
 
   .vision-mission-background-text h2 {
-    font-size: clamp(2rem, 10vw, 4rem);
+    font-size: 4rem;
+    margin-bottom: 1rem;
   }
 
+  /* UBAH GRID MENJADI 1 KOLOM KE BAWAH */
   .vision-mission-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    min-height: 400px;
-  }
-
-  .mission-card-inner {
-    max-width: 160px;
-    padding: 1rem;
-  }
-
-  .mission-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  .mission-title {
-    font-size: 0.8rem;
-  }
-
-  .mission-description {
-    font-size: 0.7rem;
-  }
-
-  .vision-mission-decorative-top {
-    width: 12rem;
-    height: 12rem;
-  }
-
-  .vision-mission-decorative-bottom {
-    width: 14rem;
-    height: 14rem;
-  }
-}
-
-/* Responsive: Small Mobile */
-@media (max-width: 640px) {
-  .vision-mission-grid {
-    grid-template-columns: 1fr;
-    min-height: auto;
+    grid-template-columns: 1fr; /* 1 Kolom */
+    gap: 5rem;
   }
 
   .mission-card-inner {
     max-width: 100%;
+    padding: 1.5rem 1rem 0rem 1rem;
+  }
+
+  .mission-card-inner:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: scale(1.0);
+    z-index: 20;
   }
 }

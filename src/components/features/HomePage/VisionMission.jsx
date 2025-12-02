@@ -35,7 +35,7 @@ export default function VisionMission() {
   ]
 
   return (
-    <section className="vision-mission-section">
+    <section className="vision-mission-section" id="vision">
       <div className="vision-mission-decorative">
         <div className="vision-mission-decorative-top"></div>
         <div className="vision-mission-decorative-bottom"></div>

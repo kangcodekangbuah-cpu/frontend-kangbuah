@@ -69,6 +69,7 @@
   background-color: white;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.8);
+  box-sizing: border-box;
 }
 
 .value-card:hover {
@@ -152,35 +153,63 @@
   margin: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .company-values {
     min-height: auto;
+    padding-bottom: 4rem;
+    height: auto;
+  }
+
+  .company-values-background-text h2 {
+    font-size: 6rem; /* Kecilkan background text */
+    margin-top: 0rem;
+  }
+
+  .values-grid {
+    height: auto; /* Reset tinggi fix */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 Kolom */
+    gap: 4rem 2rem; /* Gap vertikal besar untuk icon bulat */
+    padding-top: 2rem;
+  }
+
+  /* Reset Total Posisi Kartu */
+  .value-card {
+    position: relative !important; /* Timpa absolute */
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100%; /* Full width container */
+    transform: none !important; /* Hapus rotasi */
+    margin: 0;
+  }
+
+  /* Efek hover disederhanakan */
+  .value-card:hover {
+    transform: translateY(-5px) !important;
+  }
+}
+
+/* MOBILE (Max 768px) */
+/* Ubah menjadi 1 KOLOM */
+@media (max-width: 768px) {
+  .company-values {
     padding: 40px 20px;
   }
 
   .company-values-background-text h2 {
-    font-size: clamp(2rem, 10vw, 4rem);
+    font-size: 3rem; /* Kecilkan background text */
+    margin-top: 3rem;
   }
 
   .values-grid {
-    height: auto;
+    grid-template-columns: 1fr; /* 1 Kolom */
+    gap: 4rem; /* Jarak antar kartu */
   }
 
   .value-card {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
     width: 100%;
-    margin-bottom: 30px;
-    transform: none !important;
-  }
-
-  .value-card:hover {
-    transform: translateY(-4px) scale(1.01) !important;
-  }
-
-  .dashed-lines {
-    display: none;
+    margin-bottom: 10px;
   }
 }
