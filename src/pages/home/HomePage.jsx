@@ -9,6 +9,7 @@ import Services from "../../components/features/HomePage/Services"
 import ClientExperience from "../../components/features/HomePage/ClientExperience"
 import Advantages from "../../components/features/HomePage/Advantages"
 import MarketSegments from "../../components/features/HomePage/MarketSegments"
+import Footer from "../../components/ui/Layout/Footer";
 import ChatWidget from "../../components/features/chat/ChatWidget"
 import { useEffect } from "react"
 import { toast } from "react-toastify"
@@ -34,6 +35,7 @@ export default function HomePage() {
       <ClientExperience />
       <Advantages />
       <MarketSegments />
+      <Footer />
       {isLoggedIn && userRole !== 'ADMIN' && <ChatWidget />}
     </div>
   )

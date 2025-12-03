@@ -116,3 +116,104 @@
   font-size: 0.9rem;
   word-break: break-all;
 }
+
+/* ===========================
+   RESPONSIVE PAYMENT PAGE
+   =========================== */
+
+/* Tablet */
+@media (max-width: 992px) {
+  .payment-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .order-summary {
+    position: relative;
+    margin-top: 1rem;
+  }
+
+  .preview-image {
+    width: 18rem;
+    height: auto;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+  .payment-header .container {
+    padding: 1rem 0 0.25rem;
+  }
+
+  .payment-back-btn {
+    font-size: 1rem;
+  }
+
+  .payment-grid {
+    display: block;
+  }
+
+  .method-box {
+    padding: 0.8rem;
+  }
+
+  .qris-image {
+    max-width: 140px;
+  }
+
+  .upload-placeholder {
+    padding: 0.8rem;
+  }
+
+  .preview-image {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+  }
+
+  .order-summary {
+    margin-top: 2rem;
+    padding: 1rem;
+  }
+
+  .summary-item {
+    display: grid;
+    grid-template-columns: 42px 1fr auto;
+    gap: 0.5rem;
+  }
+
+  .summary-item .thumb img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .confirm-btn {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .payment-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .qris-image {
+    max-width: 120px;
+  }
+
+  .preview-image {
+    max-width: 260px;
+  }
+
+  .summary-item {
+    grid-template-columns: 38px 1fr auto;
+  }
+
+  .summary-item .thumb img {
+    width: 38px;
+    height: 38px;
+  }
+}

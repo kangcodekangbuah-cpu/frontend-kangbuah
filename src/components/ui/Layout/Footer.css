@@ -1,85 +1,210 @@
 .catalog-footer {
-  background: #2c5530;
-  color: white;
-  padding: 3rem 0 1rem;
+  background: linear-gradient(135deg, #0f2818 0%, #1a3a2e 100%);
+  color: #f5f5f5;
+  padding: 4rem 0 2rem;
   margin-top: 4rem;
+  font-family: "Poppins", sans-serif;
+  border-top: 1px solid rgba(168, 224, 124, 0.15);
 }
 
+/* ======================== LAYOUT ======================== */
 .footer-content {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 2rem;
-  margin-bottom: 2rem;
+  grid-template-columns: 2.5fr 1.3fr 1.2fr;
+  gap: 3.5rem;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 1rem;
+  margin: auto;
+  padding: 0 2rem;
 }
 
-.footer-section .logo-ans {
-  font-size: 2rem;
-  font-weight: bold;
-  background: linear-gradient(45deg, #ff6b35, #f7931e, #ffd23f, #7cb342);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-decoration: none;
-  display: inline-block;
-  margin-bottom: 1rem;
+/* ======================== SECTION STYLING ======================== */
+.footer-section {
+  display: flex;
+  flex-direction: column;
 }
 
 .footer-section h4 {
-  margin-bottom: 1rem;
-  color: #8bc34a;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #a8e07c;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 0.75rem;
+}
+
+.footer-section h4::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #a8e07c 0%, rgba(168, 224, 124, 0) 100%);
+}
+
+/* ======================== BRAND SECTION ======================== */
+.footer-brand {
+  justify-content: flex-start;
+}
+
+.footer-logo {
+  margin-bottom: 1.5rem;
+}
+
+.footer-logo img {
+  width: 85px;
+  height: auto;
+  transition: transform 0.3s ease;
+  filter: brightness(1.1);
+}
+
+.footer-logo a:hover img {
+  transform: scale(1.08);
 }
 
 .footer-description {
-  color: #ccc;
-  line-height: 1.6;
+  color: #c5c5c5;
+  line-height: 1.8;
+  font-size: 0.9rem;
+  letter-spacing: 0.3px;
 }
 
+/* ======================== CONTACT SECTION ======================== */
 .footer-links {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
-.footer-links li {
-  margin-bottom: 0.5rem;
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.footer-links a {
-  color: #ccc;
+.contact-icon {
+  color: #a8e07c;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.contact-item:hover .contact-icon {
+  transform: scale(1.15);
+}
+
+.contact-item a {
+  color: #d8d8d8;
   text-decoration: none;
-  transition: color 0.3s ease;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
-.footer-links a:hover {
-  color: #8bc34a;
+.contact-item a:hover {
+  color: #a8e07c;
+  padding-left: 0.5rem;
+}
+
+/* ======================== LOCATION SECTION ======================== */
+.location-icon {
+  color: #a8e07c;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.footer-location {
+  color: #c5c5c5;
+  line-height: 1.8;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* ======================== DIVIDER & BOTTOM ======================== */
+.footer-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(168, 224, 124, 0) 0%,
+    rgba(168, 224, 124, 0.3) 50%,
+    rgba(168, 224, 124, 0) 100%
+  );
+  margin: 2.5rem 2rem;
 }
 
 .footer-bottom {
-  border-top: 1px solid #444;
-  padding-top: 1rem;
   text-align: center;
-  color: #999;
+  padding: 1.5rem 2rem 0;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  margin: auto;
+  font-size: 0.85rem;
+  color: #888;
+  letter-spacing: 0.5px;
 }
 
-/* Responsive Footer */
-@media (max-width: 768px) {
+/* ======================== RESPONSIVE ======================== */
+
+/* Tablet - 2 kolom */
+@media (max-width: 900px) {
   .footer-content {
-    grid-template-columns: 1fr 1fr; /* Jadi 2 kolom di tablet */
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer-logo img {
+    width: 75px;
   }
 }
 
-@media (max-width: 480px) {
+/* Mobile - 1 kolom */
+@media (max-width: 600px) {
+  .catalog-footer {
+    padding: 3rem 0 1.5rem;
+  }
+
   .footer-content {
-    grid-template-columns: 1fr; /* Jadi 1 kolom di mobile */
-    text-align: center;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 0 1.5rem;
+  }
+
+  .contact-item {
+    justify-content: flex-start;
+  }
+
+  .footer-section h4::after {
+    width: 30px;
+  }
+
+  .footer-location {
+    justify-content: flex-start;
+  }
+
+  .footer-divider {
+    margin: 2rem 1.5rem;
+  }
+
+  .footer-bottom {
+    padding: 1rem 1.5rem 0;
+  }
+
+  .footer-logo img {
+    width: 70px;
+  }
+
+  .footer-description,
+  .footer-location {
+    font-size: 0.85rem;
   }
 }

@@ -43,7 +43,7 @@ const ProductCard = ({
           <span className={`stock-badge ${stockClass}`}>{stockText}</span>
         </div>
 
-        <button className="product-detail-btn">Detail</button>
+        {/* <button className="product-detail-btn">Detail</button> */}
 
         {showAddtoCart && (
           <>

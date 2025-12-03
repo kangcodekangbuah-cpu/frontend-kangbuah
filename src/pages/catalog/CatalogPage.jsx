@@ -234,7 +234,7 @@ const updateQuantity = (uniqueId, change) => {
                 </div>
             </main>
 
-            <Footer />
+            {/* <Footer /> */}
             <ChatWidget />
         </div>
     );

@@ -47,7 +47,7 @@ export default function LoginPage() {
         }, 1500);
       } else {
         setTimeout(() => {
-          navigate("/");
+          navigate("/catalog");
         }, 1500);
       }
     } catch (err) {

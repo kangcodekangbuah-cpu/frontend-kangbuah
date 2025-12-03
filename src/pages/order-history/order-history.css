@@ -444,3 +444,107 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* ===========================
+   RESPONSIVE IMPROVEMENTS
+   =========================== */
+
+/* --- Tablet & Mobile (<992px) --- */
+@media (max-width: 992px) {
+  .order-history-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .order-details {
+    max-height: none;
+    padding: 1.2rem;
+  }
+
+  .orders-list {
+    padding: 1.2rem;
+  }
+}
+
+/* --- Mobile (<768px) --- */
+@media (max-width: 768px) {
+  .order-history-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .order-item {
+    padding: 0.85rem;
+  }
+
+  .order-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .status-badge {
+    align-self: flex-start;
+    font-size: 0.68rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .item-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item-price {
+    width: 100%;
+    text-align: left;
+    margin-top: 4px;
+  }
+
+  .item-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .bukti-section {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.8rem !important;
+  }
+
+  .bukti-preview {
+    width: 55px;
+    height: 55px;
+  }
+
+  .btn-upload-ulang,
+  .bayar-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .payment-summary {
+    padding: 0.75rem;
+  }
+}
+
+/* --- Small Mobile (<480px) --- */
+@media (max-width: 480px) {
+  .order-history-main {
+    padding: 1.2rem 0;
+  }
+
+  .order-item {
+    padding: 0.75rem;
+  }
+
+  .order-details h2 {
+    font-size: 1.1rem;
+  }
+
+  .detail-section h3 {
+    font-size: 0.85rem;
+  }
+
+  .item-name {
+    font-size: 0.9rem;
+  }
+}
