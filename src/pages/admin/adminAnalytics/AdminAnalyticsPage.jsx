@@ -15,7 +15,8 @@ import {
   Cell,
   Legend,
   Brush,
-  BarChart, Bar
+  BarChart,
+  Bar,
 } from "recharts";
 import "./AdminAnalyticsPage.css";
 import AdminHeader from "../../../components/features/Admin/AdminHeader";
@@ -29,12 +30,14 @@ const CATEGORY_COLORS = [
   "#F87171", // merah salmon
   "#A78BFA", // ungu lembut
   "#38BDF8", // cyan
-  "#F472B6"  // pink lembut
+  "#F472B6", // pink lembut
 ];
 
 function currencyIDR(v) {
   if (v == null) return "Rp 0";
-  return "Rp " + Number(v).toLocaleString("id-ID", { maximumFractionDigits: 0 });
+  return (
+    "Rp " + Number(v).toLocaleString("id-ID", { maximumFractionDigits: 0 })
+  );
 }
 
 export default function AdminAnalyticsPage() {
@@ -52,7 +55,15 @@ export default function AdminAnalyticsPage() {
       try {
         setLoading(true);
 
-        const [summaryRes, trendRes, categoryRes, topCustRes, topProdRes, statusDistRes, ordersRes] = await Promise.all([
+        const [
+          summaryRes,
+          trendRes,
+          categoryRes,
+          topCustRes,
+          topProdRes,
+          statusDistRes,
+          ordersRes,
+        ] = await Promise.all([
           apiClient.get("/reports/summary"),
           apiClient.get("/reports/trend"),
           apiClient.get("/reports/category-distribution"),
@@ -77,10 +88,12 @@ export default function AdminAnalyticsPage() {
           cityCount[city] = (cityCount[city] || 0) + 1;
         }
 
-        const formatted = Object.entries(cityCount).map(([city, total_orders]) => ({
-          city,
-          total_orders,
-        }));
+        const formatted = Object.entries(cityCount).map(
+          ([city, total_orders]) => ({
+            city,
+            total_orders,
+          })
+        );
 
         setCustomerDistribution(formatted);
 
@@ -88,7 +101,7 @@ export default function AdminAnalyticsPage() {
         const totalProducts = (categoryRes.data.data || []).length;
 
         // Masukkan ke summary agar bisa ditampilkan di card
-        setSummary(prev => ({ ...prev, total_products: totalProducts }));
+        setSummary((prev) => ({ ...prev, total_products: totalProducts }));
       } catch (err) {
         console.error("Gagal memuat data analytics:", err);
       } finally {
@@ -135,16 +148,18 @@ export default function AdminAnalyticsPage() {
 
             <div className="card">
               <small>Total Pemasukan</small>
-              <h3 style={{ color: "#27ae60" }}>{currencyIDR(summary.total_revenue)}</h3>
+              <h3 style={{ color: "#27ae60" }}>
+                {currencyIDR(summary.total_revenue)}
+              </h3>
               <div className="muted">Seluruh transaksi</div>
             </div>
 
             <div className="card">
-                <small>Jenis Produk</small>
-                <h3>{summary.total_products ?? 0}</h3>
-                <div className="muted">Dari semua kategori</div>
+              <small>Jenis Produk</small>
+              <h3>{summary.total_products ?? 0}</h3>
+              <div className="muted">Dari semua kategori</div>
             </div>
-            
+
             <div className="card">
               <small>Total Customer</small>
               <h3>{summary.total_customers}</h3>
@@ -167,7 +182,9 @@ export default function AdminAnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis
-                    tickFormatter={(v) => (v ? `${(v / 1000).toFixed(0)}k` : "0")}
+                    tickFormatter={(v) =>
+                      v ? `${(v / 1000).toFixed(0)}k` : "0"
+                    }
                   />
                   <Tooltip formatter={(v) => currencyIDR(v)} />
                   <Area
@@ -261,7 +278,10 @@ export default function AdminAnalyticsPage() {
                       <Tooltip formatter={(v) => `${v} terjual`} />
                       <Bar dataKey="total_sold" radius={[6, 6, 0, 0]}>
                         {topProducts.map((_, i) => (
-                          <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
+                          <Cell
+                            key={i}
+                            fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]}
+                          />
                         ))}
                       </Bar>
                     </BarChart>
@@ -283,28 +303,38 @@ export default function AdminAnalyticsPage() {
                     <XAxis dataKey="city" />
                     <YAxis />
                     <Tooltip formatter={(v) => `${v} pesanan`} />
-                    <Bar dataKey="total_orders" fill="#88d8ecff" radius={[6, 6, 0, 0]} />
+                    <Bar
+                      dataKey="total_orders"
+                      fill="#88d8ecff"
+                      radius={[6, 6, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
                 <p className="muted">Belum ada data pesanan per kota</p>
               )}
             </div>
-            
+
             <div className="small-card">
               <h3>Status Pesanan</h3>
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
                   <Pie
-                    data={statusDist.map((s) => ({ name: s.status, value: s.count }))}
+                    data={statusDist.map((s) => ({
+                      name: s.status,
+                      value: s.count,
+                    }))}
                     dataKey="value"
                     nameKey="name"
                     innerRadius={30}
                     outerRadius={90}
-                    label={false} 
+                    label={false}
                   >
                     {statusDist.map((_, i) => (
-                      <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
+                      <Cell
+                        key={i}
+                        fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip formatter={(v) => `${v} pesanan`} />
@@ -322,7 +352,6 @@ export default function AdminAnalyticsPage() {
               </ResponsiveContainer>
             </div>
           </div>
-
 
           {/* Top Customers */}
           <div className="card full-width top-customers">
@@ -358,6 +387,14 @@ export default function AdminAnalyticsPage() {
                 )}
               </tbody>
             </table>
+          </div>
+          {/* Insights Section */}
+          <div className="card insights-card">
+            <h3>Insights & Saran</h3>
+            <textarea
+              placeholder="Tuliskan insight atau saran berdasarkan data analytics di atas..."
+              className="insight-textarea"
+            ></textarea>
           </div>
         </div>
       </div>

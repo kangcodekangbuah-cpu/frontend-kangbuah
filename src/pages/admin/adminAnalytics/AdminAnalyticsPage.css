@@ -145,3 +145,37 @@
 .recharts-tooltip-item-name {
   color: #065f46;
 }
+
+/* Insight Section */
+.insights-card {
+  margin-top: 22px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(34, 197, 94, 0.05), 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.insights-card h3 {
+  margin-bottom: 12px;
+  color: #0b6a3b;
+}
+
+.insight-textarea {
+  width: 100%;
+  min-height: 130px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  resize: vertical;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  color: #374151;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.insight-textarea:focus {
+  border-color: #34d399;
+  background: #ffffff;
+}
