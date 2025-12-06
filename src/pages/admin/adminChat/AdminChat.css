@@ -79,7 +79,7 @@
 
 /* Layout */
 .chat-main {
-  padding: 20px 0 40px;
+  padding: 6rem 0 0 0;
 }
 .chat-layout {
   display: grid;

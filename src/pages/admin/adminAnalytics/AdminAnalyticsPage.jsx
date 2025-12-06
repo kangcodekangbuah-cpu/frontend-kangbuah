@@ -49,6 +49,7 @@ export default function AdminAnalyticsPage() {
   const [topProducts, setTopProducts] = useState([]);
   const [statusDist, setStatusDist] = useState([]);
   const [customerDistribution, setCustomerDistribution] = useState([]);
+  const [interpretation, setInterpretation] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -63,6 +64,7 @@ export default function AdminAnalyticsPage() {
           topProdRes,
           statusDistRes,
           ordersRes,
+          interpretationRes,
         ] = await Promise.all([
           apiClient.get("/reports/summary"),
           apiClient.get("/reports/trend"),
@@ -71,6 +73,7 @@ export default function AdminAnalyticsPage() {
           apiClient.get("/reports/top-products"),
           apiClient.get("/reports/status-distribution"),
           apiClient.get("/reports/orders"),
+          apiClient.get("/reports/summary-full"),
         ]);
 
         // Pastikan semua ambil dari field .data.data
@@ -80,6 +83,9 @@ export default function AdminAnalyticsPage() {
         setTopCustomers(topCustRes.data.data || []);
         setTopProducts(topProdRes.data.data || []);
         setStatusDist(statusDistRes.data.data || []);
+
+        setInterpretation(interpretationRes.data.data?.interpretation || "Data tidak tersedia.");
+
         // hitung total order per kota
         const orders = ordersRes.data.data || [];
         const cityCount = {};
@@ -111,6 +117,18 @@ export default function AdminAnalyticsPage() {
 
     loadData();
   }, []);
+
+  const renderFormattedText = (text) => {
+    if (!text) return "Memuat data...";
+    const parts = text.split('**');
+
+    return parts.map((part, index) => {
+      if (index % 2 === 1) {
+        return <strong key={index}>{part}</strong>;
+      }
+      return part;
+    });
+  };
 
   if (loading) {
     return (
@@ -198,74 +216,6 @@ export default function AdminAnalyticsPage() {
               </ResponsiveContainer>
             </div>
 
-            {/* <div className="small-card">
-              <h3>Distribusi Kategori</h3>
-              <div style={{ width: "100%", height: 300 }}>
-                {Array.isArray(categoryData) && categoryData.length > 0 ? (
-                  <ResponsiveContainer>
-                    <PieChart>
-                      {(() => {
-                        // Urutkan dari total_sold terbesar
-                        const sortedData = [...categoryData].sort(
-                          (a, b) => b.total_sold - a.total_sold
-                        );
-
-                        // 5 kategori teratas
-                        const top5 = sortedData.slice(0, 5);
-
-                        // sisanya jadi "Lainnya"
-                        const othersTotal = sortedData
-                          .slice(5)
-                          .reduce((acc, curr) => acc + curr.total_sold, 0);
-
-                        const finalData =
-                          othersTotal > 0
-                            ? [...top5, { category: "Lainnya", total_sold: othersTotal }]
-                            : top5;
-
-                        return (
-                          <Pie
-                            data={finalData.map((c) => ({
-                              name: c.category,
-                              value: c.total_sold,
-                            }))}
-                            dataKey="value"
-                            nameKey="name"
-                            innerRadius={60}
-                            outerRadius={90}
-                            paddingAngle={2}
-                          >
-                            {finalData.map((_, i) => (
-                              <Cell
-                                key={i}
-                                fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]}
-                              />
-                            ))}
-                          </Pie>
-                        );
-                      })()}
-                      <Tooltip
-                        formatter={(value, name) => [`${value} produk`, name]}
-                        contentStyle={{ fontSize: "13px" }}
-                      />
-                      <Legend
-                        layout="vertical"
-                        verticalAlign="middle"
-                        align="right"
-                        wrapperStyle={{
-                          fontSize: "13px",
-                          lineHeight: "20px",
-                          maxHeight: "230px",
-                          overflowY: "auto",
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p className="muted">Belum ada data kategori</p>
-                )}
-              </div>
-            </div> */}
             <div className="small-card">
               <h3>Top Products</h3>
               <div style={{ width: "100%", height: 300 }}>
@@ -273,7 +223,15 @@ export default function AdminAnalyticsPage() {
                   <ResponsiveContainer>
                     <BarChart data={topProducts}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="product_name" />
+                      <XAxis
+                        dataKey="product_name"
+                        interval={0}
+                        tick={{ fontSize: 11 }}
+                        tickFormatter={(value) => {
+                          const limit = 10;
+                          return value.length > limit ? `${value.substring(0, limit)}...` : value;
+                        }}
+                      />
                       <YAxis />
                       <Tooltip formatter={(v) => `${v} terjual`} />
                       <Bar dataKey="total_sold" radius={[6, 6, 0, 0]}>
@@ -390,11 +348,22 @@ export default function AdminAnalyticsPage() {
           </div>
           {/* Insights Section */}
           <div className="card insights-card">
-            <h3>Insights & Saran</h3>
-            <textarea
-              placeholder="Tuliskan insight atau saran berdasarkan data analytics di atas..."
-              className="insight-textarea"
-            ></textarea>
+            <h3>Rangkuman</h3>
+            <div
+              className="insight-content"
+              style={{
+                whiteSpace: "pre-wrap",
+                lineHeight: "1.6",
+                color: "#333",
+                backgroundColor: "#f9fafb",
+                padding: "15px",
+                borderRadius: "8px",
+                border: "1px solid #e5e7eb",
+                fontSize: "14px"
+              }}
+            >
+              {renderFormattedText(interpretation)}
+            </div>
           </div>
         </div>
       </div>

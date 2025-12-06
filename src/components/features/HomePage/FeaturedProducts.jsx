@@ -3,11 +3,14 @@ import { Link } from "react-router-dom";
 import apiClient from "../../../services/api";
 import ProductCard from "../../ui/Product/ProductCard";
 import "./FeaturedProducts.css";
+import { useAuthStore } from "../../../store/authStore";
 
 const FeaturedProducts = () => {
   const [featuredItems, setFeaturedItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const role = useAuthStore((state) => state.user?.role);
+  const catalogLink = role === 'ADMIN' ? "/admin/catalog" : "/catalog";
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
@@ -67,7 +70,7 @@ const FeaturedProducts = () => {
           ))}
         </div>
         <div className="featured-footer">
-          <Link to="/catalog" className="btn-view-all">
+          <Link to={catalogLink} className="btn-view-all">
             Lihat Semua Produk
           </Link>
         </div>
