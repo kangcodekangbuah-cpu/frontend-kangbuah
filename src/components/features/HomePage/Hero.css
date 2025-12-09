@@ -34,18 +34,21 @@
 }
 
 .btn-login {
-  border: 1px solid white;
-  background: transparent;
-  color: white;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
+  border: 2px solid white;
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 0.6rem 1.3rem;
+  border-radius: 90px;
   cursor: pointer;
+  letter-spacing: 0.025rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   transition: 0.3s;
 }
 
 .btn-login:hover {
-  background: white;
-  color: #27ae60;
+  background: rgb(244, 170, 32);
+  color: #ffffff;
 }
 
 .hero-title,
