@@ -25,7 +25,7 @@ export default function Navbar({ isLoggedIn, onLogout }) {
 
         <div className="nav-links-left">
           <a href="#home" className="nav-link">Beranda</a>
-          <a href="#service" className="nav-link">Layanan</a>
+          <a href="#vision" className="nav-link">Visi & Misi</a>
         </div>
 
         <div className="nav-logo">
@@ -35,8 +35,8 @@ export default function Navbar({ isLoggedIn, onLogout }) {
         </div>
 
         <div className="nav-links-right">
-          <a href="#vision" className="nav-link">Visi & Misi</a>
-          <a href="#contact" className="nav-link">Kontak</a>
+          <a href="#service" className="nav-link">Layanan</a>
+          <a href="#kontak" className="nav-link">Kontak</a>
         </div>
 
         {/* --- MOBILE: HAMBURGER BUTTON --- */}
@@ -47,9 +47,9 @@ export default function Navbar({ isLoggedIn, onLogout }) {
       {/* --- MOBILE OVERLAY MENU (Hanya muncul di HP/Tablet) --- */}
       <div className={`mobile-menu ${isMenuOpen ? "active" : ""}`}>
           <a href="#home" className="mobile-link" onClick={handleLinkClick}>Beranda</a>
-          <a href="#about" className="mobile-link" onClick={handleLinkClick}>Layanan</a>
+          <a href="#service" className="mobile-link" onClick={handleLinkClick}>Layanan</a>
           <a href="#vision" className="mobile-link" onClick={handleLinkClick}>Visi & Misi</a>
-          <a href="#contact" className="mobile-link" onClick={handleLinkClick}>Kontak</a>
+          <a href="#kontak" className="mobile-link" onClick={handleLinkClick}>Kontak</a>
 
           {isLoggedIn && (
              <button className="mobile-link" onClick={handleLogoutClick} style={{background:'none', border:'none', cursor:'pointer', color:'red'}}>

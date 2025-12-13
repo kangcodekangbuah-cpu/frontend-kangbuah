@@ -3,7 +3,7 @@ import { useAuthStore } from '../store/authStore';
 import { toast } from 'react-toastify';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'https://backend-kangbuah-production.up.railway.app',
   withCredentials: true,
 });
 

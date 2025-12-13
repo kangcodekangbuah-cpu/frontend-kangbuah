@@ -76,8 +76,6 @@ export default function VisionMission() {
                     {/* Description */}
                     <p className="mission-description">{item.description}</p>
 
-                    {/* Read More link */}
-                    <button className="mission-button">READ MORE</button>
                   </div>
                 </div>
               )

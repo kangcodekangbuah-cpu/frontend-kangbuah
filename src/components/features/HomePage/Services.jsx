@@ -13,9 +13,9 @@ export default function Services() {
       description: "Pengiriman cepat dan terpercaya di area Jabodetabek",
     },
     {
-      title: "Sistem Pemesanan Fleksibel Melalui WA",
+      title: "Sistem Pemesanan Fleksibel",
       icon: "📱",
-      description: "Pemesanan mudah melalui WhatsApp dengan sistem yang fleksibel",
+      description: "Pemesanan mudah dan fleksibel melalui sistem Website atau WhatsApp tertera",
     },
     {
       title: "Layanan Konsultasi Kebutuhan Pasokan Harian/Bulanan",

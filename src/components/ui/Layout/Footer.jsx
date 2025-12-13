@@ -4,7 +4,7 @@ import LogoANS from "../../../assets/KangCode_Kang_Buah__1_-removebg-preview.png
 
 const Footer = () => {
   return (
-    <footer className="catalog-footer">
+    <footer className="catalog-footer" id="kontak">
       <div className="container">
 
         <div className="footer-content">
