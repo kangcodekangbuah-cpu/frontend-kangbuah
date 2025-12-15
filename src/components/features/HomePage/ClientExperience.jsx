@@ -1,13 +1,19 @@
 import "./ClientExperience.css"
+import marketImg from "../../../assets/market.jpg"
+import packingImg from "../../../assets/packing.jpeg"
+import trukImg from "../../../assets/truk.jpeg"
+import sayuranImg from "../../../assets/sayuran.jpg"
+import pasarImg from "../../../assets/pasar-sayur.jpg"
+import distroImg from "../../../assets/distro.jpeg"
 
 export default function ClientExperience() {
   const clientImages = [
-    { src: "src/assets/market.jpg", alt: "Fresh vegetables" },
-    { src: "src/assets/packing.jpeg", alt: "Warehouse operations" },
-    { src: "src/assets/truk.jpeg", alt: "Delivery truck" },
-    { src: "src/assets/sayuran.jpg", alt: "PT Puncak Lembah Hijau" },
-    { src: "src/assets/pasar-sayur.jpg", alt: "PT Melati Agro Prima" },
-    { src: "src/assets/distro.jpeg", alt: "Distribution center" },
+    { src: marketImg, alt: "Fresh vegetables" },
+    { src: packingImg, alt: "Warehouse operations" },
+    { src: trukImg, alt: "Delivery truck" },
+    { src: sayuranImg, alt: "PT Puncak Lembah Hijau" },
+    { src: pasarImg, alt: "PT Melati Agro Prima" },
+    { src: distroImg, alt: "Distribution center" },
   ]
 
   return (
